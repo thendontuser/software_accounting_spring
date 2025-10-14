@@ -22,7 +22,7 @@ public class Developer {
     @Column(name = "location")
     private String location;
 
-    @OneToMany(mappedBy = "software", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "developer", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Software> software = new ArrayList<>();
 
     public Developer() {

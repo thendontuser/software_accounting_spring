@@ -15,7 +15,7 @@ public class License {
     @Column(name = "l_type")
     private String type;
 
-    @OneToMany
+    @ManyToOne
     @JoinColumn(name = "software_id")
     private Software software;
 
@@ -26,13 +26,13 @@ public class License {
     private LocalDate dateEnd;
 
     @Column(name = "price")
-    private Long price;
+    private Integer price;
 
     public License() {
 
     }
 
-    public License(Long id, String type, Software software, LocalDate dateBegin, LocalDate dateEnd, Long price) {
+    public License(Long id, String type, Software software, LocalDate dateBegin, LocalDate dateEnd, Integer price) {
         this.id = id;
         this.type = type;
         this.software = software;
@@ -61,7 +61,7 @@ public class License {
         this.dateEnd = dateEnd;
     }
 
-    public void setPrice(Long price) {
+    public void setPrice(Integer price) {
         this.price = price;
     }
 
@@ -85,7 +85,7 @@ public class License {
         return dateEnd;
     }
 
-    public Long getPrice() {
+    public Integer getPrice() {
         return price;
     }
 }

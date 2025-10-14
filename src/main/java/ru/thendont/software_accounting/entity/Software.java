@@ -27,6 +27,9 @@ public class Software {
     private String logoPath;
 
     @OneToMany(mappedBy = "software", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<License> licenses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "software", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<InstallationRequest> requests = new ArrayList<>();
 
     @OneToMany(mappedBy = "software", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -90,5 +93,9 @@ public class Software {
 
     public List<SoftwareInstallation> getInstallations() {
         return installations;
+    }
+
+    public List<License> getLicenses() {
+        return licenses;
     }
 }

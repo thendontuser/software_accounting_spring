@@ -35,10 +35,10 @@ public class User {
     @JoinColumn(name = "dep_number")
     private Department department;
 
-    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<InstallationRequest> requests = new ArrayList<>();
 
-    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<SoftwareInstallation> installations = new ArrayList<>();
 
     public User() {
