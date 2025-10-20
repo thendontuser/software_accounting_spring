@@ -14,7 +14,7 @@
 
     body {
         font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: #f8f9fa;
         min-height: 100vh;
         display: flex;
         align-items: center;
@@ -23,33 +23,16 @@
     }
 
     .glass-container {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
+        background: white;
         border-radius: 24px;
         padding: 60px 50px;
         width: 100%;
         max-width: 480px;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow:
+            0 10px 30px rgba(0, 0, 0, 0.08),
+            0 1px 3px rgba(0, 0, 0, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.8);
         position: relative;
-        overflow: hidden;
-    }
-
-    .glass-container::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
-        transform: rotate(45deg);
-        animation: shine 6s infinite;
-    }
-
-    @keyframes shine {
-        0% { transform: rotate(45deg) translateX(-100%); }
-        100% { transform: rotate(45deg) translateX(100%); }
     }
 
     .logo-section {
@@ -66,7 +49,7 @@
         align-items: center;
         justify-content: center;
         margin: 0 auto 20px;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
     }
 
     .logo-icon i {
@@ -77,14 +60,12 @@
     .logo-section h1 {
         font-size: 28px;
         font-weight: 700;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        color: #2d3748;
         margin-bottom: 8px;
     }
 
     .logo-section p {
-        color: #666;
+        color: #718096;
         font-size: 16px;
         font-weight: 400;
     }
@@ -107,24 +88,25 @@
     .form-input {
         width: 100%;
         padding: 18px 20px 18px 55px;
-        border: 2px solid #e8ecf4;
+        border: 2px solid #edf2f7;
         border-radius: 16px;
         font-size: 16px;
-        background: rgba(255, 255, 255, 0.8);
+        background: #fafbfc;
         transition: all 0.3s ease;
         font-weight: 500;
+        color: #2d3748;
     }
 
     .form-input:focus {
         outline: none;
         border-color: #667eea;
         background: white;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
-        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
     }
 
     .form-input::placeholder {
-        color: #a0a3bd;
+        color: #a0aec0;
         font-weight: 400;
     }
 
@@ -157,44 +139,27 @@
         cursor: pointer;
         transition: all 0.3s ease;
         margin-top: 10px;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn-login::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-        transition: left 0.5s;
-    }
-
-    .btn-login:hover::before {
-        left: 100%;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
     }
 
     .btn-login:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(102, 126, 234, 0.3);
     }
 
     .btn-login:active {
-        transform: translateY(-1px);
+        transform: translateY(0);
     }
 
     .register-section {
         text-align: center;
         margin-top: 30px;
         padding-top: 25px;
-        border-top: 1px solid rgba(232, 236, 244, 0.8);
+        border-top: 1px solid #edf2f7;
     }
 
     .register-section p {
-        color: #666;
+        color: #718096;
         margin-bottom: 15px;
         font-size: 14px;
     }
@@ -217,12 +182,12 @@
     .btn-register:hover {
         background: #667eea;
         color: white;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
     }
 
     .error-message {
-        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        background: linear-gradient(135deg, #fc8181, #f56565);
         color: white;
         padding: 15px 20px;
         border-radius: 12px;
@@ -231,7 +196,7 @@
         font-weight: 500;
         display: none;
         animation: slideDown 0.3s ease;
-        box-shadow: 0 5px 20px rgba(255, 107, 107, 0.3);
+        box-shadow: 0 5px 15px rgba(245, 101, 101, 0.2);
     }
 
     @keyframes slideDown {
@@ -250,7 +215,7 @@
         justify-content: space-between;
         margin-top: 25px;
         font-size: 12px;
-        color: #a0a3bd;
+        color: #a0aec0;
     }
 
     .feature {
@@ -279,6 +244,32 @@
             padding: 16px 20px 16px 50px;
         }
     }
+
+    /* Стиль для поля с ошибкой */
+    .input-error {
+        border-color: #f56565 !important;
+        background: #fef5f5 !important;
+    }
+
+    .input-error:focus {
+        border-color: #f56565 !important;
+        box-shadow: 0 5px 20px rgba(245, 101, 101, 0.1) !important;
+    }
+
+    /* Стиль для сообщения об ошибке под полем */
+    .field-error {
+        display: none;
+        color: #f56565;
+        font-size: 12px;
+        margin-top: 5px;
+        margin-left: 5px;
+        font-weight: 500;
+        animation: slideDown 0.3s ease;
+    }
+
+    .field-error i {
+        margin-right: 5px;
+    }
   </style>
 </head>
 <body>
@@ -291,19 +282,24 @@
     <p>Войдите в систему управления</p>
   </div>
 
+  <div th:if="${error}" class="error-message" style="display: block;">
+    <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+  </div>
+
   <div id="errorMessage" class="error-message" th:if="${param.error}">
     <i class="fas fa-exclamation-circle"></i> Неправильный логин или пароль
   </div>
 
-  <form th:action="@{/auth/login}" method="post" id="loginForm">
+  <form th:action="@{/auth/login}" th:object="${user}" method="post" id="loginForm">
     <div class="input-group">
       <div class="input-icon">
         <i class="fas fa-user"></i>
       </div>
       <input
+              th:field="*{login}"
               type="text"
               class="form-input"
-              name="username"
+              name="login"
               placeholder="Введите ваш логин"
               required
       >
@@ -314,6 +310,7 @@
         <i class="fas fa-lock"></i>
       </div>
       <input
+              th:field="*{password}"
               type="password"
               class="form-input"
               id="password"
