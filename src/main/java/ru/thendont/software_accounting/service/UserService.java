@@ -21,7 +21,7 @@ public class UserService {
         }
     }
 
-    public static Optional<User> isAuthorise(User user, List<User> users, UserRepository userRepository) {
+    public static Optional<User> isAuthorise(User user, UserRepository userRepository) {
         User userFromDB = userRepository.findByLogin(user.getLogin()).orElse(null);
         if (userFromDB != null) {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();

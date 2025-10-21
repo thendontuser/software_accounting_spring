@@ -9,8 +9,6 @@ import ru.thendont.software_accounting.repository.DepartmentRepository;
 import ru.thendont.software_accounting.repository.UserRepository;
 import ru.thendont.software_accounting.service.UserService;
 
-import java.util.List;
-
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
@@ -31,7 +29,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public String showLoginPage(@ModelAttribute User user, Model model) {
-        User u = UserService.isAuthorise(user, (List<User>) userRepository.findAll(), userRepository).orElse(null);
+        User u = UserService.isAuthorise(user, userRepository).orElse(null);
         if (u == null) {
             model.addAttribute("error", "Неверный логин или пароль");
             return "sign-in";
