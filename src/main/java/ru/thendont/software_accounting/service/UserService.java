@@ -4,7 +4,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.repository.UserRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 public class UserService {
@@ -30,5 +29,22 @@ public class UserService {
             }
         }
         return Optional.empty();
+    }
+
+    public static String getPageFromRole(String role) {
+        switch (role) {
+            case "ADMIN":
+                return "admin-page";
+            case "IT":
+                return "it-page";
+            case "ACCOUNTANT":
+                return "accountant-page";
+            case "MANAGER":
+                return "manager-page";
+            case "TEACHER":
+                return "redirect:/teacher/dashboard";
+            default:
+                return "";
+        }
     }
 }

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель сотрудника - Учет ПО</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon i {
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text h1 {
+            font-size: 20px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 2rem 1.5rem;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: #4a5568;
+            text-decoration: none;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 28px;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        /* Search and Filters */
+        .search-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Software Grid */
+        .software-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .software-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+        }
+
+        .software-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .software-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1rem;
+        }
+
+        .software-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+
+        .software-info h3 {
+            font-size: 16px;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .software-info .version {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .software-description {
+            font-size: 14px;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .software-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #718096;
+            margin-bottom: 1rem;
+        }
+
+        .btn-request {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-request:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Requests Section */
+        .requests-section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .request-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .request-info h4 {
+            font-size: 14px;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+
+        .request-info .date {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status.pending { background: #fffaf0; color: #d69e2e; }
+        .status.approved { background: #f0fff4; color: #38a169; }
+        .status.rejected { background: #fff5f5; color: #e53e3e; }
+        .status.completed { background: #ebf8ff; color: #3182ce; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+    <div class="logo">
+        <div class="logo-icon">
+            <i class="fas fa-laptop-code"></i>
+        </div>
+        <div class="logo-text">
+            <h1>Учет ПО</h1>
+            <p>Панель сотрудника</p>
+        </div>
+    </div>
+    <div class="user-info">
+        <div class="user-avatar">
+            ИИ
+        </div>
+        <div>
+            <div style="font-weight: 600; color: #2d3748;">Иванов Иван</div>
+            <div style="font-size: 12px; color: #718096;">Преподаватель</div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="nav-section">
+            <div class="nav-title">Основное</div>
+            <a href="#" class="nav-item active">
+                <i class="fas fa-th-large"></i>
+                <span>Доступное ПО</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-plus-circle"></i>
+                <span>Подать заявку</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Мои заявки</div>
+            <a href="#" class="nav-item">
+                <i class="fas fa-clock"></i>
+                <span>В обработке (2)</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-check-circle"></i>
+                <span>Утвержденные (5)</span>
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-history"></i>
+                <span>История заявок</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Аккаунт</div>
+            <a href="#" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Профиль</span>
+            </a>
+            <a href="/auth/logout" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Выйти</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">Доступное программное обеспечение</h1>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="Поиск программного обеспечения...">
+                <button class="btn-primary">
+                    <i class="fas fa-search"></i> Поиск
+                </button>
+            </div>
+        </div>
+
+        <!-- Software Grid -->
+        <div class="software-grid">
+            <!-- Card 1 -->
+            <div class="software-card">
+                <div class="software-header">
+                    <div class="software-icon">
+                        <i class="fab fa-microsoft"></i>
+                    </div>
+                    <div class="software-info">
+                        <h3>Microsoft Office 2021</h3>
+                        <div class="version">Версия 16.0</div>
+                    </div>
+                </div>
+                <div class="software-description">
+                    Полный пакет офисных приложений для работы с документами, таблицами и презентациями.
+                </div>
+                <div class="software-meta">
+                    <span>Лицензия: Академическая</span>
+                </div>
+                <button class="btn-request" onclick="openRequestModal('Microsoft Office 2021')">
+                    <i class="fas fa-plus"></i> Подать заявку
+                </button>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="software-card">
+                <div class="software-header">
+                    <div class="software-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <div class="software-info">
+                        <h3>IntelliJ IDEA</h3>
+                        <div class="version">Версия 2023.3</div>
+                    </div>
+                </div>
+                <div class="software-description">
+                    Интегрированная среда разработки для Java и других языков программирования.
+                </div>
+                <div class="software-meta">
+                    <span>Лицензия: Образовательная</span>
+                </div>
+                <button class="btn-request" onclick="openRequestModal('IntelliJ IDEA')">
+                    <i class="fas fa-plus"></i> Подать заявку
+                </button>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="software-card">
+                <div class="software-header">
+                    <div class="software-icon">
+                        <i class="fab fa-adobe"></i>
+                    </div>
+                    <div class="software-info">
+                        <h3>Adobe Photoshop</h3>
+                        <div class="version">Версия CC 2024</div>
+                    </div>
+                </div>
+                <div class="software-description">
+                    Профессиональный графический редактор для работы с растровой графикой.
+                </div>
+                <div class="software-meta">
+                    <span>Лицензия: Подписка</span>
+                </div>
+                <button class="btn-request" onclick="openRequestModal('Adobe Photoshop')">
+                    <i class="fas fa-plus"></i> Подать заявку
+                </button>
+            </div>
+        </div>
+
+        <!-- My Requests Section -->
+        <div class="requests-section">
+            <h2 class="section-title">Мои последние заявки</h2>
+
+            <div class="request-item">
+                <div class="request-info">
+                    <h4>Visual Studio Code</h4>
+                    <div class="date">Подана: 15.01.2024</div>
+                </div>
+                <div class="status pending">В обработке</div>
+            </div>
+
+            <div class="request-item">
+                <div class="request-info">
+                    <h4>MATLAB R2023b</h4>
+                    <div class="date">Подана: 10.01.2024</div>
+                </div>
+                <div class="status approved">Утверждена</div>
+            </div>
+
+            <div class="request-item">
+                <div class="request-info">
+                    <h4>AutoCAD 2024</h4>
+                    <div class="date">Подана: 05.01.2024</div>
+                </div>
+                <div class="status completed">Установлено</div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Request Modal -->
+<div id="requestModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Подача заявки на установку</h2>
+            <button class="close-modal" onclick="closeRequestModal()">&times;</button>
+        </div>
+        <form id="requestForm">
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Программное обеспечение</label>
+                <input type="text" id="modalSoftwareName" readonly style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px; background: #f7fafc;">
+            </div>
+            <div style="margin-bottom: 1rem;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Устройство для установки</label>
+                <select style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px;">
+                    <option>Компьютер 101 (каб. 301)</option>
+                    <option>Компьютер 102 (каб. 301)</option>
+                    <option>Ноутбук преподавателя</option>
+                </select>
+            </div>
+            <button type="button" class="btn-primary" style="width: 100%;" onclick="submitRequest()">
+                <i class="fas fa-paper-plane"></i> Отправить заявку
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openRequestModal(softwareName) {
+        document.getElementById('modalSoftwareName').value = softwareName;
+        document.getElementById('requestModal').style.display = 'block';
+    }
+
+    function closeRequestModal() {
+        document.getElementById('requestModal').style.display = 'none';
+    }
+
+    function submitRequest() {
+        const softwareName = document.getElementById('modalSoftwareName').value;
+        alert(`Заявка на установку "${softwareName}" отправлена!`);
+        closeRequestModal();
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('requestModal');
+        if (event.target === modal) {
+            closeRequestModal();
+        }
+    }
+</script>
+</body>
+</html>

@@ -34,7 +34,7 @@ public class AuthController {
             model.addAttribute("error", "Неверный логин или пароль");
             return "sign-in";
         }
-        return "sign-in";
+        return UserService.getPageFromRole(u.getRole());
     }
 
     @GetMapping("/register")
@@ -55,6 +55,6 @@ public class AuthController {
         UserService.processDepartment(user);
         UserService.hashPassword(user);
         userRepository.save(user);
-        return "sign-in";
+        return UserService.getPageFromRole(user.getRole());
     }
 }
