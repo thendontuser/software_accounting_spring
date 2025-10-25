@@ -3,6 +3,7 @@ package ru.thendont.software_accounting.service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.repository.UserRepository;
+import ru.thendont.software_accounting.util.UserRoles;
 
 import java.util.Optional;
 
@@ -15,7 +16,7 @@ public class UserService {
     }
 
     public static void processDepartment(User user) {
-        if (!user.getRole().equals("MANAGER") && !user.getRole().equals("TEACHER")) {
+        if (!user.getRole().equals(UserRoles.MANAGER) && !user.getRole().equals(UserRoles.TEACHER)) {
             user.setDepartment(null);
         }
     }
@@ -29,22 +30,5 @@ public class UserService {
             }
         }
         return Optional.empty();
-    }
-
-    public static String getPageFromRole(String role) {
-        switch (role) {
-            case "ADMIN":
-                return "admin-page";
-            case "IT":
-                return "it-page";
-            case "ACCOUNTANT":
-                return "accountant-page";
-            case "MANAGER":
-                return "manager-page";
-            case "TEACHER":
-                return "redirect:/teacher/dashboard";
-            default:
-                return "";
-        }
     }
 }

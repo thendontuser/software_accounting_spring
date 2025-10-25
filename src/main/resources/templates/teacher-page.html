@@ -373,11 +373,11 @@
     </div>
     <div class="user-info">
         <div class="user-avatar">
-            ИИ
+            <span th:text="${#strings.substring(user.lastName, 0, 1) + #strings.substring(user.firstName, 0, 1)}">НП</span>
         </div>
         <div>
-            <div style="font-weight: 600; color: #2d3748;">Иванов Иван</div>
-            <div style="font-size: 12px; color: #718096;">Преподаватель</div>
+            <div style="font-weight: 600; color: #2d3748;" th:text="${user.lastName + ' ' + user.firstName + ' ' + user.patronymic}"> Неизвестный пользователь</div>
+            <div style="font-size: 12px; color: #718096;" th:text="${user.department.title}"></div>
         </div>
     </div>
 </header>
@@ -387,11 +387,11 @@
     <nav class="sidebar">
         <div class="nav-section">
             <div class="nav-title">Основное</div>
-            <a href="#" class="nav-item active">
+            <a th:href="@{/teacher/dashboard}" class="nav-item active">
                 <i class="fas fa-th-large"></i>
                 <span>Доступное ПО</span>
             </a>
-            <a href="#" class="nav-item">
+            <a href="#" class="nav-item" onclick="openRequestModal('', 1)">
                 <i class="fas fa-plus-circle"></i>
                 <span>Подать заявку</span>
             </a>
@@ -399,27 +399,23 @@
 
         <div class="nav-section">
             <div class="nav-title">Мои заявки</div>
-            <a href="#" class="nav-item">
+            <div class="nav-item" style="cursor: default;">
                 <i class="fas fa-clock"></i>
-                <span>В обработке (2)</span>
-            </a>
-            <a href="#" class="nav-item">
+                <span>В обработке
+            <span th:text="${#lists.size(user.requests.?[status == T(ru.thendont.software_accounting.util.InstallationRequestsStatus).PENDING])}">2</span>
+        </span>
+            </div>
+            <div class="nav-item" style="cursor: default;">
                 <i class="fas fa-check-circle"></i>
-                <span>Утвержденные (5)</span>
-            </a>
-            <a href="#" class="nav-item">
-                <i class="fas fa-history"></i>
-                <span>История заявок</span>
-            </a>
+                <span>Утвержденные
+            <span th:text="${#lists.size(user.requests.?[status == T(ru.thendont.software_accounting.util.InstallationRequestsStatus).APPROVED])}">5</span>
+        </span>
+            </div>
         </div>
 
         <div class="nav-section">
             <div class="nav-title">Аккаунт</div>
-            <a href="#" class="nav-item">
-                <i class="fas fa-user"></i>
-                <span>Профиль</span>
-            </a>
-            <a href="/auth/logout" class="nav-item">
+            <a th:href="@{/auth/login}" class="nav-item">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Выйти</span>
             </a>
@@ -435,108 +431,56 @@
         <!-- Search Section -->
         <div class="search-section">
             <div class="search-box">
-                <input type="text" class="search-input" placeholder="Поиск программного обеспечения...">
-                <button class="btn-primary">
+                <input type="text" class="search-input" placeholder="Поиск программного обеспечения..." id="searchInput">
+                <button class="btn-primary" onclick="filterSoftware()">
                     <i class="fas fa-search"></i> Поиск
                 </button>
             </div>
         </div>
 
         <!-- Software Grid -->
-        <div class="software-grid">
-            <!-- Card 1 -->
-            <div class="software-card">
+        <div class="software-grid" id="softwareGrid">
+            <!-- Динамическая загрузка ПО из базы -->
+            <div class="software-card" th:each="sw : ${software}" th:attr="data-title=${sw.title}">
                 <div class="software-header">
                     <div class="software-icon">
-                        <i class="fab fa-microsoft"></i>
+                        <i th:classappend="'fas fa-cube'" th:if="${sw.logoPath == null}"></i>
+                        <img th:if="${sw.logoPath != null}" th:src="${sw.logoPath}" style="width: 30px; height: 30px;">
                     </div>
                     <div class="software-info">
-                        <h3>Microsoft Office 2021</h3>
-                        <div class="version">Версия 16.0</div>
+                        <h3 th:text="${sw.title}">Название ПО</h3>
+                        <div class="version" th:text="'Версия ' + ${sw.version}">Версия</div>
                     </div>
-                </div>
-                <div class="software-description">
-                    Полный пакет офисных приложений для работы с документами, таблицами и презентациями.
                 </div>
                 <div class="software-meta">
-                    <span>Лицензия: Академическая</span>
+                    <span th:text="'Разработчик: ' + ${sw.developer.title}">Разработчик</span>
                 </div>
-                <button class="btn-request" onclick="openRequestModal('Microsoft Office 2021')">
-                    <i class="fas fa-plus"></i> Подать заявку
-                </button>
-            </div>
-
-            <!-- Card 2 -->
-            <div class="software-card">
-                <div class="software-header">
-                    <div class="software-icon">
-                        <i class="fas fa-code"></i>
-                    </div>
-                    <div class="software-info">
-                        <h3>IntelliJ IDEA</h3>
-                        <div class="version">Версия 2023.3</div>
-                    </div>
-                </div>
-                <div class="software-description">
-                    Интегрированная среда разработки для Java и других языков программирования.
-                </div>
-                <div class="software-meta">
-                    <span>Лицензия: Образовательная</span>
-                </div>
-                <button class="btn-request" onclick="openRequestModal('IntelliJ IDEA')">
-                    <i class="fas fa-plus"></i> Подать заявку
-                </button>
-            </div>
-
-            <!-- Card 3 -->
-            <div class="software-card">
-                <div class="software-header">
-                    <div class="software-icon">
-                        <i class="fab fa-adobe"></i>
-                    </div>
-                    <div class="software-info">
-                        <h3>Adobe Photoshop</h3>
-                        <div class="version">Версия CC 2024</div>
-                    </div>
-                </div>
-                <div class="software-description">
-                    Профессиональный графический редактор для работы с растровой графикой.
-                </div>
-                <div class="software-meta">
-                    <span>Лицензия: Подписка</span>
-                </div>
-                <button class="btn-request" onclick="openRequestModal('Adobe Photoshop')">
-                    <i class="fas fa-plus"></i> Подать заявку
+                <button class="btn-request"
+                        th:attr="data-software-name=${sw.title}, data-software-id=${sw.id}"
+                        onclick="openRequestModalFromButton(this)">
+                        <i class="fas fa-plus"></i> Подать заявку
                 </button>
             </div>
         </div>
 
         <!-- My Requests Section -->
         <div class="requests-section">
-            <h2 class="section-title">Мои последние заявки</h2>
+            <h2 class="section-title">Мои заявки</h2>
 
-            <div class="request-item">
+            <!-- Динамическая загрузка заявок из базы -->
+            <div class="request-item" th:each="request : ${user.requests}">
                 <div class="request-info">
-                    <h4>Visual Studio Code</h4>
-                    <div class="date">Подана: 15.01.2024</div>
+                    <h4 th:text="${request.software.title}">Название ПО</h4>
+                    <div class="date" th:text="'Подана: ' + ${#temporals.format(request.date, 'dd.MM.yyyy')}">Дата</div>
                 </div>
-                <div class="status pending">В обработке</div>
+                <div class="status" th:classappend="${request.status}">
+                    <span th:text="${request.status}">Статус</span>
+                </div>
             </div>
 
-            <div class="request-item">
-                <div class="request-info">
-                    <h4>MATLAB R2023b</h4>
-                    <div class="date">Подана: 10.01.2024</div>
-                </div>
-                <div class="status approved">Утверждена</div>
-            </div>
-
-            <div class="request-item">
-                <div class="request-info">
-                    <h4>AutoCAD 2024</h4>
-                    <div class="date">Подана: 05.01.2024</div>
-                </div>
-                <div class="status completed">Установлено</div>
+            <div th:if="${user.requests == null or user.requests.empty}" style="text-align: center; padding: 2rem; color: #718096;">
+                <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p>У вас пока нет заявок</p>
             </div>
         </div>
     </main>
@@ -549,20 +493,30 @@
             <h2>Подача заявки на установку</h2>
             <button class="close-modal" onclick="closeRequestModal()">&times;</button>
         </div>
-        <form id="requestForm">
+        <form th:action="@{|/teacher/request?userId=${user.id}|}" method="post">
+            <!-- <input type="hidden" id="softwareId" name="softwareId"> -->
             <div style="margin-bottom: 1rem;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Программное обеспечение</label>
-                <input type="text" id="modalSoftwareName" readonly style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px; background: #f7fafc;">
+                <select name="softwareId" id="softwareSelect" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px;">
+                    <option th:each="soft : ${software}"
+                            th:value="${soft.id}"
+                            th:text="${soft.title}">ПО</option>
+                </select>
             </div>
             <div style="margin-bottom: 1rem;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Устройство для установки</label>
-                <select style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px;">
-                    <option>Компьютер 101 (каб. 301)</option>
-                    <option>Компьютер 102 (каб. 301)</option>
-                    <option>Ноутбук преподавателя</option>
+                <select name="deviceId" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px;">
+                    <option th:each="device : ${user.department.devices}"
+                            th:value="${device.id}"
+                            th:text="|${device.title} (инв. номер - №${device.id})|">Устройство</option>
                 </select>
             </div>
-            <button type="button" class="btn-primary" style="width: 100%;" onclick="submitRequest()">
+            <div style="margin-bottom: 1.5rem;">
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Комментарий к заявке</label>
+                <textarea name="comment" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px; height: 100px; resize: vertical;"
+                          placeholder="Опишите причину установки, особенности использования..."></textarea>
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%;">
                 <i class="fas fa-paper-plane"></i> Отправить заявку
             </button>
         </form>
@@ -570,8 +524,14 @@
 </div>
 
 <script>
-    function openRequestModal(softwareName) {
-        document.getElementById('modalSoftwareName').value = softwareName;
+    function openRequestModalFromButton(button) {
+        const softwareName = button.getAttribute('data-software-name');
+        const softwareId = button.getAttribute('data-software-id');
+        openRequestModal(softwareName, softwareId);
+    }
+
+    function openRequestModal(softwareName, softwareId) {
+        document.getElementById('softwareSelect').value = softwareId || '';
         document.getElementById('requestModal').style.display = 'block';
     }
 
@@ -579,10 +539,15 @@
         document.getElementById('requestModal').style.display = 'none';
     }
 
-    function submitRequest() {
-        const softwareName = document.getElementById('modalSoftwareName').value;
-        alert(`Заявка на установку "${softwareName}" отправлена!`);
-        closeRequestModal();
+    function filterSoftware() {
+        const searchText = document.getElementById('searchInput').value.toLowerCase();
+        const cards = document.querySelectorAll('.software-card');
+
+        cards.forEach(card => {
+            const title = card.getAttribute('data-title').toLowerCase();
+            const matchesSearch = title.includes(searchText);
+            card.style.display = matchesSearch ? 'block' : 'none';
+        });
     }
 
     // Close modal when clicking outside

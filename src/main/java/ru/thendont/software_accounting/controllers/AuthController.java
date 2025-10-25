@@ -8,6 +8,7 @@ import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.repository.DepartmentRepository;
 import ru.thendont.software_accounting.repository.UserRepository;
 import ru.thendont.software_accounting.service.UserService;
+import ru.thendont.software_accounting.util.UserRoles;
 
 @Controller
 @RequestMapping("/auth")
@@ -34,7 +35,7 @@ public class AuthController {
             model.addAttribute("error", "Неверный логин или пароль");
             return "sign-in";
         }
-        return UserService.getPageFromRole(u.getRole());
+        return getPageFromUser(u);
     }
 
     @GetMapping("/register")
@@ -55,6 +56,17 @@ public class AuthController {
         UserService.processDepartment(user);
         UserService.hashPassword(user);
         userRepository.save(user);
-        return UserService.getPageFromRole(user.getRole());
+        return getPageFromUser(user);
+    }
+
+    private String getPageFromUser(User user) {
+        return switch (user.getRole()) {
+            case UserRoles.ADMIN -> "admin-page";
+            case UserRoles.IT -> "it-page";
+            case UserRoles.ACCOUNTANT -> "accountant-page";
+            case UserRoles.MANAGER -> "manager-page";
+            case UserRoles.TEACHER -> "redirect:/teacher/dashboard?userId=" + user.getId();
+            default -> "";
+        };
     }
 }

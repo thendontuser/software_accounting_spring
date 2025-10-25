@@ -1,5 +1,6 @@
 package ru.thendont.software_accounting.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
