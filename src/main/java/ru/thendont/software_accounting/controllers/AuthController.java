@@ -5,8 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import ru.thendont.software_accounting.entity.User;
-import ru.thendont.software_accounting.repository.DepartmentRepository;
-import ru.thendont.software_accounting.repository.UserRepository;
+import ru.thendont.software_accounting.service.DepartmentService;
 import ru.thendont.software_accounting.service.UserService;
 import ru.thendont.software_accounting.util.UserRoles;
 
@@ -14,12 +13,12 @@ import ru.thendont.software_accounting.util.UserRoles;
 @RequestMapping("/auth")
 public class AuthController {
 
-    private final DepartmentRepository departmentRepository;
-    private final UserRepository userRepository;
+    private final DepartmentService departmentService;
+    private final UserService userService;
 
-    public AuthController(DepartmentRepository departmentRepository, UserRepository userRepository) {
-        this.departmentRepository = departmentRepository;
-        this.userRepository = userRepository;
+    public AuthController(DepartmentService departmentService, UserService userService) {
+        this.departmentService = departmentService;
+        this.userService = userService;
     }
 
     @GetMapping("/login")
@@ -30,7 +29,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public String showLoginPage(@ModelAttribute User user, Model model) {
-        User u = UserService.isAuthorise(user, userRepository).orElse(null);
+        User u = userService.isAuthorise(user).orElse(null);
         if (u == null) {
             model.addAttribute("error", "Неверный логин или пароль");
             return "sign-in";
@@ -41,21 +40,21 @@ public class AuthController {
     @GetMapping("/register")
     public String showRegisterPage(Model model) {
         model.addAttribute("user", new User());
-        model.addAttribute("departments", departmentRepository.findAll());
+        model.addAttribute("departments", departmentService.findAll());
         return "sign-up";
     }
 
     @PostMapping("/register")
     public String showRegisterPage(@ModelAttribute User user, Model model) {
-        User u = userRepository.findByLogin(user.getLogin()).orElse(null);
+        User u = userService.findByLogin(user.getLogin()).orElse(null);
         if (u != null) {
             model.addAttribute("error", "Логин уже занят");
-            model.addAttribute("departments", departmentRepository.findAll());
+            model.addAttribute("departments", departmentService.findAll());
             return "sign-up";
         }
-        UserService.processDepartment(user);
-        UserService.hashPassword(user);
-        userRepository.save(user);
+        userService.processDepartment(user);
+        userService.hashPassword(user);
+        userService.save(user);
         return getPageFromUser(user);
     }
 

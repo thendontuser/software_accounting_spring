@@ -11,10 +11,10 @@ import ru.thendont.software_accounting.entity.Device;
 import ru.thendont.software_accounting.entity.InstallationRequest;
 import ru.thendont.software_accounting.entity.Software;
 import ru.thendont.software_accounting.entity.User;
-import ru.thendont.software_accounting.repository.DeviceRepository;
-import ru.thendont.software_accounting.repository.InstallationRequestRepository;
-import ru.thendont.software_accounting.repository.SoftwareRepository;
-import ru.thendont.software_accounting.repository.UserRepository;
+import ru.thendont.software_accounting.service.DeviceService;
+import ru.thendont.software_accounting.service.InstallationRequestService;
+import ru.thendont.software_accounting.service.SoftwareService;
+import ru.thendont.software_accounting.service.UserService;
 import ru.thendont.software_accounting.util.InstallationRequestsStatus;
 
 import java.time.LocalDate;
@@ -23,40 +23,40 @@ import java.time.LocalDate;
 @RequestMapping("/teacher")
 public class TeacherPageController {
 
-    private final UserRepository userRepository;
-    private final SoftwareRepository softwareRepository;
-    private final DeviceRepository deviceRepository;
-    private final InstallationRequestRepository installationRequestRepository;
+    private final UserService userService;
+    private final SoftwareService softwareService;
+    private final DeviceService deviceService;
+    private final InstallationRequestService installationRequestService;
 
-    public TeacherPageController(UserRepository userRepository,
-                                 SoftwareRepository softwareRepository,
-                                 DeviceRepository deviceRepository,
-                                 InstallationRequestRepository installationRequestRepository) {
-        this.userRepository = userRepository;
-        this.softwareRepository = softwareRepository;
-        this.deviceRepository = deviceRepository;
-        this.installationRequestRepository = installationRequestRepository;
+    public TeacherPageController(UserService userService,
+                                 SoftwareService softwareService,
+                                 DeviceService deviceService,
+                                 InstallationRequestService installationRequestService) {
+        this.userService = userService;
+        this.softwareService = softwareService;
+        this.deviceService = deviceService;
+        this.installationRequestService = installationRequestService;
     }
 
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userService.findById(userId).orElseThrow();
         model.addAttribute("user", user);
-        model.addAttribute("software", softwareRepository.findAll());
+        model.addAttribute("software", softwareService.findAll());
         return "teacher-page";
     }
 
     @PostMapping("/request")
     public String sendRequest(@RequestParam Long userId, @RequestParam Long softwareId, @RequestParam Long deviceId,
                               @RequestParam(required = false) String comment) {
-        User user = userRepository.findById(userId).orElse(null);
-        Software software = softwareRepository.findById(softwareId).orElse(null);
-        Device device = deviceRepository.findById(deviceId).orElse(null);
+        User user = userService.findById(userId).orElse(null);
+        Software software = softwareService.findById(softwareId).orElse(null);
+        Device device = deviceService.findById(deviceId).orElse(null);
 
         InstallationRequest request = new InstallationRequest(null, software, device, user, LocalDate.now(),
                 InstallationRequestsStatus.PENDING, comment);
 
-        installationRequestRepository.save(request);
+        installationRequestService.save(request);
         return "redirect:/teacher/dashboard?userId=" + userId;
     }
 }
