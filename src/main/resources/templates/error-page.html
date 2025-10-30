@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ошибка - Учет ПО</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: #f8f9fa;
+        min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo-icon i {
+        color: white;
+        font-size: 20px;
+    }
+
+    .logo-text h1 {
+        font-size: 20px;
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .logo-text p {
+        font-size: 12px;
+        color: #718096;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .user-avatar {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    /* Main Content */
+    .container {
+        display: flex;
+        min-height: calc(100vh - 80px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 280px;
+        background: white;
+        padding: 2rem 1.5rem;
+        border-right: 1px solid #e2e8f0;
+    }
+
+    .nav-section {
+        margin-bottom: 2rem;
+    }
+
+    .nav-title {
+        font-size: 12px;
+        color: #718096;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        letter-spacing: 0.5px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 15px;
+        border-radius: 10px;
+        color: #4a5568;
+        text-decoration: none;
+        margin-bottom: 5px;
+        transition: all 0.3s ease;
+    }
+
+    .nav-item:hover, .nav-item.active {
+        background: #667eea;
+        color: white;
+    }
+
+    .nav-item i {
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Error Content */
+    .error-content {
+        flex: 1;
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .error-card {
+        background: white;
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        text-align: center;
+        max-width: 500px;
+        width: 100%;
+    }
+
+    .error-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        color: white;
+        font-size: 2rem;
+    }
+
+    .error-title {
+        font-size: 2rem;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .error-message {
+        font-size: 1.1rem;
+        color: #4a5568;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .error-details {
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        text-align: left;
+    }
+
+    .error-details pre {
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        color: #718096;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border: none;
+        font-size: 0.95rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+
+    .btn-secondary:hover {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-back {
+        background: #e2e8f0;
+        color: #4a5568;
+    }
+
+    .btn-back:hover {
+        background: #cbd5e0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .error-card {
+            margin: 1rem;
+            padding: 2rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+    }
+  </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">
+      <i class="fas fa-laptop-code"></i>
+    </div>
+    <div class="logo-text">
+      <h1>Учет программного обеспечения</h1>
+      <p>Система управления</p>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="nav-section">
+      <div class="nav-title">Помощь</div>
+      <a href="#" class="nav-item" onclick="showHelp()">
+        <i class="fas fa-question-circle"></i>
+        <span>Справка</span>
+      </a>
+      <a href="#" class="nav-item" onclick="contactSupport()">
+        <i class="fas fa-headset"></i>
+        <span>Техподдержка</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Error Content -->
+  <main class="error-content">
+    <div class="error-card">
+      <div class="error-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+
+      <h1 class="error-title" th:text="${errorTitle ?: 'Произошла ошибка'}">
+        Произошла ошибка
+      </h1>
+
+      <div class="error-message" th:text="${errorMessage ?: 'При обработке вашего запроса возникла непредвиденная ошибка.'}">
+        При обработке вашего запроса возникла непредвиденная ошибка.
+      </div>
+
+      <div class="error-details" th:if="${timestamp}">
+        <strong>Время ошибки:</strong>
+        <span th:text="${#temporals.format(timestamp, 'dd.MM.yyyy HH:mm:ss')}"></span>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-secondary" onclick="history.back()">
+          <i class="fas fa-arrow-left"></i> Назад
+        </button>
+
+        <a th:href="@{/auth/login}" class="btn btn-back" th:if="${showLogin}">
+          <i class="fas fa-sign-in-alt"></i> Войти снова
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  function showHelp() {
+      alert('Если ошибка повторяется, обратитесь в техническую поддержку по телефону: +7 (XXX) XXX-XX-XX');
+  }
+
+  function contactSupport() {
+      alert('Напишите нам на email: support@software-accounting.ru');
+  }
+
+  // Автоматическое скрытие деталей ошибки на продакшене
+  document.addEventListener('DOMContentLoaded', function() {
+      const errorDetails = document.querySelector('.error-details pre');
+      if (errorDetails && !errorDetails.textContent.trim()) {
+          errorDetails.parentElement.style.display = 'none';
+      }
+  });
+</script>
+</body>
+</html>

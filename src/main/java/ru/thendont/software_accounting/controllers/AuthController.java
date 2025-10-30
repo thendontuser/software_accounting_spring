@@ -63,7 +63,7 @@ public class AuthController {
             case UserRoles.ADMIN -> "admin-page";
             case UserRoles.IT -> "it-page";
             case UserRoles.ACCOUNTANT -> "accountant-page";
-            case UserRoles.MANAGER -> "manager-page";
+            case UserRoles.MANAGER -> "redirect:/manager/dashboard?userId=" + user.getId();
             case UserRoles.TEACHER -> "redirect:/teacher/dashboard?userId=" + user.getId();
             default -> "";
         };
