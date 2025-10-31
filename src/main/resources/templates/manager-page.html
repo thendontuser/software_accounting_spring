@@ -462,20 +462,24 @@
               <span th:unless="${request.comment}" style="color: #718096; font-style: italic;">нет комментария</span>
             </td>
             <td>
-              <form th:action="@{|/manager/request/approve|}" method="post" style="display: inline;">
-                <input type="hidden" name="requestId" th:value="${request.id}">
-                <input type="hidden" name="userId" th:value="${user.id}">
-                <button type="submit" class="btn btn-success btn-sm">
-                  <i class="fas fa-check"></i> Одобрить
-                </button>
-              </form>
-              <form th:action="@{|/manager/request/reject|}" method="post" style="display: inline; margin-left: 5px;">
-                <input type="hidden" name="requestId" th:value="${request.id}">
-                <input type="hidden" name="userId" th:value="${user.id}">
-                <button type="submit" class="btn btn-danger btn-sm">
-                  <i class="fas fa-times"></i> Отклонить
-                </button>
-              </form>
+              <div style="display: flex; gap: 8px; align-items: center;">
+                <form th:action="@{|/manager/request/handle|}" method="post" style="display: inline;">
+                  <input type="hidden" name="requestId" th:value="${request.id}">
+                  <input type="hidden" name="userId" th:value="${user.id}">
+                  <input type="hidden" name="status" th:value="${T(ru.thendont.software_accounting.util.InstallationRequestsStatus).APPROVED}">
+                  <button type="submit" class="btn btn-success btn-sm">
+                    <i class="fas fa-check"></i> Одобрить
+                  </button>
+                </form>
+                <form th:action="@{|/manager/request/handle|}" method="post" style="display: inline;">
+                  <input type="hidden" name="requestId" th:value="${request.id}">
+                  <input type="hidden" name="userId" th:value="${user.id}">
+                  <input type="hidden" name="status" th:value="${T(ru.thendont.software_accounting.util.InstallationRequestsStatus).REJECTED}">
+                  <button type="submit" class="btn btn-danger btn-sm">
+                    <i class="fas fa-times"></i> Отклонить
+                  </button>
+                </form>
+              </div>
             </td>
           </tr>
           </tbody>

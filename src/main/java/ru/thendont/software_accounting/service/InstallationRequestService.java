@@ -6,6 +6,7 @@ import ru.thendont.software_accounting.repository.InstallationRequestRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InstallationRequestService {
@@ -16,13 +17,17 @@ public class InstallationRequestService {
         this.installationRequestRepository = installationRequestRepository;
     }
 
+    public Optional<InstallationRequest> findById(Long id) {
+        return installationRequestRepository.findById(id);
+    }
+
     public List<InstallationRequest> findByDepartmentNumber(Long depNumber) {
         List<InstallationRequest> requests = new ArrayList<>();
-        for (InstallationRequest request : installationRequestRepository.findAll()) {
+        installationRequestRepository.findAll().forEach(request -> {
             if (request.getUser().getDepartment().getDepNumber().equals(depNumber)) {
                 requests.add(request);
             }
-        }
+        });
         return requests;
     }
 

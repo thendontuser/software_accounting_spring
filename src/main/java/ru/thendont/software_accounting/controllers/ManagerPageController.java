@@ -3,6 +3,7 @@ package ru.thendont.software_accounting.controllers;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.thendont.software_accounting.entity.InstallationRequest;
@@ -53,6 +54,20 @@ public class ManagerPageController {
         }
         catch (NoSuchElementException ex) {
             return handleException("Не найден объект", ex.getMessage(), model);
+        }
+    }
+
+    @PostMapping("/request/handle")
+    public String approveRequest(@RequestParam Long requestId, @RequestParam Long userId,
+                                 @RequestParam String status, Model model) {
+        try {
+            InstallationRequest request = installationRequestService.findById(requestId).orElseThrow();
+            request.setStatus(status);
+            installationRequestService.save(request);
+            return showDashboard(userId, model);
+        }
+        catch (NoSuchElementException ex) {
+            return handleException("Заявка не найдена", "Не найдена требуемая заявка", model);
         }
     }
 
