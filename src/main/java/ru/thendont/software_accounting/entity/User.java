@@ -22,6 +22,9 @@ public class User {
     @Column(name = "patronymic")
     private String patronymic;
 
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "login")
     private String login;
 
@@ -45,12 +48,13 @@ public class User {
 
     }
 
-    public User(Long id, String lastName, String firstName, String patronymic, String login,
-                String password, String role, Department department) {
+    public User(Long id, String lastName, String firstName, String patronymic, String email,
+                String login, String password, String role, Department department) {
         this.id = id;
         this.lastName = lastName;
         this.firstName = firstName;
         this.patronymic = patronymic;
+        this.email = email;
         this.login = login;
         this.password = password;
         this.role = role;
@@ -71,6 +75,10 @@ public class User {
 
     public void setPatronymic(String patronymic) {
         this.patronymic = patronymic;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public void setLogin(String login) {
@@ -103,6 +111,10 @@ public class User {
 
     public String getPatronymic() {
         return patronymic;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public String getLogin() {

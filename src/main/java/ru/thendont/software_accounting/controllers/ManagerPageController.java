@@ -11,6 +11,7 @@ import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.service.InstallationRequestService;
 import ru.thendont.software_accounting.service.SoftwareInstallationService;
 import ru.thendont.software_accounting.service.UserService;
+import ru.thendont.software_accounting.service.email.EmailHelper;
 import ru.thendont.software_accounting.util.InstallationRequestsStatus;
 
 import java.time.LocalDate;
@@ -24,13 +25,16 @@ public class ManagerPageController {
     private final UserService userService;
     private final SoftwareInstallationService softwareInstallationService;
     private final InstallationRequestService installationRequestService;
+    private final EmailHelper emailHelper;
 
     public ManagerPageController(UserService userService,
                                  SoftwareInstallationService softwareInstallationService,
-                                 InstallationRequestService installationRequestService) {
+                                 InstallationRequestService installationRequestService,
+                                 EmailHelper emailHelper) {
         this.userService = userService;
         this.softwareInstallationService = softwareInstallationService;
         this.installationRequestService = installationRequestService;
+        this.emailHelper = emailHelper;
     }
 
     @GetMapping("/dashboard")
@@ -64,6 +68,12 @@ public class ManagerPageController {
             InstallationRequest request = installationRequestService.findById(requestId).orElseThrow();
             request.setStatus(status);
             installationRequestService.save(request);
+
+            String toAddress = request.getUser().getEmail();
+            String subject = "Решение по заявке \"Установка " + request.getSoftware().getTitle() +
+                    " на " + request.getDevice().getTitle() + "\"";
+            String statusInMsg = status.equals(InstallationRequestsStatus.APPROVED) ? "одобрена" : "отклонена";
+            emailHelper.sendMessage(toAddress, subject, "Ваша заявка " + statusInMsg + " руководителем");
             return showDashboard(userId, model);
         }
         catch (NoSuchElementException ex) {
