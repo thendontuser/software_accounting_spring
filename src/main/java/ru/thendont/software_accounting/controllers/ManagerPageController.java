@@ -62,7 +62,7 @@ public class ManagerPageController {
     }
 
     @PostMapping("/request/handle")
-    public String approveRequest(@RequestParam Long requestId, @RequestParam Long userId,
+    public String handleRequest(@RequestParam Long requestId, @RequestParam Long userId,
                                  @RequestParam String status, Model model) {
         try {
             InstallationRequest request = installationRequestService.findById(requestId).orElseThrow();
