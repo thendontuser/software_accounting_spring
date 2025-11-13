@@ -1,6 +1,7 @@
 package ru.thendont.software_accounting.service.email;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class EmailHelper {
         this.javaMailSender = javaMailSender;
     }
 
-    public void sendMessage(String toAddress, String subject, String message) {
+    public void sendMessage(String toAddress, String subject, String message) throws MailException {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(fromUser);
         mailMessage.setTo(toAddress);

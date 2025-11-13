@@ -36,6 +36,7 @@ public class SoftwareInstallation {
         this.software = software;
         this.device = device;
         this.user = user;
+        this.date = date;
     }
 
     public void setId(Long id) {

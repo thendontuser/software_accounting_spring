@@ -2,6 +2,7 @@ package ru.thendont.software_accounting.service;
 
 import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.Software;
+import ru.thendont.software_accounting.entity.SoftwareInstallation;
 import ru.thendont.software_accounting.repository.SoftwareInstallationRepository;
 
 import java.util.ArrayList;
@@ -32,5 +33,9 @@ public class SoftwareInstallationService {
             softwareList.add(softwareInstallation.getSoftware());
         });
         return softwareList;
+    }
+
+    public SoftwareInstallation save(SoftwareInstallation softwareInstallation) {
+        return softwareInstallationRepository.save(softwareInstallation);
     }
 }

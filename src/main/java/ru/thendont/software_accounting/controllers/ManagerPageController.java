@@ -1,5 +1,6 @@
 package ru.thendont.software_accounting.controllers;
 
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.thendont.software_accounting.entity.InstallationRequest;
+import ru.thendont.software_accounting.entity.SoftwareInstallation;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.service.InstallationRequestService;
 import ru.thendont.software_accounting.service.SoftwareInstallationService;
@@ -66,6 +68,19 @@ public class ManagerPageController {
                                  @RequestParam String status, Model model) {
         try {
             InstallationRequest request = installationRequestService.findById(requestId).orElseThrow();
+
+            if (status.equals(InstallationRequestsStatus.APPROVED)) {
+                if (!installationRequestService.isPossibleInstallSoftware(request)) {
+                    model.addAttribute("installFlag", false);
+                    model.addAttribute("installFlagMessage",
+                            "Нельзя установить ПО \"" + request.getSoftware().getTitle() +
+                            "\" на устройство \"" + request.getDevice().getTitle() + "\"\nЗаявка автоматически отклонена");
+                    status = InstallationRequestsStatus.REJECTED;
+                } else {
+                    softwareInstallationService.save(new SoftwareInstallation(null, request.getSoftware(),
+                            request.getDevice(), request.getUser(), LocalDate.now()));
+                }
+            }
             request.setStatus(status);
             installationRequestService.save(request);
 
@@ -78,6 +93,9 @@ public class ManagerPageController {
         }
         catch (NoSuchElementException ex) {
             return handleException("Заявка не найдена", "Не найдена требуемая заявка", model);
+        }
+        catch (MailException ex) {
+            return handleException("Ошибка отправки сообщения на почту", "Плохое подключение к сети", model);
         }
     }
 

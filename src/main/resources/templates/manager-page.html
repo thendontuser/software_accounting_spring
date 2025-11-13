@@ -334,6 +334,99 @@
         margin-bottom: 1rem;
         opacity: 0.5;
     }
+
+    .notification-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        max-width: 400px;
+    }
+
+    .notification {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        border-left: 4px solid #e53e3e;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        animation: slideIn 0.3s ease-out;
+    }
+
+    .notification.success {
+        border-left-color: #38a169;
+    }
+
+    .notification.error {
+        border-left-color: #e53e3e;
+    }
+
+    .notification-icon {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-top: 2px;
+    }
+
+    .notification.error .notification-icon {
+        background: #fed7d7;
+        color: #c53030;
+    }
+
+    .notification.success .notification-icon {
+        background: #c6f6d5;
+        color: #2f855a;
+    }
+
+    .notification-content {
+        flex: 1;
+    }
+
+    .notification-title {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .notification-message {
+        color: #4a5568;
+        font-size: 13px;
+        line-height: 1.4;
+        white-space: pre-line;
+    }
+
+    .notification-close {
+        background: none;
+        border: none;
+        color: #718096;
+        cursor: pointer;
+        padding: 4px;
+        margin-left: 8px;
+        flex-shrink: 0;
+    }
+
+    .notification-close:hover {
+        color: #4a5568;
+    }
+
+    @keyframes slideIn {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
   </style>
 </head>
 <body>
@@ -358,6 +451,24 @@
     </div>
   </div>
 </header>
+
+<!-- Уведомление в правом верхнем углу -->
+<div class="notification-container">
+  <div th:if="${installFlag != null and !installFlag}" class="notification error">
+    <div class="notification-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <div class="notification-content">
+      <div class="notification-title">Ошибка установки</div>
+      <div class="notification-message" th:text="${installFlagMessage}">
+        Нельзя установить ПО на устройство
+      </div>
+    </div>
+    <button class="notification-close" onclick="this.parentElement.style.display='none'">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+</div>
 
 <div class="container">
   <!-- Sidebar -->
@@ -602,6 +713,13 @@
               }
           });
       });
+
+      const notification = document.querySelector('.notification');
+      if (notification) {
+          setTimeout(() => {
+              notification.style.display = 'none';
+          }, 8000);
+      }
   });
 </script>
 </body>

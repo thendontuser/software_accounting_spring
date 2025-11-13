@@ -48,4 +48,8 @@ public class InstallationRequestService {
     public InstallationRequest save(InstallationRequest installationRequest) {
         return installationRequestRepository.save(installationRequest);
     }
+
+    public boolean isPossibleInstallSoftware(InstallationRequest installationRequest) {
+        return installationRequest.getDevice().getRamSize() > 1;
+    }
 }

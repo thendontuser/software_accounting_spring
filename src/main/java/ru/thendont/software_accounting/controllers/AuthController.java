@@ -61,7 +61,6 @@ public class AuthController {
     private String getPageFromUser(User user) {
         return switch (user.getRole()) {
             case UserRoles.ADMIN -> "admin-page";
-            case UserRoles.IT -> "it-page";
             case UserRoles.ACCOUNTANT -> "redirect:/accountant/dashboard?userId=" + user.getId();
             case UserRoles.MANAGER -> "redirect:/manager/dashboard?userId=" + user.getId();
             case UserRoles.TEACHER -> "redirect:/teacher/dashboard?userId=" + user.getId();
