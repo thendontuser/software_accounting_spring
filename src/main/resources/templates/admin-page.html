@@ -1,0 +1,1310 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора - Учет ПО</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon i {
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text h1 {
+            font-size: 20px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 2rem 1.5rem;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: #4a5568;
+            text-decoration: none;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 28px;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        /* Report Controls */
+        .report-controls {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-select {
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            min-width: 200px;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+
+        .tabs-header {
+            display: flex;
+            background: #f7fafc;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #718096;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+            background: #edf2f7;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Table Actions */
+        .table-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .table-title {
+            font-size: 18px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: #38a169;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2f855a;
+        }
+
+        .btn-info {
+            background: #4299e1;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #3182ce;
+        }
+
+        .btn-warning {
+            background: #d69e2e;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #b7791f;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .btn-secondary {
+            background: #a0aec0;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #718096;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table tr:hover {
+            background: #f7fafc;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #718096;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 24px;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        /* Form styles */
+        .report-form {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+    <div class="logo">
+        <div class="logo-icon">
+            <i class="fas fa-laptop-code"></i>
+        </div>
+        <div class="logo-text">
+            <h1>Учет ПО</h1>
+            <p>Панель администратора</p>
+        </div>
+    </div>
+    <div class="user-info">
+        <div class="user-avatar">
+            <span th:text="${#strings.substring(user.lastName, 0, 1) + #strings.substring(user.firstName, 0, 1)}">НП</span>
+        </div>
+        <div>
+            <div style="font-weight: 600; color: #2d3748;" th:text="${user.lastName + ' ' + user.firstName + ' ' + user.patronymic}">Неизвестный пользователь</div>
+            <div style="font-size: 12px; color: #718096;">Администратор системы</div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="nav-section">
+            <div class="nav-title">Навигация</div>
+            <a th:href="@{/admin/dashboard}" class="nav-item active">
+                <i class="fas fa-th-large"></i>
+                <span>Управление БД</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Система</div>
+            <div class="nav-item" style="cursor: default;">
+                <i class="fas fa-database"></i>
+                <span>Таблиц: 7</span>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Аккаунт</div>
+            <a th:href="@{/auth/logout}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Выйти</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Управление базой данных</h1>
+            <div style="font-size: 16px; color: #718096;">
+                <i class="fas fa-calendar-alt"></i>
+                <span th:text="${#temporals.format(#temporals.createToday(), 'dd.MM.yyyy')}"></span>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-table"></i>
+                </div>
+                <div class="stat-number">8</div>
+                <div class="stat-label">Таблиц в БД</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-number" th:text="${userCount}">0</div>
+                <div class="stat-label">Пользователей</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-cube"></i>
+                </div>
+                <div class="stat-number" th:text="${softwareCount}">0</div>
+                <div class="stat-label">Программ</div>
+            </div>
+        </div>
+
+        <!-- Report Controls -->
+        <div class="report-controls">
+            <form th:action="@{/admin/reports/software}" method="get" target="_blank" class="report-form">
+                <div class="control-group">
+                    <label for="report-type">Тип отчета</label>
+                    <select id="report-type" name="type" class="form-select" onchange="toggleDepartmentSelect()">
+                        <option value="all">Полный перечень ПО</option>
+                        <option value="department">ПО по подразделению</option>
+                    </select>
+                </div>
+                <div class="control-group" id="department-control" style="display: none;">
+                    <label for="department-select">Подразделение</label>
+                    <select class="form-select" name="department" id="department-select">
+                        <option value="ALL">Все отделы</option>
+                        <option th:each="dept : ${departments}"
+                                th:value="${dept.depNumber}"
+                                th:text="${dept.title}">Отдел</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-info">
+                    <i class="fas fa-file-pdf"></i> Сформировать отчет PDF
+                </button>
+            </form>
+        </div>
+
+        <!-- Tabs Container -->
+        <div class="tabs-container">
+            <!-- Tabs Header -->
+            <div class="tabs-header">
+                <button class="tab-button active" onclick="showTab('users')">Пользователи</button>
+                <button class="tab-button" onclick="showTab('department')">Факультеты</button>
+                <button class="tab-button" onclick="showTab('device')">Устройства</button>
+                <button class="tab-button" onclick="showTab('software')">Программное обеспечение</button>
+                <button class="tab-button" onclick="showTab('developer')">Разработчики</button>
+                <button class="tab-button" onclick="showTab('license')">Лицензии</button>
+                <button class="tab-button" onclick="showTab('installation_request')">Заявки</button>
+                <button class="tab-button" onclick="showTab('software_installation')">Установки</button>
+            </div>
+
+            <!-- Tab: Users -->
+            <div id="tab-users" class="tab-content active">
+                <div class="table-actions">
+                    <h3 class="table-title">Таблица: Пользователи</h3>
+                    <button class="btn btn-primary" onclick="showAddModal('users')">
+                        <i class="fas fa-plus"></i> Добавить запись
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Фамилия</th>
+                            <th>Имя</th>
+                            <th>Отчество</th>
+                            <th>Логин</th>
+                            <th>Роль</th>
+                            <th>Факультет</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="user : ${users}">
+                            <td th:text="${user.lastName}">Иванов</td>
+                            <td th:text="${user.firstName}">Иван</td>
+                            <td th:text="${user.patronymic}">Иванович</td>
+                            <td th:text="${user.login}">ivanov</td>
+                            <td th:text="${user.role}">ADMIN</td>
+                            <td th:text="${user.department.title}">-</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-sm"
+                                            th:onclick="|showEditModal('users', ${user.id})|">
+                                        <i class="fas fa-edit"></i> Изменить
+                                    </button>
+                                    <button class="btn btn-danger btn-sm"
+                                            th:onclick="|confirmDelete('users', ${user.id})|">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Department -->
+            <div id="tab-department" class="tab-content">
+                <div class="table-actions">
+                    <h3 class="table-title">Таблица: факультеты</h3>
+                    <button class="btn btn-primary" onclick="showAddModal('department')">
+                        <i class="fas fa-plus"></i> Добавить запись
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Номер подразделения</th>
+                            <th>Название</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="dept : ${departments}">
+                            <td th:text="${dept.depNumber}">1</td>
+                            <td th:text="${dept.title}">IT отдел</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-sm"
+                                            th:onclick="|showEditModal('department', ${dept.depNumber})|">
+                                        <i class="fas fa-edit"></i> Изменить
+                                    </button>
+                                    <button class="btn btn-danger btn-sm"
+                                            th:onclick="|confirmDelete('department', ${dept.depNumber})|">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Device -->
+            <div id="tab-device" class="tab-content">
+                <div class="table-actions">
+                    <h3 class="table-title">Таблица: устройства</h3>
+                    <button class="btn btn-primary" onclick="showAddModal('device')">
+                        <i class="fas fa-plus"></i> Добавить запись
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>ОС</th>
+                            <th>IP-адрес</th>
+                            <th>ОЗУ (ГБ)</th>
+                            <th>Привязан к факультету</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="device : ${devices}">
+                            <td th:text="${device.title}">Компьютер 1</td>
+                            <td th:text="${device.osTitle}">Windows 10</td>
+                            <td th:text="${device.ipAddress}">192.168.1.10</td>
+                            <td th:text="${device.ramSize}">16</td>
+                            <td th:text="${device.department.title}">1</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-sm"
+                                            th:onclick="|showEditModal('device', ${device.id})|">
+                                        <i class="fas fa-edit"></i> Изменить
+                                    </button>
+                                    <button class="btn btn-danger btn-sm"
+                                            th:onclick="|confirmDelete('device', ${device.id})|">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Software -->
+            <div id="tab-software" class="tab-content">
+                <div class="table-actions">
+                    <h3 class="table-title">Таблица: программное обеспечение</h3>
+                    <button class="btn btn-primary" onclick="showAddModal('software')">
+                        <i class="fas fa-plus"></i> Добавить запись
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Версия</th>
+                            <th>Разработчик</th>
+                            <th>Логотип</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="soft : ${softwareList}">
+                            <td th:text="${soft.old}">1</td>
+                            <td th:text="${soft.title}">Microsoft Office</td>
+                            <td th:text="${soft.version}">2021</td>
+                            <td th:text="${soft.developer.title}">1</td>
+                            <td>
+                                <img th:if="${soft.logoPath}" th:src="${soft.logoPath}" alt="Логотип" style="max-width: 50px; max-height: 50px; object-fit: contain;">
+                                <span th:unless="${soft.logoPath}">Нет логотипа</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-sm"
+                                            th:onclick="|showEditModal('software', ${soft.id})|">
+                                        <i class="fas fa-edit"></i> Изменить
+                                    </button>
+                                    <button class="btn btn-danger btn-sm"
+                                            th:onclick="|confirmDelete('software', ${soft.id})|">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Developer -->
+            <div id="tab-developer" class="tab-content">
+                <div class="table-actions">
+                    <h3 class="table-title">Таблица: разработчики</h3>
+                    <button class="btn btn-primary" onclick="showAddModal('developer')">
+                        <i class="fas fa-plus"></i> Добавить запись
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th>Тип компании</th>
+                            <th>Местоположение</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="dev : ${developers}">
+                            <td th:text="${dev.title}">Microsoft</td>
+                            <td th:text="${dev.companyType}">Корпорация</td>
+                            <td th:text="${dev.location}">США</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-sm"
+                                            th:onclick="|showEditModal('developer', ${dev.id})|">
+                                        <i class="fas fa-edit"></i> Изменить
+                                    </button>
+                                    <button class="btn btn-danger btn-sm"
+                                            th:onclick="|confirmDelete('developer', ${dev.id})|">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: License -->
+            <div id="tab-license" class="tab-content">
+                <div class="table-actions">
+                    <h3 class="table-title">Таблица: лицензии</h3>
+                    <button class="btn btn-primary" onclick="showAddModal('license')">
+                        <i class="fas fa-plus"></i> Добавить запись
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Тип лицензии</th>
+                            <th>Программное обеспечение</th>
+                            <th>Дата начала</th>
+                            <th>Дата окончания</th>
+                            <th>Цена (руб)</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="license : ${licenses}">
+                            <td th:text="${license.type}">Коммерческая</td>
+                            <td th:text="${license.software.title + ' ' + license.software.version}">Microsoft Office 2021</td>
+                            <td th:text="${#temporals.format(license.dateBegin, 'dd.MM.yyyy')}">01.01.2024</td>
+                            <td th:text="${#temporals.format(license.dateEnd, 'dd.MM.yyyy')}">31.12.2024</td>
+                            <td th:text="${license.price}">5000</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-sm"
+                                            th:onclick="|showEditModal('license', ${license.id})|">
+                                        <i class="fas fa-edit"></i> Изменить
+                                    </button>
+                                    <button class="btn btn-danger btn-sm"
+                                            th:onclick="|confirmDelete('license', ${license.id})|">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Installation Request -->
+            <div id="tab-installation_request" class="tab-content">
+                <div class="table-actions">
+                    <h3 class="table-title">Таблица: заявки</h3>
+                    <button class="btn btn-primary" onclick="showAddModal('installation_request')">
+                        <i class="fas fa-plus"></i> Добавить запись
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Номер заявки</th>
+                            <th>Программное обеспечение</th>
+                            <th>Устройство</th>
+                            <th>Пользователь</th>
+                            <th>Дата запроса</th>
+                            <th>Статус</th>
+                            <th>Комментарий</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="req : ${installationRequests}">
+                            <td th:text="${req.id}">1</td>
+                            <td th:text="${req.software.title}">1</td>
+                            <td th:text="${req.device.title}">1</td>
+                            <td th:text="${req.user.lastName + req.user.firstName + req.user.patronymic}">1</td>
+                            <td th:text="${req.date}">2024-01-15</td>
+                            <td th:text="${req.status}">PENDING</td>
+                            <td th:text="${req.comment}">Нужно для работы</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-sm"
+                                            th:onclick="|showEditModal('installation_request', ${req.id})|">
+                                        <i class="fas fa-edit"></i> Изменить
+                                    </button>
+                                    <button class="btn btn-danger btn-sm"
+                                            th:onclick="|confirmDelete('installation_request', ${req.id})|">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Software Installation -->
+            <div id="tab-software_installation" class="tab-content">
+                <div class="table-actions">
+                    <h3 class="table-title">Таблица: установки</h3>
+                    <button class="btn btn-primary" onclick="showAddModal('software_installation')">
+                        <i class="fas fa-plus"></i> Добавить запись
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th>Программное обеспечение</th>
+                            <th>Устройство</th>
+                            <th>Пользователь</th>
+                            <th>Дата установки</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="inst : ${softwareInstallations}">
+                            <td th:text="${inst.software.title}">1</td>
+                            <td th:text="${inst.device.title}">1</td>
+                            <td th:text="${inst.user.lastName + inst.user.firstName + inst.user.patronymic}">1</td>
+                            <td th:text="${inst.installation_date}">2024-01-16</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-warning btn-sm"
+                                            th:onclick="|showEditModal('software_installation', ${inst.id})|">
+                                        <i class="fas fa-edit"></i> Изменить
+                                    </button>
+                                    <button class="btn btn-danger btn-sm"
+                                            th:onclick="|confirmDelete('software_installation', ${inst.id})|">
+                                        <i class="fas fa-trash"></i> Удалить
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Модальное окно для добавления/редактирования -->
+<div id="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 15px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 id="modal-title">Добавить запись</h3>
+            <button onclick="closeModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #718096;">&times;</button>
+        </div>
+        <form id="modal-form" method="post">
+            <div id="modal-fields">
+                <!-- Поля формы будут генерироваться динамически -->
+            </div>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Текущая таблица и ID записи для редактирования
+    let currentTable = null;
+    let currentRecordId = null;
+
+    // Функции для работы с вкладками
+    function showTab(tableName) {
+        // Скрыть все вкладки
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // Убрать активный класс со всех кнопок
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.classList.remove('active');
+        });
+
+        // Показать выбранную вкладку
+        document.getElementById('tab-' + tableName).classList.add('active');
+
+        // Активировать кнопку
+        event.target.classList.add('active');
+    }
+
+    // Функции для управления отчетами
+    function toggleDepartmentSelect() {
+        const reportType = document.getElementById('report-type').value;
+        const departmentControl = document.getElementById('department-control');
+
+        if (reportType === 'department') {
+            departmentControl.style.display = 'block';
+        } else {
+            departmentControl.style.display = 'none';
+            // Очищаем значение при скрытии
+            document.getElementById('department-select').value = '';
+        }
+    }
+
+    // Функции для модальных окон
+    function showAddModal(tableName) {
+        currentTable = tableName;
+        currentRecordId = null;
+
+        document.getElementById('modal-title').textContent = 'Добавить запись в ' + tableName;
+        document.getElementById('modal-form').action = '/admin/save/' + tableName;
+
+        // Очищаем поля формы
+        document.getElementById('modal-fields').innerHTML = '';
+
+        // Создаем поля формы в зависимости от таблицы
+        createFormFields(tableName);
+
+        document.getElementById('modal').style.display = 'block';
+    }
+
+    function showEditModal(tableName, recordId) {
+        currentTable = tableName;
+        currentRecordId = recordId;
+
+        document.getElementById('modal-title').textContent = 'Редактировать запись в ' + tableName;
+        document.getElementById('modal-form').action = '/admin/update/' + tableName + '/' + recordId;
+
+        // Очищаем поля формы
+        document.getElementById('modal-fields').innerHTML = '';
+
+        // Создаем поля формы в зависимости от таблицы
+        createFormFields(tableName);
+
+        // Здесь должна быть логика заполнения формы данными из записи
+        // Для демонстрации просто показываем модальное окно
+        document.getElementById('modal').style.display = 'block';
+    }
+
+    function createFormFields(tableName) {
+        const modalFields = document.getElementById('modal-fields');
+
+        switch(tableName) {
+            case 'users':
+                modalFields.innerHTML = `
+                    <div class="form-group">
+                        <label for="lastName">Фамилия</label>
+                        <input type="text" class="form-control" id="lastName" name="lastName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="firstName">Имя</label>
+                        <input type="text" class="form-control" id="firstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="patronymic">Отчество</label>
+                        <input type="text" class="form-control" id="patronymic" name="patronymic">
+                    </div>
+                    <div class="form-group">
+                        <label for="login">Логин</label>
+                        <input type="text" class="form-control" id="login" name="login" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Пароль</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Роль</label>
+                        <select class="form-control" id="role" name="role" required>
+                            <option value="ADMIN">Администратор</option>
+                            <option value="ACCOUNTANT">Бухгалтер</option>
+                            <option value="MANAGER">Управляющий факультетом</option>
+                            <option value="TEACHER">Сотрудник/Преподаватель</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="department_id">Факультет</label>
+                        <select class="form-control" id="department_id" name="department_id" required>
+                            <option value="">Выберите факультет</option>
+                            <option th:each="dept : ${departments}"
+                                    th:value="${dept.depNumber}"
+                                    th:text="${dept.title}">Факультет</option>
+                        </select>
+                    </div>
+                `;
+                break;
+
+            case 'department':
+                modalFields.innerHTML = `
+                    <div class="form-group">
+                        <label for="depNumber">Номер подразделения</label>
+                        <input type="number" class="form-control" id="depNumber" name="depNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="title">Название</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                `;
+                break;
+
+            case 'device':
+                modalFields.innerHTML = `
+                    <div class="form-group">
+                        <label for="title">Название</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="osTitle">Операционная система</label>
+                        <input type="text" class="form-control" id="osTitle" name="osTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ipAddress">IP-адрес</label>
+                        <input type="text" class="form-control" id="ipAddress" name="ipAddress" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ramSize">ОЗУ (ГБ)</label>
+                        <input type="number" class="form-control" id="ramSize" name="ramSize" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="department_id">Привязано к факультету</label>
+                        <select class="form-control" id="department_id" name="department_id" required>
+                            <option value="">Выберите факультет</option>
+                            <option th:each="dept : ${departments}"
+                                    th:value="${dept.depNumber}"
+                                    th:text="${dept.title}">Факультет</option>
+                        </select>
+                    </div>
+                `;
+                break;
+
+            case 'software':
+                modalFields.innerHTML = `
+                    <div class="form-group">
+                        <label for="title">Название</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="version">Версия</label>
+                        <input type="text" class="form-control" id="version" name="version" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="developer_id">Разработчик</label>
+                        <select class="form-control" id="developer_id" name="developer_id" required>
+                            <option value="">Выберите разработчика</option>
+                            <option th:each="dev : ${developers}"
+                                    th:value="${dev.id}"
+                                    th:text="${dev.title}">Разработчик</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="logoPath">Путь к логотипу</label>
+                        <input type="text" class="form-control" id="logoPath" name="logoPath">
+                    </div>
+                `;
+                break;
+
+            case 'developer':
+                modalFields.innerHTML = `
+                    <div class="form-group">
+                        <label for="title">Название</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="companyType">Тип компании</label>
+                        <input type="text" class="form-control" id="companyType" name="companyType" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Местоположение</label>
+                        <input type="text" class="form-control" id="location" name="location" required>
+                    </div>
+                `;
+                break;
+
+            case 'license':
+                modalFields.innerHTML = `
+                    <div class="form-group">
+                        <label for="type">Тип лицензии</label>
+                        <select class="form-control" id="type" name="type" required>
+                            <option value="">Выберите тип лицензии</option>
+                            <option value="Коммерческая">Коммерческая</option>
+                            <option value="Пробная">Пробная</option>
+                            <option value="Бесплатная">Бесплатная</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="software_id">Программное обеспечение</label>
+                        <select class="form-control" id="software_id" name="software_id" required>
+                            <option value="">Выберите ПО</option>
+                            <option th:each="soft : ${softwareList}"
+                                    th:value="${soft.id}"
+                                    th:text="${soft.title + ' ' + soft.version}">ПО</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateBegin">Дата начала</label>
+                        <input type="date" class="form-control" id="dateBegin" name="dateBegin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateEnd">Дата окончания</label>
+                        <input type="date" class="form-control" id="dateEnd" name="dateEnd" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Цена (руб)</label>
+                        <input type="number" class="form-control" id="price" name="price" min="0" required>
+                    </div>
+                `;
+                break;
+
+            case 'installation_request':
+                modalFields.innerHTML = `
+                    <div class="form-group">
+                        <label for="software_id">Программное обеспечение</label>
+                        <select class="form-control" id="software_id" name="software_id" required>
+                            <option value="">Выберите ПО</option>
+                            <option th:each="soft : ${softwareList}"
+                                    th:value="${soft.id}"
+                                    th:text="${soft.title + ' ' + soft.version}">ПО</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="device_id">Устройство</label>
+                        <select class="form-control" id="device_id" name="device_id" required>
+                            <option value="">Выберите устройство</option>
+                            <option th:each="device : ${devices}"
+                                    th:value="${device.id}"
+                                    th:text="${device.title + ' (' + device.ipAddress + ')'}">Устройство</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user_id">Пользователь</label>
+                        <select class="form-control" id="user_id" name="user_id" required>
+                            <option value="">Выберите пользователя</option>
+                            <option th:each="user : ${users}"
+                                    th:value="${user.id}"
+                                    th:text="${user.lastName + ' ' + user.firstName + ' ' + user.patronymic}">Пользователь</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="request_date">Дата запроса</label>
+                        <input type="date" class="form-control" id="request_date" name="request_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Статус</label>
+                        <select class="form-control" id="status" name="status" required>
+                            <option value="В рассмотрении">В рассмотрении</option>
+                            <option value="Одобрено">Одобрено</option>
+                            <option value="Отклонено">Отклонено</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="comment">Комментарий</label>
+                        <textarea class="form-control" id="comment" name="comment"></textarea>
+                    </div>
+                `;
+                break;
+
+            case 'software_installation':
+                modalFields.innerHTML = `
+                    <div class="form-group">
+                        <label for="software_id">Программное обеспечение</label>
+                        <select class="form-control" id="software_id" name="software_id" required>
+                            <option value="">Выберите ПО</option>
+                            <option th:each="soft : ${softwareList}"
+                                    th:value="${soft.id}"
+                                    th:text="${soft.title + ' ' + soft.version}">ПО</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="device_id">Устройство</label>
+                        <select class="form-control" id="device_id" name="device_id" required>
+                            <option value="">Выберите устройство</option>
+                            <option th:each="device : ${devices}"
+                                    th:value="${device.id}"
+                                    th:text="${device.title + ' (' + device.ipAddress + ')'}">Устройство</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="user_id">Пользователь</label>
+                        <select class="form-control" id="user_id" name="user_id" required>
+                            <option value="">Выберите пользователя</option>
+                            <option th:each="user : ${users}"
+                                    th:value="${user.id}"
+                                    th:text="${user.lastName + ' ' + user.firstName + ' ' + user.patronymic}">Пользователь</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="installation_date">Дата установки</label>
+                        <input type="date" class="form-control" id="installation_date" name="installation_date" required>
+                    </div>
+                `;
+                break;
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+        currentTable = null;
+        currentRecordId = null;
+    }
+
+    function confirmDelete(tableName, recordId) {
+        if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+            // Создаем форму для отправки POST запроса на удаление
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/delete/' + tableName + '/' + recordId;
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // Закрытие модального окна при клике вне его
+    document.getElementById('modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Предотвращение закрытия при клике на содержимое модального окна
+    document.querySelector('#modal > div').addEventListener('click', function(e) {
+        e.stopPropagation();
+    });
+</script>
+</body>
+</html>
