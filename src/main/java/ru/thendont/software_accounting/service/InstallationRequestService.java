@@ -21,6 +21,10 @@ public class InstallationRequestService {
         return installationRequestRepository.findById(id);
     }
 
+    public List<InstallationRequest> findAll() {
+        return (List<InstallationRequest>) installationRequestRepository.findAll();
+    }
+
     public List<InstallationRequest> findByDepartmentNumber(Long depNumber) {
         List<InstallationRequest> requests = new ArrayList<>();
         installationRequestRepository.findAll().forEach(request -> {

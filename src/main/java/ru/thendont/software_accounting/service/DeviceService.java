@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.Device;
 import ru.thendont.software_accounting.repository.DeviceRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,5 +18,9 @@ public class DeviceService {
 
     public Optional<Device> findById(Long id) {
         return deviceRepository.findById(id);
+    }
+
+    public List<Device> findAll() {
+        return (List<Device>) deviceRepository.findAll();
     }
 }

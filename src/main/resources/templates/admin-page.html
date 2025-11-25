@@ -474,7 +474,7 @@
     <nav class="sidebar">
         <div class="nav-section">
             <div class="nav-title">Навигация</div>
-            <a th:href="@{/admin/dashboard}" class="nav-item active">
+            <a th:href="@{/admin/dashboard(userId=${user.id})}" class="nav-item active">
                 <i class="fas fa-th-large"></i>
                 <span>Управление БД</span>
             </a>
@@ -490,7 +490,7 @@
 
         <div class="nav-section">
             <div class="nav-title">Аккаунт</div>
-            <a th:href="@{/auth/logout}" class="nav-item">
+            <a th:href="@{/auth/login}" class="nav-item">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Выйти</span>
             </a>
@@ -537,18 +537,20 @@
         <div class="report-controls">
             <form th:action="@{/admin/reports/software}" method="get" target="_blank" class="report-form">
                 <div class="control-group">
+                    <input type="hidden" name="userId" th:value="${user.id}">
                     <label for="report-type">Тип отчета</label>
                     <select id="report-type" name="type" class="form-select" onchange="toggleDepartmentSelect()">
                         <option value="all">Полный перечень ПО</option>
-                        <option value="department">ПО по подразделению</option>
+                        <option value="department">ПО по факультету</option>
                     </select>
                 </div>
                 <div class="control-group" id="department-control" style="display: none;">
-                    <label for="department-select">Подразделение</label>
-                    <select class="form-select" name="department" id="department-select">
-                        <option value="ALL">Все отделы</option>
-                        <option th:each="dept : ${departments}"
+                    <input type="hidden" name="userId" th:value="${user.id}">
+                    <label for="department-select">Факультет</label>
+                    <select class="form-select" name="departmentNumber" id="department-select">
+                        <option th:each="dept, iter : ${departments}"
                                 th:value="${dept.depNumber}"
+                                th:selected="${iter.index == 0}"
                                 th:text="${dept.title}">Отдел</option>
                     </select>
                 </div>
@@ -600,7 +602,10 @@
                             <td th:text="${user.patronymic}">Иванович</td>
                             <td th:text="${user.login}">ivanov</td>
                             <td th:text="${user.role}">ADMIN</td>
-                            <td th:text="${user.department.title}">-</td>
+                            <td>
+                                <span th:if="${user.department != null}" th:text="${user.department.title}">Факультет</span>
+                                <span th:unless="${user.department != null}" style="color: #718096; font-style: italic;">Не назначен</span>
+                            </td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="btn btn-warning btn-sm"
@@ -724,7 +729,6 @@
                         </thead>
                         <tbody>
                         <tr th:each="soft : ${softwareList}">
-                            <td th:text="${soft.old}">1</td>
                             <td th:text="${soft.title}">Microsoft Office</td>
                             <td th:text="${soft.version}">2021</td>
                             <td th:text="${soft.developer.title}">1</td>
@@ -815,8 +819,16 @@
                         <tr th:each="license : ${licenses}">
                             <td th:text="${license.type}">Коммерческая</td>
                             <td th:text="${license.software.title + ' ' + license.software.version}">Microsoft Office 2021</td>
-                            <td th:text="${#temporals.format(license.dateBegin, 'dd.MM.yyyy')}">01.01.2024</td>
-                            <td th:text="${#temporals.format(license.dateEnd, 'dd.MM.yyyy')}">31.12.2024</td>
+                            <td>
+                                <span th:if="${license.dateBegin != null}"
+                                      th:text="${#temporals.format(license.dateBegin, 'dd.MM.yyyy')}">01.01.2025</span>
+                                <span th:unless="${license.dateBegin != null}" style="color: #718096; font-style: italic;">Не указана</span>
+                            </td>
+                            <td>
+                                <span th:if="${license.dateEnd != null}"
+                                      th:text="${#temporals.format(license.dateEnd, 'dd.MM.yyyy')}">31.12.2025</span>
+                                <span th:unless="${license.dateEnd != null}" style="color: #718096; font-style: italic;">Не указана</span>
+                            </td>
                             <td th:text="${license.price}">5000</td>
                             <td>
                                 <div class="action-buttons">
@@ -863,10 +875,13 @@
                             <td th:text="${req.id}">1</td>
                             <td th:text="${req.software.title}">1</td>
                             <td th:text="${req.device.title}">1</td>
-                            <td th:text="${req.user.lastName + req.user.firstName + req.user.patronymic}">1</td>
+                            <td th:text="${req.user.lastName + ' ' + req.user.firstName + ' ' + req.user.patronymic}">1</td>
                             <td th:text="${req.date}">2024-01-15</td>
                             <td th:text="${req.status}">PENDING</td>
-                            <td th:text="${req.comment}">Нужно для работы</td>
+                            <td>
+                                <span th:if="${#strings.length(req.comment) > 0}" th:text="${req.comment}">Нужно для работы</span>
+                                <span th:unless="${#strings.length(req.comment)} > 0" style="color: #718096; font-style: italic;">Отсутствует</span>
+                            </td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="btn btn-warning btn-sm"
@@ -908,8 +923,8 @@
                         <tr th:each="inst : ${softwareInstallations}">
                             <td th:text="${inst.software.title}">1</td>
                             <td th:text="${inst.device.title}">1</td>
-                            <td th:text="${inst.user.lastName + inst.user.firstName + inst.user.patronymic}">1</td>
-                            <td th:text="${inst.installation_date}">2024-01-16</td>
+                            <td th:text="${inst.user.lastName + ' ' + inst.user.firstName + ' ' + inst.user.patronymic}">1</td>
+                            <td th:text="${inst.date}">2024-01-16</td>
                             <td>
                                 <div class="action-buttons">
                                     <button class="btn btn-warning btn-sm"
@@ -988,6 +1003,20 @@
         }
     }
 
+    function toggleDepartmentRequirement() {
+        const role = document.getElementById('role').value;
+        const departmentField = document.getElementById('department_id');
+
+        // Роли, для которых факультет обязателен
+        const rolesRequiringDepartment = ['MANAGER', 'TEACHER'];
+
+        if (rolesRequiringDepartment.includes(role)) {
+            departmentField.required = true;
+        } else {
+            departmentField.required = false;
+        }
+    }
+
     // Функции для модальных окон
     function showAddModal(tableName) {
         currentTable = tableName;
@@ -1001,6 +1030,13 @@
 
         // Создаем поля формы в зависимости от таблицы
         createFormFields(tableName);
+
+        // Инициализируем проверку для ролей
+        if (tableName === 'users') {
+            setTimeout(() => {
+                toggleDepartmentRequirement();
+            }, 100);
+        }
 
         document.getElementById('modal').style.display = 'block';
     }
@@ -1060,12 +1096,13 @@
                     </div>
                     <div class="form-group">
                         <label for="department_id">Факультет</label>
-                        <select class="form-control" id="department_id" name="department_id" required>
-                            <option value="">Выберите факультет</option>
+                        <select class="form-control" id="department_id" name="department_id">
+                            <option value="">Не назначен</option>
                             <option th:each="dept : ${departments}"
                                     th:value="${dept.depNumber}"
                                     th:text="${dept.title}">Факультет</option>
                         </select>
+                        <small class="form-text text-muted">Для некоторых ролей факультет не требуется</small>
                     </div>
                 `;
                 break;

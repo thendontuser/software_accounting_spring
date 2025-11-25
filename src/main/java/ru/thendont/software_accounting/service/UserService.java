@@ -6,6 +6,7 @@ import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.repository.UserRepository;
 import ru.thendont.software_accounting.util.UserRoles;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,6 +24,10 @@ public class UserService {
 
     public Optional<User> findByLogin(String login) {
         return userRepository.findByLogin(login);
+    }
+
+    public List<User> findAll() {
+        return (List<User>) userRepository.findAll();
     }
 
     public User save(User user) {

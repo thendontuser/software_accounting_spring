@@ -35,6 +35,10 @@ public class SoftwareInstallationService {
         return softwareList;
     }
 
+    public List<SoftwareInstallation> findAll() {
+        return (List<SoftwareInstallation>) softwareInstallationRepository.findAll();
+    }
+
     public SoftwareInstallation save(SoftwareInstallation softwareInstallation) {
         return softwareInstallationRepository.save(softwareInstallation);
     }
