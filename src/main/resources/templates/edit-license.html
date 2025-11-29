@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование лицензии - Учет ПО</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control:disabled {
+            background-color: #f7fafc;
+            color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .form-control.error {
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-top: 0.25rem;
+            display: none;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #a0aec0;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #718096;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .license-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 32px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+        }
+
+        .info-message {
+            background: #f0fff4;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #38a169;
+            margin-bottom: 1rem;
+        }
+
+        .warning-message {
+            background: #fffaf0;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #dd6b20;
+            margin-bottom: 1rem;
+        }
+
+        .info-message i {
+            color: #38a169;
+        }
+
+        .warning-message i {
+            color: #dd6b20;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .price-input {
+            position: relative;
+        }
+
+        .price-input::after {
+            content: '₽';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #718096;
+            font-weight: 600;
+        }
+
+        .date-info {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Кнопка назад -->
+    <div style="padding: 1.5rem 2rem 0;">
+        <a th:href="@{/admin/dashboard(userId=${currentUserId})}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Назад к панели управления
+        </a>
+    </div>
+
+    <!-- Заголовок -->
+    <div class="header">
+        <div class="license-icon">
+            <i class="fas fa-key"></i>
+        </div>
+        <h1 th:text="${license.id != null} ? 'Редактирование лицензии' : 'Добавление лицензии'">
+            Редактирование лицензии
+        </h1>
+        <p th:text="${license.id != null} ?
+                   'Измените данные лицензии' :
+                   'Добавьте новую лицензию в систему'">
+            Измените данные лицензии
+        </p>
+    </div>
+
+    <!-- Форма -->
+    <div class="form-container">
+        <form th:action="@{/admin/edit/licenses}" th:object="${license}" method="post" id="licenseForm">
+            <!-- Скрытое поле для ID -->
+            <input type="hidden" th:field="*{id}">
+
+            <div class="form-group">
+                <label for="software">Программное обеспечение *</label>
+                <select class="form-control" id="software" th:field="*{software.id}" required>
+                    <option value="">Выберите ПО</option>
+                    <option th:each="soft : ${software}"
+                            th:value="${soft.id}"
+                            th:text="${soft.title + ' ' + soft.version}"
+                            th:selected="${license.software != null && license.software.id == soft.id}">
+                        Программное обеспечение
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="type">Тип лицензии *</label>
+                <select class="form-control" id="type" th:field="*{type}" required>
+                    <option value="">Выберите тип лицензии</option>
+                    <option value="Пробная" th:selected="${license.type == 'Пробная'}">Пробная</option>
+                    <option value="Коммерческая" th:selected="${license.type == 'Коммерческая'}">Коммерческая</option>
+                    <option value="Бесплатная" th:selected="${license.type == 'Бесплатная'}">Бесплатная</option>
+                    <option value="Образовательная" th:selected="${license.type == 'Образовательная'}">Образовательная</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dateBegin">Дата начала *</label>
+                    <input type="date" class="form-control" id="dateBegin" name="dateBegin"
+                           th:value="${license.dateBegin != null} ? ${#temporals.format(license.dateBegin, 'yyyy-MM-dd')} : ''"
+                           required>
+                    <div class="date-info">Дата начала действия лицензии</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dateEnd">Дата окончания</label>
+                    <input type="date" class="form-control" id="dateEnd" name="dateEnd"
+                           th:value="${license.dateEnd != null} ? ${#temporals.format(license.dateEnd, 'yyyy-MM-dd')} : ''">
+                    <div class="date-info">Дата окончания действия лицензии</div>
+                    <div id="dateEndError" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>Дата окончания не может быть раньше даты начала</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Стоимость</label>
+                <div class="price-input">
+                    <input type="number" class="form-control" id="price" th:field="*{price}"
+                           placeholder="0" min="0" step="1" style="padding-right: 30px;">
+                </div>
+                <small style="color: #718096; font-size: 12px; margin-top: 0.25rem; display: block;">
+                    Укажите стоимость в рублях
+                </small>
+            </div>
+
+            <!-- Информация для новой лицензии -->
+            <div th:if="${license.id == null}" class="info-message">
+                <i class="fas fa-info-circle"></i>
+                <span>После создания лицензии она будет доступна для использования в системе.</span>
+            </div>
+
+            <!-- Предупреждение о просроченной лицензии -->
+            <div th:if="${license.id != null && license.dateEnd != null && license.dateEnd.isBefore(T(java.time.LocalDate).now())}"
+                 class="warning-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Внимание! Срок действия данной лицензии истек.</span>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    <span th:text="${license.id != null} ? 'Сохранить изменения' : 'Создать лицензию'">
+                        Сохранить изменения
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Функция показа/скрытия ошибки дат
+    function showDateError(show) {
+        const errorElement = document.getElementById('dateEndError');
+        const dateEndInput = document.getElementById('dateEnd');
+
+        if (show) {
+            errorElement.style.display = 'block';
+            dateEndInput.classList.add('error');
+        } else {
+            errorElement.style.display = 'none';
+            dateEndInput.classList.remove('error');
+        }
+    }
+
+    // Валидация дат
+    function validateDates() {
+        const dateBegin = document.getElementById('dateBegin').value;
+        const dateEnd = document.getElementById('dateEnd').value;
+
+        if (dateBegin && dateEnd && dateEnd < dateBegin) {
+            showDateError(true);
+            return false;
+        } else {
+            showDateError(false);
+            return true;
+        }
+    }
+
+    // Обработчик отправки формы
+    document.getElementById('licenseForm').addEventListener('submit', function(e) {
+        const software = document.getElementById('software').value;
+        const type = document.getElementById('type').value;
+        const dateBegin = document.getElementById('dateBegin').value;
+
+        if (!software) {
+            e.preventDefault();
+            alert('Пожалуйста, выберите программное обеспечение');
+            document.getElementById('software').focus();
+            return;
+        }
+
+        if (!type) {
+            e.preventDefault();
+            alert('Пожалуйста, выберите тип лицензии');
+            document.getElementById('type').focus();
+            return;
+        }
+
+        if (!dateBegin) {
+            e.preventDefault();
+            alert('Пожалуйста, укажите дату начала действия лицензии');
+            document.getElementById('dateBegin').focus();
+            return;
+        }
+
+        if (!validateDates()) {
+            e.preventDefault();
+            alert('Пожалуйста, исправьте ошибку в датах: Дата окончания не может быть раньше даты начала');
+            document.getElementById('dateEnd').focus();
+            return;
+        }
+
+        console.log('Форма лицензии отправляется');
+    });
+
+    // Валидация дат при изменении
+    document.getElementById('dateBegin').addEventListener('change', function() {
+        validateDates();
+        // Обновляем минимальную дату для dateEnd
+        if (this.value) {
+            document.getElementById('dateEnd').min = this.value;
+        }
+    });
+
+    document.getElementById('dateEnd').addEventListener('change', function() {
+        validateDates();
+    });
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Форма редактирования лицензии загружена');
+
+        // Автофокус на поле типа лицензии для новых лицензий
+        if ([[${license.id == null}]]) {
+            document.getElementById('type').focus();
+        }
+
+        // Установка минимальной даты для полей дат
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('dateEnd').min = today;
+
+        // Если есть дата начала, устанавливаем ее как минимальную для даты окончания
+        const dateBeginValue = document.getElementById('dateBegin').value;
+        if (dateBeginValue) {
+            document.getElementById('dateEnd').min = dateBeginValue;
+        }
+
+        // Валидация существующих дат при загрузке
+        validateDates();
+    });
+</script>
+</body>
+</html>

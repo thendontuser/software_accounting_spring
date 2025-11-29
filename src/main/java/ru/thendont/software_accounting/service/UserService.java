@@ -34,6 +34,10 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
+    }
+
     public void hashPassword(User user) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String passwordEncoded = passwordEncoder.encode(user.getPassword());

@@ -23,4 +23,12 @@ public class SoftwareService {
     public List<Software> findAll() {
         return (List<Software>) softwareRepository.findAll();
     }
+
+    public Software save(Software software) {
+        return softwareRepository.save(software);
+    }
+
+    public void deleteById(Long id) {
+        softwareRepository.deleteById(id);
+    }
 }

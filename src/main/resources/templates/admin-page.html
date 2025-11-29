@@ -484,7 +484,7 @@
             <div class="nav-title">Система</div>
             <div class="nav-item" style="cursor: default;">
                 <i class="fas fa-database"></i>
-                <span>Таблиц: 7</span>
+                <span>Таблиц: 8</span>
             </div>
         </div>
 
@@ -537,7 +537,6 @@
         <div class="report-controls">
             <form th:action="@{/admin/reports/software}" method="get" target="_blank" class="report-form">
                 <div class="control-group">
-                    <input type="hidden" name="userId" th:value="${user.id}">
                     <label for="report-type">Тип отчета</label>
                     <select id="report-type" name="type" class="form-select" onchange="toggleDepartmentSelect()">
                         <option value="all">Полный перечень ПО</option>
@@ -578,9 +577,6 @@
             <div id="tab-users" class="tab-content active">
                 <div class="table-actions">
                     <h3 class="table-title">Таблица: Пользователи</h3>
-                    <button class="btn btn-primary" onclick="showAddModal('users')">
-                        <i class="fas fa-plus"></i> Добавить запись
-                    </button>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
@@ -608,10 +604,10 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm"
-                                            th:onclick="|showEditModal('users', ${user.id})|">
+                                    <a th:href="@{/admin/edit/users/{id}(id=${user.id})}"
+                                       class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i> Изменить
-                                    </button>
+                                    </a>
                                     <button class="btn btn-danger btn-sm"
                                             th:onclick="|confirmDelete('users', ${user.id})|">
                                         <i class="fas fa-trash"></i> Удалить
@@ -628,9 +624,10 @@
             <div id="tab-department" class="tab-content">
                 <div class="table-actions">
                     <h3 class="table-title">Таблица: факультеты</h3>
-                    <button class="btn btn-primary" onclick="showAddModal('department')">
+                    <a th:href="@{/admin/edit/departments/{id}(id=${0})}"
+                       class="btn btn-primary">
                         <i class="fas fa-plus"></i> Добавить запись
-                    </button>
+                    </a>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
@@ -647,12 +644,12 @@
                             <td th:text="${dept.title}">IT отдел</td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm"
-                                            th:onclick="|showEditModal('department', ${dept.depNumber})|">
+                                    <a th:href="@{/admin/edit/departments/{id}(id=${dept.depNumber})}"
+                                       class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i> Изменить
-                                    </button>
+                                    </a>
                                     <button class="btn btn-danger btn-sm"
-                                            th:onclick="|confirmDelete('department', ${dept.depNumber})|">
+                                            th:onclick="|confirmDelete('departments', ${dept.depNumber})|">
                                         <i class="fas fa-trash"></i> Удалить
                                     </button>
                                 </div>
@@ -667,9 +664,10 @@
             <div id="tab-device" class="tab-content">
                 <div class="table-actions">
                     <h3 class="table-title">Таблица: устройства</h3>
-                    <button class="btn btn-primary" onclick="showAddModal('device')">
+                    <a th:href="@{/admin/edit/devices/{id}(id=${0})}"
+                       class="btn btn-primary">
                         <i class="fas fa-plus"></i> Добавить запись
-                    </button>
+                    </a>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
@@ -692,12 +690,12 @@
                             <td th:text="${device.department.title}">1</td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm"
-                                            th:onclick="|showEditModal('device', ${device.id})|">
+                                    <a th:href="@{/admin/edit/devices/{id}(id=${device.id})}"
+                                       class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i> Изменить
-                                    </button>
+                                    </a>
                                     <button class="btn btn-danger btn-sm"
-                                            th:onclick="|confirmDelete('device', ${device.id})|">
+                                            th:onclick="|confirmDelete('devices', ${device.id})|">
                                         <i class="fas fa-trash"></i> Удалить
                                     </button>
                                 </div>
@@ -712,9 +710,10 @@
             <div id="tab-software" class="tab-content">
                 <div class="table-actions">
                     <h3 class="table-title">Таблица: программное обеспечение</h3>
-                    <button class="btn btn-primary" onclick="showAddModal('software')">
+                    <a th:href="@{/admin/edit/software/{id}(id=${0})}"
+                       class="btn btn-primary">
                         <i class="fas fa-plus"></i> Добавить запись
-                    </button>
+                    </a>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
@@ -738,10 +737,10 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm"
-                                            th:onclick="|showEditModal('software', ${soft.id})|">
+                                    <a th:href="@{/admin/edit/software/{id}(id=${soft.id})}"
+                                       class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i> Изменить
-                                    </button>
+                                    </a>
                                     <button class="btn btn-danger btn-sm"
                                             th:onclick="|confirmDelete('software', ${soft.id})|">
                                         <i class="fas fa-trash"></i> Удалить
@@ -758,9 +757,10 @@
             <div id="tab-developer" class="tab-content">
                 <div class="table-actions">
                     <h3 class="table-title">Таблица: разработчики</h3>
-                    <button class="btn btn-primary" onclick="showAddModal('developer')">
+                    <a th:href="@{/admin/edit/developers/{id}(id=${0})}"
+                       class="btn btn-primary">
                         <i class="fas fa-plus"></i> Добавить запись
-                    </button>
+                    </a>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
@@ -779,12 +779,12 @@
                             <td th:text="${dev.location}">США</td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm"
-                                            th:onclick="|showEditModal('developer', ${dev.id})|">
+                                    <a th:href="@{/admin/edit/developers/{id}(id=${dev.id})}"
+                                       class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i> Изменить
-                                    </button>
+                                    </a>
                                     <button class="btn btn-danger btn-sm"
-                                            th:onclick="|confirmDelete('developer', ${dev.id})|">
+                                            th:onclick="|confirmDelete('developers', ${dev.id})|">
                                         <i class="fas fa-trash"></i> Удалить
                                     </button>
                                 </div>
@@ -799,9 +799,10 @@
             <div id="tab-license" class="tab-content">
                 <div class="table-actions">
                     <h3 class="table-title">Таблица: лицензии</h3>
-                    <button class="btn btn-primary" onclick="showAddModal('license')">
+                    <a th:href="@{/admin/edit/licenses/{id}(id=${0})}"
+                       class="btn btn-primary">
                         <i class="fas fa-plus"></i> Добавить запись
-                    </button>
+                    </a>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
@@ -832,12 +833,12 @@
                             <td th:text="${license.price}">5000</td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm"
-                                            th:onclick="|showEditModal('license', ${license.id})|">
+                                    <a th:href="@{/admin/edit/licenses/{id}(id=${license.id})}"
+                                       class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i> Изменить
-                                    </button>
+                                    </a>
                                     <button class="btn btn-danger btn-sm"
-                                            th:onclick="|confirmDelete('license', ${license.id})|">
+                                            th:onclick="|confirmDelete('licenses', ${license.id})|">
                                         <i class="fas fa-trash"></i> Удалить
                                     </button>
                                 </div>
@@ -852,9 +853,6 @@
             <div id="tab-installation_request" class="tab-content">
                 <div class="table-actions">
                     <h3 class="table-title">Таблица: заявки</h3>
-                    <button class="btn btn-primary" onclick="showAddModal('installation_request')">
-                        <i class="fas fa-plus"></i> Добавить запись
-                    </button>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
@@ -884,12 +882,12 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm"
-                                            th:onclick="|showEditModal('installation_request', ${req.id})|">
+                                    <a th:href="@{/admin/edit/installation_requests/{id}(id=${req.id})}"
+                                       class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i> Изменить
-                                    </button>
+                                    </a>
                                     <button class="btn btn-danger btn-sm"
-                                            th:onclick="|confirmDelete('installation_request', ${req.id})|">
+                                            th:onclick="|confirmDelete('installation_requests', ${req.id})|">
                                         <i class="fas fa-trash"></i> Удалить
                                     </button>
                                 </div>
@@ -904,9 +902,10 @@
             <div id="tab-software_installation" class="tab-content">
                 <div class="table-actions">
                     <h3 class="table-title">Таблица: установки</h3>
-                    <button class="btn btn-primary" onclick="showAddModal('software_installation')">
+                    <a th:href="@{/admin/edit/software_installations/{id}(id=${0})}"
+                       class="btn btn-primary">
                         <i class="fas fa-plus"></i> Добавить запись
-                    </button>
+                    </a>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
@@ -927,12 +926,12 @@
                             <td th:text="${inst.date}">2024-01-16</td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="btn btn-warning btn-sm"
-                                            th:onclick="|showEditModal('software_installation', ${inst.id})|">
+                                    <a th:href="@{/admin/edit/software_installations/{id}(id=${inst.id})}"
+                                       class="btn btn-warning btn-sm">
                                         <i class="fas fa-edit"></i> Изменить
-                                    </button>
+                                    </a>
                                     <button class="btn btn-danger btn-sm"
-                                            th:onclick="|confirmDelete('software_installation', ${inst.id})|">
+                                            th:onclick="|confirmDelete('software_installations', ${inst.id})|">
                                         <i class="fas fa-trash"></i> Удалить
                                     </button>
                                 </div>
@@ -941,28 +940,9 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </div>-
         </div>
     </main>
-</div>
-
-<!-- Модальное окно для добавления/редактирования -->
-<div id="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 15px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-            <h3 id="modal-title">Добавить запись</h3>
-            <button onclick="closeModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: #718096;">&times;</button>
-        </div>
-        <form id="modal-form" method="post">
-            <div id="modal-fields">
-                <!-- Поля формы будут генерироваться динамически -->
-            </div>
-            <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-                <button type="button" class="btn btn-secondary" onclick="closeModal()">Отмена</button>
-                <button type="submit" class="btn btn-primary">Сохранить</button>
-            </div>
-        </form>
-    </div>
 </div>
 
 <script>
@@ -1017,309 +997,6 @@
         }
     }
 
-    // Функции для модальных окон
-    function showAddModal(tableName) {
-        currentTable = tableName;
-        currentRecordId = null;
-
-        document.getElementById('modal-title').textContent = 'Добавить запись в ' + tableName;
-        document.getElementById('modal-form').action = '/admin/save/' + tableName;
-
-        // Очищаем поля формы
-        document.getElementById('modal-fields').innerHTML = '';
-
-        // Создаем поля формы в зависимости от таблицы
-        createFormFields(tableName);
-
-        // Инициализируем проверку для ролей
-        if (tableName === 'users') {
-            setTimeout(() => {
-                toggleDepartmentRequirement();
-            }, 100);
-        }
-
-        document.getElementById('modal').style.display = 'block';
-    }
-
-    function showEditModal(tableName, recordId) {
-        currentTable = tableName;
-        currentRecordId = recordId;
-
-        document.getElementById('modal-title').textContent = 'Редактировать запись в ' + tableName;
-        document.getElementById('modal-form').action = '/admin/update/' + tableName + '/' + recordId;
-
-        // Очищаем поля формы
-        document.getElementById('modal-fields').innerHTML = '';
-
-        // Создаем поля формы в зависимости от таблицы
-        createFormFields(tableName);
-
-        // Здесь должна быть логика заполнения формы данными из записи
-        // Для демонстрации просто показываем модальное окно
-        document.getElementById('modal').style.display = 'block';
-    }
-
-    function createFormFields(tableName) {
-        const modalFields = document.getElementById('modal-fields');
-
-        switch(tableName) {
-            case 'users':
-                modalFields.innerHTML = `
-                    <div class="form-group">
-                        <label for="lastName">Фамилия</label>
-                        <input type="text" class="form-control" id="lastName" name="lastName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="firstName">Имя</label>
-                        <input type="text" class="form-control" id="firstName" name="firstName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="patronymic">Отчество</label>
-                        <input type="text" class="form-control" id="patronymic" name="patronymic">
-                    </div>
-                    <div class="form-group">
-                        <label for="login">Логин</label>
-                        <input type="text" class="form-control" id="login" name="login" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Пароль</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="role">Роль</label>
-                        <select class="form-control" id="role" name="role" required>
-                            <option value="ADMIN">Администратор</option>
-                            <option value="ACCOUNTANT">Бухгалтер</option>
-                            <option value="MANAGER">Управляющий факультетом</option>
-                            <option value="TEACHER">Сотрудник/Преподаватель</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="department_id">Факультет</label>
-                        <select class="form-control" id="department_id" name="department_id">
-                            <option value="">Не назначен</option>
-                            <option th:each="dept : ${departments}"
-                                    th:value="${dept.depNumber}"
-                                    th:text="${dept.title}">Факультет</option>
-                        </select>
-                        <small class="form-text text-muted">Для некоторых ролей факультет не требуется</small>
-                    </div>
-                `;
-                break;
-
-            case 'department':
-                modalFields.innerHTML = `
-                    <div class="form-group">
-                        <label for="depNumber">Номер подразделения</label>
-                        <input type="number" class="form-control" id="depNumber" name="depNumber" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="title">Название</label>
-                        <input type="text" class="form-control" id="title" name="title" required>
-                    </div>
-                `;
-                break;
-
-            case 'device':
-                modalFields.innerHTML = `
-                    <div class="form-group">
-                        <label for="title">Название</label>
-                        <input type="text" class="form-control" id="title" name="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="osTitle">Операционная система</label>
-                        <input type="text" class="form-control" id="osTitle" name="osTitle" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="ipAddress">IP-адрес</label>
-                        <input type="text" class="form-control" id="ipAddress" name="ipAddress" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="ramSize">ОЗУ (ГБ)</label>
-                        <input type="number" class="form-control" id="ramSize" name="ramSize" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="department_id">Привязано к факультету</label>
-                        <select class="form-control" id="department_id" name="department_id" required>
-                            <option value="">Выберите факультет</option>
-                            <option th:each="dept : ${departments}"
-                                    th:value="${dept.depNumber}"
-                                    th:text="${dept.title}">Факультет</option>
-                        </select>
-                    </div>
-                `;
-                break;
-
-            case 'software':
-                modalFields.innerHTML = `
-                    <div class="form-group">
-                        <label for="title">Название</label>
-                        <input type="text" class="form-control" id="title" name="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="version">Версия</label>
-                        <input type="text" class="form-control" id="version" name="version" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="developer_id">Разработчик</label>
-                        <select class="form-control" id="developer_id" name="developer_id" required>
-                            <option value="">Выберите разработчика</option>
-                            <option th:each="dev : ${developers}"
-                                    th:value="${dev.id}"
-                                    th:text="${dev.title}">Разработчик</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="logoPath">Путь к логотипу</label>
-                        <input type="text" class="form-control" id="logoPath" name="logoPath">
-                    </div>
-                `;
-                break;
-
-            case 'developer':
-                modalFields.innerHTML = `
-                    <div class="form-group">
-                        <label for="title">Название</label>
-                        <input type="text" class="form-control" id="title" name="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="companyType">Тип компании</label>
-                        <input type="text" class="form-control" id="companyType" name="companyType" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="location">Местоположение</label>
-                        <input type="text" class="form-control" id="location" name="location" required>
-                    </div>
-                `;
-                break;
-
-            case 'license':
-                modalFields.innerHTML = `
-                    <div class="form-group">
-                        <label for="type">Тип лицензии</label>
-                        <select class="form-control" id="type" name="type" required>
-                            <option value="">Выберите тип лицензии</option>
-                            <option value="Коммерческая">Коммерческая</option>
-                            <option value="Пробная">Пробная</option>
-                            <option value="Бесплатная">Бесплатная</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="software_id">Программное обеспечение</label>
-                        <select class="form-control" id="software_id" name="software_id" required>
-                            <option value="">Выберите ПО</option>
-                            <option th:each="soft : ${softwareList}"
-                                    th:value="${soft.id}"
-                                    th:text="${soft.title + ' ' + soft.version}">ПО</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="dateBegin">Дата начала</label>
-                        <input type="date" class="form-control" id="dateBegin" name="dateBegin" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="dateEnd">Дата окончания</label>
-                        <input type="date" class="form-control" id="dateEnd" name="dateEnd" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="price">Цена (руб)</label>
-                        <input type="number" class="form-control" id="price" name="price" min="0" required>
-                    </div>
-                `;
-                break;
-
-            case 'installation_request':
-                modalFields.innerHTML = `
-                    <div class="form-group">
-                        <label for="software_id">Программное обеспечение</label>
-                        <select class="form-control" id="software_id" name="software_id" required>
-                            <option value="">Выберите ПО</option>
-                            <option th:each="soft : ${softwareList}"
-                                    th:value="${soft.id}"
-                                    th:text="${soft.title + ' ' + soft.version}">ПО</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="device_id">Устройство</label>
-                        <select class="form-control" id="device_id" name="device_id" required>
-                            <option value="">Выберите устройство</option>
-                            <option th:each="device : ${devices}"
-                                    th:value="${device.id}"
-                                    th:text="${device.title + ' (' + device.ipAddress + ')'}">Устройство</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="user_id">Пользователь</label>
-                        <select class="form-control" id="user_id" name="user_id" required>
-                            <option value="">Выберите пользователя</option>
-                            <option th:each="user : ${users}"
-                                    th:value="${user.id}"
-                                    th:text="${user.lastName + ' ' + user.firstName + ' ' + user.patronymic}">Пользователь</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="request_date">Дата запроса</label>
-                        <input type="date" class="form-control" id="request_date" name="request_date" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="status">Статус</label>
-                        <select class="form-control" id="status" name="status" required>
-                            <option value="В рассмотрении">В рассмотрении</option>
-                            <option value="Одобрено">Одобрено</option>
-                            <option value="Отклонено">Отклонено</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="comment">Комментарий</label>
-                        <textarea class="form-control" id="comment" name="comment"></textarea>
-                    </div>
-                `;
-                break;
-
-            case 'software_installation':
-                modalFields.innerHTML = `
-                    <div class="form-group">
-                        <label for="software_id">Программное обеспечение</label>
-                        <select class="form-control" id="software_id" name="software_id" required>
-                            <option value="">Выберите ПО</option>
-                            <option th:each="soft : ${softwareList}"
-                                    th:value="${soft.id}"
-                                    th:text="${soft.title + ' ' + soft.version}">ПО</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="device_id">Устройство</label>
-                        <select class="form-control" id="device_id" name="device_id" required>
-                            <option value="">Выберите устройство</option>
-                            <option th:each="device : ${devices}"
-                                    th:value="${device.id}"
-                                    th:text="${device.title + ' (' + device.ipAddress + ')'}">Устройство</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="user_id">Пользователь</label>
-                        <select class="form-control" id="user_id" name="user_id" required>
-                            <option value="">Выберите пользователя</option>
-                            <option th:each="user : ${users}"
-                                    th:value="${user.id}"
-                                    th:text="${user.lastName + ' ' + user.firstName + ' ' + user.patronymic}">Пользователь</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="installation_date">Дата установки</label>
-                        <input type="date" class="form-control" id="installation_date" name="installation_date" required>
-                    </div>
-                `;
-                break;
-        }
-    }
-
-    function closeModal() {
-        document.getElementById('modal').style.display = 'none';
-        currentTable = null;
-        currentRecordId = null;
-    }
-
     function confirmDelete(tableName, recordId) {
         if (confirm('Вы уверены, что хотите удалить эту запись?')) {
             // Создаем форму для отправки POST запроса на удаление
@@ -1330,18 +1007,6 @@
             form.submit();
         }
     }
-
-    // Закрытие модального окна при клике вне его
-    document.getElementById('modal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeModal();
-        }
-    });
-
-    // Предотвращение закрытия при клике на содержимое модального окна
-    document.querySelector('#modal > div').addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
 </script>
 </body>
 </html>

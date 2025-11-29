@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Редактирование устройства - Учет ПО</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: #f8f9fa;
+        min-height: 100vh;
+        padding: 2rem;
+    }
+
+    .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        overflow: hidden;
+    }
+
+    .header {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .header h1 {
+        font-size: 24px;
+        margin-bottom: 0.5rem;
+    }
+
+    .header p {
+        opacity: 0.9;
+    }
+
+    .form-container {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2d3748;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-control:disabled {
+        background-color: #f7fafc;
+        color: #a0aec0;
+        cursor: not-allowed;
+    }
+
+    .form-control.error {
+        border-color: #e53e3e;
+        box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+    }
+
+    .error-message {
+        color: #e53e3e;
+        font-size: 12px;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: none;
+        font-size: 14px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+        background: #a0aec0;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #718096;
+    }
+
+    .btn-danger {
+        background: #e53e3e;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #c53030;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: space-between;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .device-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 32px;
+        margin: 0 auto 1.5rem;
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #667eea;
+        text-decoration: none;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+
+    .back-link:hover {
+        color: #764ba2;
+    }
+
+    .info-message {
+        background: #f0fff4;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 4px solid #38a169;
+        margin-bottom: 1rem;
+    }
+
+    .warning-message {
+        background: #fffaf0;
+        padding: 12px;
+        border-radius: 8px;
+        border-left: 4px solid #dd6b20;
+        margin-bottom: 1rem;
+    }
+
+    .info-message i {
+        color: #38a169;
+    }
+
+    .warning-message i {
+        color: #dd6b20;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .stat-card {
+        background: #f7fafc;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+    }
+
+    .stat-number {
+        font-size: 24px;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #718096;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .ip-address {
+        font-family: monospace;
+        font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <!-- Кнопка назад -->
+  <div style="padding: 1.5rem 2rem 0;">
+    <a th:href="@{/admin/dashboard(userId=${currentUserId})}" class="back-link">
+      <i class="fas fa-arrow-left"></i>
+      Назад к панели управления
+    </a>
+  </div>
+
+  <!-- Заголовок -->
+  <div class="header">
+    <div class="device-icon">
+      <i class="fas fa-desktop"></i>
+    </div>
+    <h1 th:text="${device.id != null} ? 'Редактирование устройства' : 'Добавление устройства'">
+      Редактирование устройства
+    </h1>
+    <p th:text="${device.id != null} ?
+                   'Измените данные устройства' :
+                   'Добавьте новое устройство в систему'">
+      Измените данные устройства
+    </p>
+  </div>
+
+  <!-- Форма -->
+  <div class="form-container">
+    <form th:action="@{/admin/edit/devices}" th:object="${device}" method="post" id="deviceForm">
+      <!-- Скрытое поле для ID -->
+      <input type="hidden" th:field="*{id}">
+
+      <div class="form-group">
+        <label for="title">Название устройства *</label>
+        <input type="text" class="form-control" id="title" th:field="*{title}"
+               placeholder="Введите название устройства" required maxlength="255">
+      </div>
+
+      <div class="form-group">
+        <label for="osTitle">Операционная система *</label>
+        <input type="text" class="form-control" id="osTitle" th:field="*{osTitle}"
+               placeholder="Введите операционную систему" required maxlength="255">
+      </div>
+
+      <div class="form-group">
+        <label for="ipAddress">IP-адрес</label>
+        <input type="text" class="form-control ip-address" id="ipAddress" th:field="*{ipAddress}"
+               placeholder="192.168.1.1" maxlength="15"
+               pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$">
+        <div id="ipError" class="error-message">
+          <i class="fas fa-exclamation-circle"></i>
+          <span>Введите корректный IP-адрес в формате XXX.XXX.XXX.XXX</span>
+        </div>
+        <small style="color: #718096; font-size: 12px; margin-top: 0.25rem; display: block;">
+          Формат: XXX.XXX.XXX.XXX (каждая часть от 0 до 255)
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="ramSize">Объем ОЗУ (ГБ)</label>
+        <input type="number" class="form-control" id="ramSize" th:field="*{ramSize}"
+               placeholder="Введите объем ОЗУ" min="0" max="1024">
+        <small style="color: #718096; font-size: 12px; margin-top: 0.25rem; display: block;">
+          Рекомендуется указывать в гигабайтах
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="department">Факультет *</label>
+        <select class="form-control" id="department" th:field="*{department.depNumber}" required>
+          <option value="">Выберите факультет</option>
+          <option th:each="dept : ${departments}"
+                  th:value="${dept.depNumber}"
+                  th:text="${dept.title}"
+                  th:selected="${device.department != null && device.department.depNumber == dept.depNumber}">
+            Факультет
+          </option>
+        </select>
+      </div>
+
+      <!-- Статистика (только для редактирования существующего устройства) -->
+      <div th:if="${device.id != null}">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-number" th:text="${device.requests.size()}">0</div>
+            <div class="stat-label">Запросов</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" th:text="${device.installations.size()}">0</div>
+            <div class="stat-label">Установок ПО</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Информация для нового устройства -->
+      <div th:if="${device.id == null}" class="info-message">
+        <i class="fas fa-info-circle"></i>
+        <span>После создания устройства вы сможете назначать ему программное обеспечение.</span>
+      </div>
+
+      <div class="form-actions">
+        <div style="display: flex; gap: 1rem; margin-left: auto;">
+          <button type="button" class="btn btn-secondary" onclick="history.back()">
+            <i class="fas fa-times"></i> Отмена
+          </button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i>
+            <span th:text="${device.id != null} ? 'Сохранить изменения' : 'Создать устройство'">
+                            Сохранить изменения
+                        </span>
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Функция валидации IP-адреса
+  function validateIPAddress(ip) {
+      if (!ip || ip.trim() === '') {
+          return true; // Пустое значение допустимо
+      }
+
+      const ipRegex = /^([0-9]{1,3}\.){3}[0-9]{1,3}$/;
+      if (!ipRegex.test(ip)) {
+          return false;
+      }
+
+      // Проверка что каждая часть от 0 до 255
+      const parts = ip.split('.');
+      for (let part of parts) {
+          const num = parseInt(part, 10);
+          if (num < 0 || num > 255 || isNaN(num)) {
+              return false;
+          }
+          // Проверка на ведущие нули
+          if (part.length > 1 && part[0] === '0') {
+              return false;
+          }
+      }
+
+      return true;
+  }
+
+  // Функция показа/скрытия ошибки
+  function showIPError(show, message) {
+      const errorElement = document.getElementById('ipError');
+      const ipInput = document.getElementById('ipAddress');
+
+      if (show) {
+          errorElement.style.display = 'block';
+          ipInput.classList.add('error');
+          if (message) {
+              errorElement.querySelector('span').textContent = message;
+          }
+      } else {
+          errorElement.style.display = 'none';
+          ipInput.classList.remove('error');
+      }
+  }
+
+  // Обработчик ввода IP-адреса
+  document.getElementById('ipAddress').addEventListener('input', function(e) {
+      const ip = e.target.value.trim();
+
+      if (ip === '') {
+          showIPError(false);
+          return;
+      }
+
+      if (!validateIPAddress(ip)) {
+          showIPError(true, 'Введите корректный IP-адрес в формате XXX.XXX.XXX.XXX (каждая часть от 0 до 255)');
+      } else {
+          showIPError(false);
+      }
+  });
+
+  // Обработчик отправки формы
+  document.getElementById('deviceForm').addEventListener('submit', function(e) {
+      const title = document.getElementById('title').value.trim();
+      const osTitle = document.getElementById('osTitle').value.trim();
+      const department = document.getElementById('department').value;
+      const ipAddress = document.getElementById('ipAddress').value.trim();
+
+      // Валидация обязательных полей
+      if (!title) {
+          e.preventDefault();
+          alert('Пожалуйста, введите название устройства');
+          document.getElementById('title').focus();
+          return;
+      }
+
+      if (!osTitle) {
+          e.preventDefault();
+          alert('Пожалуйста, введите операционную систему');
+          document.getElementById('osTitle').focus();
+          return;
+      }
+
+      if (!department) {
+          e.preventDefault();
+          alert('Пожалуйста, выберите факультет');
+          document.getElementById('department').focus();
+          return;
+      }
+
+      // Валидация IP-адреса
+      if (ipAddress && !validateIPAddress(ipAddress)) {
+          e.preventDefault();
+          alert('Пожалуйста, введите корректный IP-адрес');
+          document.getElementById('ipAddress').focus();
+          return;
+      }
+
+      console.log('Форма устройства отправляется');
+  });
+
+  // Инициализация при загрузке страницы
+  document.addEventListener('DOMContentLoaded', function() {
+      console.log('Форма редактирования устройства загружена');
+
+      // Валидация существующего IP-адреса при загрузке
+      const ipInput = document.getElementById('ipAddress');
+      if (ipInput.value && !validateIPAddress(ipInput.value)) {
+          showIPError(true, 'Текущий IP-адрес имеет неверный формат');
+      }
+
+      // Автофокус на поле названия для новых устройств
+      if ([[${device.id == null}]]) {
+          document.getElementById('title').focus();
+      }
+  });
+</script>
+</body>
+</html>

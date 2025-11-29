@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование пользователя - Учет ПО</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control:disabled {
+            background-color: #f7fafc;
+            color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #a0aec0;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #718096;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 24px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+        }
+
+        .info-message {
+            background: #f0fff4;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #38a169;
+            margin-bottom: 1rem;
+        }
+
+        .info-message i {
+            color: #38a169;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Кнопка назад -->
+    <div style="padding: 1.5rem 2rem 0;">
+        <a th:href="@{/admin/dashboard(userId=${currentUserId})}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Назад к панели управления
+        </a>
+    </div>
+
+    <!-- Заголовок -->
+    <div class="header">
+        <div class="user-avatar">
+            <span th:text="${#strings.substring(user.lastName, 0, 1) + #strings.substring(user.firstName, 0, 1)}">НП</span>
+        </div>
+        <h1>Редактирование пользователя</h1>
+        <p>Измените данные пользователя системы</p>
+    </div>
+
+    <!-- Форма -->
+    <div class="form-container">
+        <form th:action="@{/admin/edit/users}" th:object="${user}" method="post" id="userForm">
+            <!-- Скрытое поле для ID -->
+            <input type="hidden" th:field="*{id}">
+
+            <!-- Скрытое поле для пароля -->
+            <input type="hidden" th:field="*{password}">
+
+            <div class="form-group">
+                <label for="lastName">Фамилия *</label>
+                <input type="text" class="form-control" id="lastName" th:field="*{lastName}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="firstName">Имя *</label>
+                <input type="text" class="form-control" id="firstName" th:field="*{firstName}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="patronymic">Отчество</label>
+                <input type="text" class="form-control" id="patronymic" th:field="*{patronymic}">
+            </div>
+
+            <div class="form-group">
+                <label for="login">Логин *</label>
+                <input type="text" class="form-control" id="login" th:field="*{login}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="role">Роль *</label>
+                <select class="form-control" id="role" th:field="*{role}" required onchange="toggleDepartmentField()">
+                    <option value="ADMIN">Администратор</option>
+                    <option value="ACCOUNTANT">Бухгалтер</option>
+                    <option value="MANAGER">Управляющий факультетом</option>
+                    <option value="TEACHER">Сотрудник/Преподаватель</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="department">Факультет</label>
+                <select class="form-control" id="department" th:field="*{department.depNumber}" name="departmentNumber">
+                    <option value="">Не назначен</option>
+                    <option th:each="dept : ${departments}"
+                            th:value="${dept.depNumber}"
+                            th:text="${dept.title}"
+                            th:selected="${user.department != null && user.department.depNumber == dept.depNumber}">
+                        Факультет
+                    </option>
+                </select>
+                <div id="department-info" class="info-message" style="display: none;">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Для выбранной роли факультет не требуется</span>
+                </div>
+                <small style="color: #718096; font-size: 12px; margin-top: 0.25rem; display: block;">
+                    Для некоторых ролей факультет не требуется
+                </small>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Сохранить изменения
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Функция для блокировки/разблокировки выбора факультета
+    function toggleDepartmentField() {
+        const roleSelect = document.getElementById('role');
+        const departmentSelect = document.getElementById('department');
+        const departmentInfo = document.getElementById('department-info');
+
+        // Роли, для которых факультет не требуется
+        const rolesWithoutDepartment = ['ADMIN', 'ACCOUNTANT'];
+
+        if (rolesWithoutDepartment.includes(roleSelect.value)) {
+            // Блокируем выбор факультета
+            departmentSelect.disabled = true;
+            departmentSelect.value = ''; // Очищаем значение
+            departmentInfo.style.display = 'block';
+        } else {
+            // Разблокируем выбор факультета
+            departmentSelect.disabled = false;
+            departmentInfo.style.display = 'none';
+        }
+    }
+
+    // Обработчик отправки формы - устанавливаем department в null для ролей без факультета
+    document.getElementById('userForm').addEventListener('submit', function(e) {
+        const roleSelect = document.getElementById('role');
+        const rolesWithoutDepartment = ['ADMIN', 'ACCOUNTANT'];
+
+        if (rolesWithoutDepartment.includes(roleSelect.value)) {
+            // Создаем скрытое поле для отправки department=null
+            const hiddenField = document.createElement('input');
+            hiddenField.type = 'hidden';
+            hiddenField.name = 'department';
+            hiddenField.value = '';
+            this.appendChild(hiddenField);
+        }
+    });
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleDepartmentField(); // Применяем логику при загрузке
+
+        // Информация о защите пароля
+        console.log('Форма редактирования пользователя загружена');
+        console.log('Пароль защищен от изменения через интерфейс');
+    });
+</script>
+</body>
+</html>

@@ -53,6 +53,10 @@ public class InstallationRequestService {
         return installationRequestRepository.save(installationRequest);
     }
 
+    public void deleteById(Long id) {
+        installationRequestRepository.deleteById(id);
+    }
+
     public boolean isPossibleInstallSoftware(InstallationRequest installationRequest) {
         return installationRequest.getDevice().getRamSize() > 1;
     }

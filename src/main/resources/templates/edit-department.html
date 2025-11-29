@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование факультета - Учет ПО</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control:disabled {
+            background-color: #f7fafc;
+            color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #a0aec0;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #718096;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .department-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 32px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+        }
+
+        .info-message {
+            background: #f0fff4;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #38a169;
+            margin-bottom: 1rem;
+        }
+
+        .warning-message {
+            background: #fffaf0;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #dd6b20;
+            margin-bottom: 1rem;
+        }
+
+        .info-message i {
+            color: #38a169;
+        }
+
+        .warning-message i {
+            color: #dd6b20;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Кнопка назад -->
+    <div style="padding: 1.5rem 2rem 0;">
+        <a th:href="@{/admin/dashboard(userId=${currentUserId})}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Назад к панели управления
+        </a>
+    </div>
+
+    <!-- Заголовок -->
+    <div class="header">
+        <div class="department-icon">
+            <i class="fas fa-building"></i>
+        </div>
+        <h1 th:text="${department.depNumber != null} ? 'Редактирование факультета' : 'Добавление факультета'">
+            Редактирование факультета
+        </h1>
+        <p th:text="${department.depNumber != null} ?
+                   'Измените данные факультета' :
+                   'Добавьте новый факультет в систему'">
+            Измените данные факультета
+        </p>
+    </div>
+
+    <!-- Форма -->
+    <div class="form-container">
+        <form th:action="@{/admin/edit/departments}" th:object="${department}" method="post" id="departmentForm">
+            <!-- Скрытое поле для ID -->
+            <input type="hidden" th:field="*{depNumber}">
+
+            <div class="form-group">
+                <label for="title">Название факультета *</label>
+                <input type="text" class="form-control" id="title" th:field="*{title}"
+                       placeholder="Введите название факультета" required maxlength="255">
+            </div>
+
+            <!-- Статистика (только для редактирования существующего факультета) -->
+            <div th:if="${department.depNumber != null}">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${department.users.size()}">0</div>
+                        <div class="stat-label">Пользователей</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${department.devices.size()}">0</div>
+                        <div class="stat-label">Устройств</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Информация для нового факультета -->
+            <div th:if="${department.depNumber == null}" class="info-message">
+                <i class="fas fa-info-circle"></i>
+                <span>После создания факультета вы сможете назначать ему пользователей и устройства.</span>
+            </div>
+
+            <div class="form-actions">
+                <div style="display: flex; gap: 1rem; margin-left: auto;">
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        <span th:text="${department.depNumber != null} ? 'Сохранить изменения' : 'Создать факультет'">
+                            Сохранить изменения
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Обработчик отправки формы
+    document.getElementById('departmentForm').addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+
+        if (!title) {
+            e.preventDefault();
+            alert('Пожалуйста, введите название факультета');
+            document.getElementById('title').focus();
+            return;
+        }
+
+        // Можно добавить дополнительную валидацию здесь
+        console.log('Форма факультета отправляется');
+    });
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Форма редактирования факультета загружена');
+
+        // Автофокус на поле названия для новых факультетов
+        if ([[${department.depNumber == null}]]) {
+            document.getElementById('title').focus();
+        }
+    });
+</script>
+</body>
+</html>

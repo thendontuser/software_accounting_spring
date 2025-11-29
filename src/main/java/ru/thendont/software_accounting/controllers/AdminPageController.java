@@ -4,9 +4,7 @@ import com.itextpdf.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import ru.thendont.software_accounting.entity.*;
 import ru.thendont.software_accounting.service.*;
 import ru.thendont.software_accounting.service.report.ReportService;
@@ -29,6 +27,8 @@ public class AdminPageController {
     private final SoftwareService softwareService;
     private final SoftwareInstallationService softwareInstallationService;
 
+    private Long currentUserId;
+
     public AdminPageController(UserService userService,
                                DepartmentService departmentService,
                                DeveloperService developerService,
@@ -49,6 +49,9 @@ public class AdminPageController {
 
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
+        if (currentUserId == null) {
+            currentUserId = userId;
+        }
         try {
             User user = userService.findById(userId).orElseThrow();
             List<Department> departments = departmentService.findAll();
@@ -80,7 +83,7 @@ public class AdminPageController {
 
     @GetMapping("/reports/software")
     public void generateReport(@RequestParam String type, @RequestParam(required = false) Long departmentNumber,
-                               @RequestParam Long userId, HttpServletResponse response, Model model) {
+                               HttpServletResponse response, Model model) {
         try {
             response.setContentType("application/pdf");
             response.setHeader("Content-Disposition", "inline; filename=software_report.pdf");
@@ -103,6 +106,233 @@ public class AdminPageController {
         catch (NullPointerException ex) {
             handleException("Не найден факультет", "Не найден факультет в системе", model);
         }
+    }
+
+// Для сущности user ==========================================================================================
+    @GetMapping("/edit/users/{id}")
+    public String editUser(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("user", userService.findById(id).orElseThrow());
+            model.addAttribute("departments", departmentService.findAll());
+            model.addAttribute("currentUserId", currentUserId);
+            return "edit-user";
+        }
+        catch (NoSuchElementException ex) {
+            return handleException("Не найден пользователь", "Пользователь не найден в системе", model);
+        }
+    }
+
+    @PostMapping("/edit/users")
+    public String editUser(@ModelAttribute User user, Model model) {
+        userService.save(user);
+        return showDashboard(currentUserId, model);
+    }
+
+    @PostMapping("/delete/users/{id}")
+    public String deleteUser(@PathVariable Long id, Model model) {
+        userService.deleteById(id);
+        return showDashboard(currentUserId, model);
+    }
+// Для сущности user ==========================================================================================
+
+// Для сущности department ==========================================================================================
+    @GetMapping("/edit/departments/{id}")
+    public String editDepartment(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("department", isNewRecord(id) ? new Department() :
+                    departmentService.findById(id).orElseThrow());
+            model.addAttribute("currentUserId", currentUserId);
+            return "edit-department";
+        }
+        catch (NoSuchElementException ex) {
+            return handleException("Не найден факультет", "Факультет не найден в системе", model);
+        }
+    }
+
+    @PostMapping("/edit/departments")
+    public String editDepartment(@ModelAttribute Department department, Model model) {
+        departmentService.save(department);
+        return showDashboard(currentUserId, model);
+    }
+
+    @PostMapping("/delete/departments/{id}")
+    public String deleteDepartment(@PathVariable Long id, Model model) {
+        departmentService.deleteById(id);
+        return showDashboard(currentUserId, model);
+    }
+// Для сущности department ==========================================================================================
+
+// Для сущности device ==========================================================================================
+    @GetMapping("/edit/devices/{id}")
+    public String editDevice(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("device", isNewRecord(id) ? new Device() : deviceService.findById(id).orElseThrow());
+            model.addAttribute("departments", departmentService.findAll());
+            model.addAttribute("currentUserId", currentUserId);
+            return "edit-device";
+        }
+        catch (NoSuchElementException ex) {
+            return handleException("Не найдено устройство", "Устройство не найдено в системе", model);
+        }
+    }
+
+    @PostMapping("/edit/devices")
+    public String editDevice(@ModelAttribute Device device, Model model) {
+        deviceService.save(device);
+        return showDashboard(currentUserId, model);
+    }
+
+    @PostMapping("/delete/devices/{id}")
+    public String deleteDevice(@PathVariable Long id, Model model) {
+        deviceService.deleteById(id);
+        return showDashboard(currentUserId, model);
+    }
+// Для сущности device ==========================================================================================
+
+// Для сущности software ==========================================================================================
+    @GetMapping("/edit/software/{id}")
+    public String editSoftware(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("software", isNewRecord(id) ? new Software() :
+                    softwareService.findById(id).orElseThrow());
+            model.addAttribute("developers", developerService.findAll());
+            model.addAttribute("currentUserId", currentUserId);
+            return "edit-software";
+        }
+        catch (NoSuchElementException ex) {
+            return handleException("Не найдено программное обеспечение", "Программное обеспечение не найдено в системе", model);
+        }
+    }
+
+    @PostMapping("/edit/software")
+    public String editSoftware(@ModelAttribute Software software, Model model) {
+        softwareService.save(software);
+        return showDashboard(currentUserId, model);
+    }
+
+    @PostMapping("/delete/software/{id}")
+    public String deleteSoftware(@PathVariable Long id, Model model) {
+        softwareService.deleteById(id);
+        return showDashboard(currentUserId, model);
+    }
+// Для сущности software ==========================================================================================
+
+// Для сущности developer ==========================================================================================
+    @GetMapping("/edit/developers/{id}")
+    public String editDeveloper(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("developer", isNewRecord(id) ? new Developer() :
+                    developerService.findById(id).orElseThrow());
+            model.addAttribute("currentUserId", currentUserId);
+            return "edit-developer";
+        }
+        catch (NoSuchElementException ex) {
+            return handleException("Не найден разработчик", "Разработчик не найден в системе", model);
+        }
+    }
+
+    @PostMapping("/edit/developers")
+    public String editDeveloper(@ModelAttribute Developer developer, Model model) {
+        developerService.save(developer);
+        return showDashboard(currentUserId, model);
+    }
+
+    @PostMapping("/delete/developers/{id}")
+    public String deleteDeveloper(@PathVariable Long id, Model model) {
+        developerService.deleteById(id);
+        return showDashboard(currentUserId, model);
+    }
+// Для сущности developer ==========================================================================================
+
+// Для сущности license ==========================================================================================
+    @GetMapping("/edit/licenses/{id}")
+    public String editLicense(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("license", isNewRecord(id) ? new License() :
+                    licenseService.findById(id).orElseThrow());
+            model.addAttribute("software", softwareService.findAll());
+            model.addAttribute("currentUserId", currentUserId);
+            return "edit-license";
+        }
+        catch (NoSuchElementException ex) {
+            return handleException("Не найдена лицензия", "Лицензия не найдена в системе", model);
+        }
+    }
+
+    @PostMapping("/edit/licenses")
+    public String editLicense(@ModelAttribute License license, Model model) {
+        licenseService.save(license);
+        return showDashboard(currentUserId, model);
+    }
+
+    @PostMapping("/delete/licenses/{id}")
+    public String deleteLicense(@PathVariable Long id, Model model) {
+        licenseService.deleteById(id);
+        return showDashboard(currentUserId, model);
+    }
+// Для сущности license ==========================================================================================
+
+// Для сущности InstallationRequest ==========================================================================================
+    @GetMapping("/edit/installation_requests/{id}")
+    public String editInstallationRequest(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("request", installationRequestService.findById(id).orElseThrow());
+            model.addAttribute("software", softwareService.findAll());
+            model.addAttribute("devices", deviceService.findAll());
+            model.addAttribute("users", userService.findAll());
+            model.addAttribute("currentUserId", currentUserId);
+            return "edit-installation-request";
+        }
+        catch (NoSuchElementException ex) {
+            return handleException("Не найдена заявка на установку ПО", "Заявка не найдена в системе", model);
+        }
+    }
+
+    @PostMapping("/edit/installation_requests")
+    public String editInstallationRequest(@ModelAttribute InstallationRequest installationRequest, Model model) {
+        installationRequestService.save(installationRequest);
+        return showDashboard(currentUserId, model);
+    }
+
+    @PostMapping("/delete/installation_requests/{id}")
+    public String deleteInstallationRequest(@PathVariable Long id, Model model) {
+        installationRequestService.deleteById(id);
+        return showDashboard(currentUserId, model);
+    }
+// Для сущности InstallationRequest ==========================================================================================
+
+// Для сущности SoftwareInstallation ==========================================================================================
+    @GetMapping("/edit/software_installations/{id}")
+    public String editSoftwareInstallation(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("installation", isNewRecord(id) ? new SoftwareInstallation() :
+                    softwareInstallationService.findById(id).orElseThrow());
+            model.addAttribute("software", softwareService.findAll());
+            model.addAttribute("devices", deviceService.findAll());
+            model.addAttribute("users", userService.findAll());
+            model.addAttribute("currentUserId", currentUserId);
+            return "edit-software-installation";
+        }
+        catch (NoSuchElementException ex) {
+            return handleException("Не найдена установка", "Установка не найдена в системе", model);
+        }
+    }
+
+    @PostMapping("/edit/software_installations")
+    public String editSoftwareInstallation(@ModelAttribute SoftwareInstallation softwareInstallation, Model model) {
+        softwareInstallationService.save(softwareInstallation);
+        return showDashboard(currentUserId, model);
+    }
+
+    @PostMapping("/delete/software_installations/{id}")
+    public String deleteSoftwareInstallation(@PathVariable Long id, Model model) {
+        softwareInstallationService.deleteById(id);
+        return showDashboard(currentUserId, model);
+    }
+// Для сущности SoftwareInstallation ==========================================================================================
+
+    private boolean isNewRecord(Long id) {
+        return id == 0;
     }
 
     private String handleException(String title, String message, Model model) {

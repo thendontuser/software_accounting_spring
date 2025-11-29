@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование ПО - Учет ПО</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control:disabled {
+            background-color: #f7fafc;
+            color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #a0aec0;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #718096;
+        }
+
+        .btn-danger {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c53030;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .software-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 32px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+        }
+
+        .info-message {
+            background: #f0fff4;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #38a169;
+            margin-bottom: 1rem;
+        }
+
+        .warning-message {
+            background: #fffaf0;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #dd6b20;
+            margin-bottom: 1rem;
+        }
+
+        .info-message i {
+            color: #38a169;
+        }
+
+        .warning-message i {
+            color: #dd6b20;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-preview {
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0.5rem 0;
+            background: #f7fafc;
+            overflow: hidden;
+        }
+
+        .logo-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-upload {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Кнопка назад -->
+    <div style="padding: 1.5rem 2rem 0;">
+        <a th:href="@{/admin/dashboard(userId=${currentUserId})}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Назад к панели управления
+        </a>
+    </div>
+
+    <!-- Заголовок -->
+    <div class="header">
+        <div class="software-icon">
+            <i class="fas fa-cube"></i>
+        </div>
+        <h1 th:text="${software.id != null} ? 'Редактирование ПО' : 'Добавление ПО'">
+            Редактирование ПО
+        </h1>
+        <p th:text="${software.id != null} ?
+                   'Измените данные программного обеспечения' :
+                   'Добавьте новое программное обеспечение в систему'">
+            Измените данные программного обеспечения
+        </p>
+    </div>
+
+    <!-- Форма -->
+    <div class="form-container">
+        <form th:action="@{/admin/edit/software}" th:object="${software}" method="post" id="softwareForm">
+            <!-- Скрытое поле для ID -->
+            <input type="hidden" th:field="*{id}">
+
+            <div class="form-group">
+                <label for="title">Название ПО *</label>
+                <input type="text" class="form-control" id="title" th:field="*{title}"
+                       placeholder="Введите название программного обеспечения" required maxlength="255">
+            </div>
+
+            <div class="form-group">
+                <label for="version">Версия *</label>
+                <input type="text" class="form-control" id="version" th:field="*{version}"
+                       placeholder="Введите версию ПО" required maxlength="100">
+            </div>
+
+            <div class="form-group">
+                <label for="developer">Разработчик *</label>
+                <select class="form-control" id="developer" th:field="*{developer.id}" required>
+                    <option value="">Выберите разработчика</option>
+                    <option th:each="dev : ${developers}"
+                            th:value="${dev.id}"
+                            th:text="${dev.title}"
+                            th:selected="${software.developer != null && software.developer.id == dev.id}">
+                        Разработчик
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="logoPath">Путь к логотипу</label>
+                <div class="logo-upload">
+                    <input type="text" class="form-control" id="logoPath" th:field="*{logoPath}"
+                           placeholder="/images/logo.png" maxlength="500">
+                </div>
+                <!-- Превью логотипа -->
+                <div class="logo-preview" th:if="${software.logoPath != null and software.logoPath != ''}">
+                    <img th:src="${software.logoPath}" alt="Логотип ПО"
+                         onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\'fas fa-image\' style=\'font-size: 24px; color: #a0aec0;\'></i>'">
+                </div>
+                <div class="logo-preview" th:unless="${software.logoPath != null and software.logoPath != ''}">
+                    <i class="fas fa-image" style="font-size: 24px; color: #a0aec0;"></i>
+                </div>
+                <small style="color: #718096; font-size: 12px; margin-top: 0.25rem; display: block;">
+                    Укажите путь к изображению логотипа (например: /images/logo.png)
+                </small>
+            </div>
+
+            <!-- Статистика (только для редактирования существующего ПО) -->
+            <div th:if="${software.id != null}">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${software.licenses.size()}">0</div>
+                        <div class="stat-label">Лицензий</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${software.requests.size()}">0</div>
+                        <div class="stat-label">Запросов</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" th:text="${software.installations.size()}">0</div>
+                        <div class="stat-label">Установок</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Информация для нового ПО -->
+            <div th:if="${software.id == null}" class="info-message">
+                <i class="fas fa-info-circle"></i>
+                <span>После создания программного обеспечения вы сможете добавлять лицензии и отслеживать установки.</span>
+            </div>
+
+            <div class="form-actions">
+                <div style="display: flex; gap: 1rem; margin-left: auto;">
+                    <button type="button" class="btn btn-secondary" onclick="history.back()">
+                        <i class="fas fa-times"></i> Отмена
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        <span th:text="${software.id != null} ? 'Сохранить изменения' : 'Создать ПО'">
+                            Сохранить изменения
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Функция подтверждения удаления
+    function confirmDelete() {
+        const softwareName = document.getElementById('title').value || 'это программное обеспечение';
+        const licensesCount = [[${software?.licenses?.size() ?: 0}]];
+        const requestsCount = [[${software?.requests?.size() ?: 0}]];
+        const installationsCount = [[${software?.installations?.size() ?: 0}]];
+
+        let message = `Вы уверены, что хотите удалить программное обеспечение "${softwareName}"?`;
+
+        if (licensesCount > 0 || requestsCount > 0 || installationsCount > 0) {
+            message += '\n\nВнимание! Будут также удалены:';
+            if (licensesCount > 0) {
+                message += `\n• ${licensesCount} лицензий`;
+            }
+            if (requestsCount > 0) {
+                message += `\n• ${requestsCount} запросов на установку`;
+            }
+            if (installationsCount > 0) {
+                message += `\n• ${installationsCount} записей об установках`;
+            }
+        }
+
+        if (confirm(message)) {
+            // Создаем форму для отправки POST запроса на удаление
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/admin/delete/software/' + [[${software.id}]];
+
+            // Добавляем CSRF токен
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_csrf';
+            csrfToken.value = document.querySelector('meta[name="_csrf"]').content;
+            form.appendChild(csrfToken);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // Обработчик отправки формы
+    document.getElementById('softwareForm').addEventListener('submit', function(e) {
+        const title = document.getElementById('title').value.trim();
+        const version = document.getElementById('version').value.trim();
+        const developer = document.getElementById('developer').value;
+
+        if (!title) {
+            e.preventDefault();
+            alert('Пожалуйста, введите название программного обеспечения');
+            document.getElementById('title').focus();
+            return;
+        }
+
+        if (!version) {
+            e.preventDefault();
+            alert('Пожалуйста, введите версию ПО');
+            document.getElementById('version').focus();
+            return;
+        }
+
+        if (!developer) {
+            e.preventDefault();
+            alert('Пожалуйста, выберите разработчика');
+            document.getElementById('developer').focus();
+            return;
+        }
+
+        console.log('Форма программного обеспечения отправляется');
+    });
+
+    // Обновление превью логотипа при изменении пути
+    document.getElementById('logoPath').addEventListener('input', function(e) {
+        const logoPath = e.target.value.trim();
+        const preview = document.querySelector('.logo-preview');
+
+        if (logoPath) {
+            preview.innerHTML = `<img src="${logoPath}" alt="Логотип ПО"
+                onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\'fas fa-image\' style=\'font-size: 24px; color: #a0aec0;\'></i>'">`;
+        } else {
+            preview.innerHTML = '<i class="fas fa-image" style="font-size: 24px; color: #a0aec0;"></i>';
+        }
+    });
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Форма редактирования ПО загружена');
+
+        // Автофокус на поле названия для нового ПО
+        if ([[${software.id == null}]]) {
+            document.getElementById('title').focus();
+        }
+    });
+</script>
+</body>
+</html>

@@ -23,4 +23,12 @@ public class DepartmentService {
     public Optional<Department> findById(Long id) {
         return departmentRepository.findById(id);
     }
+
+    public Department save(Department department) {
+        return departmentRepository.save(department);
+    }
+
+    public void deleteById(Long id) {
+        departmentRepository.deleteById(id);
+    }
 }

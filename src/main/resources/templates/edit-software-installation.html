@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактирование установки - Учет ПО</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-control:disabled {
+            background-color: #f7fafc;
+            color: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #a0aec0;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #718096;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .installation-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 32px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            color: #764ba2;
+        }
+
+        .info-message {
+            background: #f0fff4;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #38a169;
+            margin-bottom: 1rem;
+        }
+
+        .warning-message {
+            background: #fffaf0;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #dd6b20;
+            margin-bottom: 1rem;
+        }
+
+        .info-message i {
+            color: #38a169;
+        }
+
+        .warning-message i {
+            color: #dd6b20;
+        }
+
+        .date-info {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Кнопка назад -->
+    <div style="padding: 1.5rem 2rem 0;">
+        <a th:href="@{/admin/dashboard(userId=${currentUserId})}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Назад к панели управления
+        </a>
+    </div>
+
+    <!-- Заголовок -->
+    <div class="header">
+        <div class="installation-icon">
+            <i class="fas fa-download"></i>
+        </div>
+        <h1 th:text="${installation.id != null} ? 'Редактирование установки' : 'Добавление установки'">
+            Редактирование установки
+        </h1>
+        <p th:text="${installation.id != null} ?
+                   'Измените данные установки ПО' :
+                   'Добавьте новую запись об установке ПО'">
+            Измените данные установки
+        </p>
+    </div>
+
+    <!-- Форма -->
+    <div class="form-container">
+        <form th:action="@{/admin/edit/software_installations}" th:object="${installation}" method="post" id="installationForm">
+            <!-- Скрытое поле для ID -->
+            <input type="hidden" th:field="*{id}">
+
+            <div class="form-group">
+                <label for="software">Программное обеспечение *</label>
+                <select class="form-control" id="software" th:field="*{software.id}" required>
+                    <option value="">Выберите ПО</option>
+                    <option th:each="soft : ${software}"
+                            th:value="${soft.id}"
+                            th:text="${soft.title + ' ' + soft.version}"
+                            th:selected="${installation.software != null && installation.software.id == soft.id}">
+                        Программное обеспечение
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="device">Устройство *</label>
+                <select class="form-control" id="device" th:field="*{device.id}" required>
+                    <option value="">Выберите устройство</option>
+                    <option th:each="device : ${devices}"
+                            th:value="${device.id}"
+                            th:text="${device.title + ' (' + device.ipAddress + ')'}"
+                            th:selected="${installation.device != null && installation.device.id == device.id}">
+                        Устройство
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="user">Пользователь *</label>
+                <select class="form-control" id="user" th:field="*{user.id}" required>
+                    <option value="">Выберите пользователя</option>
+                    <option th:each="user : ${users}"
+                            th:value="${user.id}"
+                            th:text="${user.lastName + ' ' + user.firstName + ' ' + user.patronymic}"
+                            th:selected="${installation.user != null && installation.user.id == user.id}">
+                        Пользователь
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="date">Дата установки *</label>
+                <input type="date" class="form-control" id="date" name="date"
+                       th:value="${installation.date != null} ? ${#temporals.format(installation.date, 'yyyy-MM-dd')} : ''"
+                       required>
+                <div class="date-info">Дата установки программного обеспечения</div>
+            </div>
+
+            <!-- Информация для новой установки -->
+            <div th:if="${installation.id == null}" class="info-message">
+                <i class="fas fa-info-circle"></i>
+                <span>После создания записи об установке она будет отображаться в системе.</span>
+            </div>
+
+            <!-- Информация для существующей установки -->
+            <div th:if="${installation.id != null}" class="info-message">
+                <i class="fas fa-info-circle"></i>
+                <span>Установка создана:
+                    <span th:text="${#temporals.format(installation.date, 'dd.MM.yyyy')}"></span>
+                </span>
+            </div>
+
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    <span th:text="${installation.id != null} ? 'Сохранить изменения' : 'Создать установку'">
+                        Сохранить изменения
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Обработчик отправки формы
+    document.getElementById('installationForm').addEventListener('submit', function(e) {
+        const software = document.getElementById('software').value;
+        const device = document.getElementById('device').value;
+        const user = document.getElementById('user').value;
+        const date = document.getElementById('date').value;
+
+        if (!software) {
+            e.preventDefault();
+            alert('Пожалуйста, выберите программное обеспечение');
+            document.getElementById('software').focus();
+            return;
+        }
+
+        if (!device) {
+            e.preventDefault();
+            alert('Пожалуйста, выберите устройство');
+            document.getElementById('device').focus();
+            return;
+        }
+
+        if (!user) {
+            e.preventDefault();
+            alert('Пожалуйста, выберите пользователя');
+            document.getElementById('user').focus();
+            return;
+        }
+
+        if (!date) {
+            e.preventDefault();
+            alert('Пожалуйста, укажите дату установки');
+            document.getElementById('date').focus();
+            return;
+        }
+
+        console.log('Форма установки отправляется');
+    });
+
+    // Инициализация при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Форма редактирования установки загружена');
+
+        // Установка сегодняшней даты по умолчанию для новой установки
+        if ([[${installation.id == null}]]) {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = today;
+
+            // Автофокус на поле ПО для новых установок
+            document.getElementById('software').focus();
+        }
+
+        // Установка максимальной даты (сегодня) для поля даты
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').max = today;
+
+        // Отладочная информация для проверки значений
+        console.log('Installation date:', document.getElementById('date').value);
+    });
+</script>
+</body>
+</html>

@@ -23,4 +23,12 @@ public class DeviceService {
     public List<Device> findAll() {
         return (List<Device>) deviceRepository.findAll();
     }
+
+    public Device save(Device device) {
+        return deviceRepository.save(device);
+    }
+
+    public void deleteById(Long id) {
+        deviceRepository.deleteById(id);
+    }
 }

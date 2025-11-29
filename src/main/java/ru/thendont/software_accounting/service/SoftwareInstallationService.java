@@ -7,6 +7,7 @@ import ru.thendont.software_accounting.repository.SoftwareInstallationRepository
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SoftwareInstallationService {
@@ -39,7 +40,15 @@ public class SoftwareInstallationService {
         return (List<SoftwareInstallation>) softwareInstallationRepository.findAll();
     }
 
+    public Optional<SoftwareInstallation> findById(Long id) {
+        return softwareInstallationRepository.findById(id);
+    }
+
     public SoftwareInstallation save(SoftwareInstallation softwareInstallation) {
         return softwareInstallationRepository.save(softwareInstallation);
+    }
+
+    public void deleteById(Long id) {
+        softwareInstallationRepository.deleteById(id);
     }
 }
