@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.service.DepartmentService;
 import ru.thendont.software_accounting.service.UserService;
+import ru.thendont.software_accounting.util.Urls;
 import ru.thendont.software_accounting.util.UserRoles;
 
 @Controller
@@ -60,10 +61,10 @@ public class AuthController {
 
     private String getPageFromUser(User user) {
         return switch (user.getRole()) {
-            case UserRoles.ADMIN -> "redirect:/admin/dashboard?userId=" + user.getId();
-            case UserRoles.ACCOUNTANT -> "redirect:/accountant/dashboard?userId=" + user.getId();
-            case UserRoles.MANAGER -> "redirect:/manager/dashboard?userId=" + user.getId();
-            case UserRoles.TEACHER -> "redirect:/teacher/dashboard?userId=" + user.getId();
+            case UserRoles.ADMIN -> Urls.ADMIN_URL + user.getId();
+            case UserRoles.ACCOUNTANT -> Urls.ACCOUNTANT_URL + user.getId();
+            case UserRoles.MANAGER -> Urls.MANAGER_URL + user.getId();
+            case UserRoles.TEACHER -> Urls.TEACHER_URL + user.getId();
             default -> "";
         };
     }

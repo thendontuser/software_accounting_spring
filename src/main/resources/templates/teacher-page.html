@@ -387,7 +387,7 @@
     <nav class="sidebar">
         <div class="nav-section">
             <div class="nav-title">Основное</div>
-            <a th:href="@{/teacher/dashboard}" class="nav-item active">
+            <a th:href="@{/teacher/dashboard(userId=${user.id})}" class="nav-item active">
                 <i class="fas fa-th-large"></i>
                 <span>Доступное ПО</span>
             </a>

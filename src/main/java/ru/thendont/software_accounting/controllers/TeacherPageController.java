@@ -16,6 +16,7 @@ import ru.thendont.software_accounting.service.InstallationRequestService;
 import ru.thendont.software_accounting.service.SoftwareService;
 import ru.thendont.software_accounting.service.UserService;
 import ru.thendont.software_accounting.util.InstallationRequestsStatus;
+import ru.thendont.software_accounting.util.Urls;
 
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
@@ -64,7 +65,7 @@ public class TeacherPageController {
                     InstallationRequestsStatus.PENDING, comment);
 
             installationRequestService.save(request);
-            return "redirect:/teacher/dashboard?userId=" + userId;
+            return Urls.TEACHER_URL + userId;
         }
         catch (NoSuchElementException ex) {
             return handleException("Не найден требуемый объект", ex.getMessage(), model);

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.thendont.software_accounting.entity.*;
 import ru.thendont.software_accounting.service.*;
 import ru.thendont.software_accounting.service.report.ReportService;
+import ru.thendont.software_accounting.util.Urls;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -125,13 +126,13 @@ public class AdminPageController {
     @PostMapping("/edit/users")
     public String editUser(@ModelAttribute User user, Model model) {
         userService.save(user);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/users/{id}")
     public String deleteUser(@PathVariable Long id, Model model) {
         userService.deleteById(id);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности user ==========================================================================================
 
@@ -152,13 +153,13 @@ public class AdminPageController {
     @PostMapping("/edit/departments")
     public String editDepartment(@ModelAttribute Department department, Model model) {
         departmentService.save(department);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/departments/{id}")
     public String deleteDepartment(@PathVariable Long id, Model model) {
         departmentService.deleteById(id);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности department ==========================================================================================
 
@@ -179,13 +180,13 @@ public class AdminPageController {
     @PostMapping("/edit/devices")
     public String editDevice(@ModelAttribute Device device, Model model) {
         deviceService.save(device);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/devices/{id}")
     public String deleteDevice(@PathVariable Long id, Model model) {
         deviceService.deleteById(id);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности device ==========================================================================================
 
@@ -207,13 +208,13 @@ public class AdminPageController {
     @PostMapping("/edit/software")
     public String editSoftware(@ModelAttribute Software software, Model model) {
         softwareService.save(software);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/software/{id}")
     public String deleteSoftware(@PathVariable Long id, Model model) {
         softwareService.deleteById(id);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности software ==========================================================================================
 
@@ -234,13 +235,13 @@ public class AdminPageController {
     @PostMapping("/edit/developers")
     public String editDeveloper(@ModelAttribute Developer developer, Model model) {
         developerService.save(developer);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/developers/{id}")
     public String deleteDeveloper(@PathVariable Long id, Model model) {
         developerService.deleteById(id);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности developer ==========================================================================================
 
@@ -262,13 +263,13 @@ public class AdminPageController {
     @PostMapping("/edit/licenses")
     public String editLicense(@ModelAttribute License license, Model model) {
         licenseService.save(license);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/licenses/{id}")
     public String deleteLicense(@PathVariable Long id, Model model) {
         licenseService.deleteById(id);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности license ==========================================================================================
 
@@ -291,13 +292,13 @@ public class AdminPageController {
     @PostMapping("/edit/installation_requests")
     public String editInstallationRequest(@ModelAttribute InstallationRequest installationRequest, Model model) {
         installationRequestService.save(installationRequest);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/installation_requests/{id}")
     public String deleteInstallationRequest(@PathVariable Long id, Model model) {
         installationRequestService.deleteById(id);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности InstallationRequest ==========================================================================================
 
@@ -321,13 +322,13 @@ public class AdminPageController {
     @PostMapping("/edit/software_installations")
     public String editSoftwareInstallation(@ModelAttribute SoftwareInstallation softwareInstallation, Model model) {
         softwareInstallationService.save(softwareInstallation);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/software_installations/{id}")
     public String deleteSoftwareInstallation(@PathVariable Long id, Model model) {
         softwareInstallationService.deleteById(id);
-        return showDashboard(currentUserId, model);
+        return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности SoftwareInstallation ==========================================================================================
 

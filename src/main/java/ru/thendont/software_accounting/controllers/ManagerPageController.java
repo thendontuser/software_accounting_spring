@@ -15,6 +15,7 @@ import ru.thendont.software_accounting.service.SoftwareInstallationService;
 import ru.thendont.software_accounting.service.UserService;
 import ru.thendont.software_accounting.service.email.EmailHelper;
 import ru.thendont.software_accounting.util.InstallationRequestsStatus;
+import ru.thendont.software_accounting.util.Urls;
 
 import java.time.LocalDate;
 import java.util.List;

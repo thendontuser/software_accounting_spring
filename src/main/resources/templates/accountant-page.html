@@ -503,6 +503,7 @@
                         <option value="Пробная">Пробная</option>
                         <option value="Коммерческая">Коммерческая</option>
                         <option value="Бесплатная">Бесплатная</option>
+                        <option value="Образовательная">Образовательная</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -530,9 +531,9 @@
         <div class="software-grid" id="softwareGrid">
             <div class="software-card" th:each="software : ${filteredSoftware}"
                  th:with="departmentsList=${software.installations.![device.department.depNumber]}"
-                 th:attr="data-license-type=${software.licenses[0]?.type},
-                          data-departments=${#strings.listJoin(departmentsList, ',')},
-                          data-developer=${software.developer.id}">
+                 th:attr="data-license-type=${not software.licenses.empty ? software.licenses[0].type : ''},
+                     data-departments=${#strings.listJoin(departmentsList, ',')},
+                     data-developer=${software.developer.id}">
                 <div class="software-header">
                     <div class="software-icon">
                         <img th:if="${software.logoPath != null and software.logoPath != ''}"
