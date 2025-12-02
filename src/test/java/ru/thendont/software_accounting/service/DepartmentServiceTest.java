@@ -14,12 +14,38 @@ public class DepartmentServiceTest {
     private DepartmentService departmentService;
 
     @Test
+    public void testCreateDepartment() {
+        Department department = new Department(null, "test");
+        Department saved = departmentService.save(department);
+        assertEquals(department.getTitle(), saved.getTitle());
+
+        assertNotNull(saved.getDepNumber());
+
+        departmentService.deleteById(saved.getDepNumber());
+    }
+
+    @Test
+    public void testUpdateDepartment() {
+        Department department = new Department(null, "test");
+        Department saved = departmentService.save(department);
+        Department target = departmentService.findById(Long.valueOf(saved.getDepNumber())).orElse(null);
+
+        target.setTitle("testUpdate");
+        target = departmentService.save(target);
+
+        assertNotEquals(department.getTitle(), target.getTitle());
+
+        departmentService.deleteById(saved.getDepNumber());
+    }
+
+    @Test
     public void testDeleteDepartment() {
         Department department = new Department(null, "testTitle");
         Department saved = departmentService.save(department);
         Long savedDepNumber = saved.getDepNumber();
+
         departmentService.deleteById(savedDepNumber);
 
-        assertNotEquals(saved, departmentService.findById(savedDepNumber).orElse(null));
+        assertNull(departmentService.findById(savedDepNumber).orElse(null));
     }
 }

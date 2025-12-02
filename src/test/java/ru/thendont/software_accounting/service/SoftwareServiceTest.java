@@ -28,4 +28,30 @@ public class SoftwareServiceTest {
 
         softwareService.deleteById(saved.getId());
     }
+
+    @Test
+    public void testUpdateSoftware() {
+        Developer developer = developerService.findById(Long.valueOf(3)).orElse(null);
+        Software software = new Software(null, "testTitle", "testVersion", developer, "testLogo");
+        Software saved = softwareService.save(software);
+        Software target = softwareService.findById(Long.valueOf(saved.getId())).orElse(null);
+
+        target.setVersion("1.5");
+        target = softwareService.save(target);
+
+        assertNotEquals(software.getVersion(), target.getVersion());
+
+        softwareService.deleteById(saved.getId());
+    }
+
+    @Test
+    public void testDeleteSoftware() {
+        Developer developer = developerService.findById(Long.valueOf(3)).orElse(null);
+        Software software = new Software(null, "testTitle", "testVersion", developer, "testLogo");
+        Software saved = softwareService.save(software);
+
+        softwareService.deleteById(saved.getId());
+
+        assertNull(softwareService.findById(saved.getId()).orElse(null));
+    }
 }
