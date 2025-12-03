@@ -1,5 +1,7 @@
 package ru.thendont.software_accounting.service.email;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -8,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailHelper {
+
+    private static final Logger logger = LogManager.getLogger(EmailHelper.class);
 
     private final JavaMailSender javaMailSender;
 
@@ -25,5 +29,6 @@ public class EmailHelper {
         mailMessage.setSubject(subject);
         mailMessage.setText(message);
         javaMailSender.send(mailMessage);
+        logger.info("=== ОТПРАВЛЕНО СООБЩЕНИЕ НА ПОЧТУ <{}> ===", toAddress);
     }
 }

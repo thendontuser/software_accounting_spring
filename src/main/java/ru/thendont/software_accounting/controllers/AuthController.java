@@ -1,5 +1,7 @@
 package ru.thendont.software_accounting.controllers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,8 @@ import ru.thendont.software_accounting.util.UserRoles;
 @RequestMapping("/auth")
 public class AuthController {
 
+    private static final Logger logger = LogManager.getLogger(AuthController.class);
+
     private final DepartmentService departmentService;
     private final UserService userService;
 
@@ -24,6 +28,7 @@ public class AuthController {
 
     @GetMapping("/login")
     public String showLoginPage(Model model) {
+        logger.info("=== ПЕРЕХОД НА СТРАНИЦУ ВХОДА === ");
         model.addAttribute("user", new User());
         return "sign-in";
     }
@@ -32,6 +37,7 @@ public class AuthController {
     public String showLoginPage(@ModelAttribute User user, Model model) {
         User u = userService.isAuthorise(user).orElse(null);
         if (u == null) {
+            logger.warn("=== НЕВЕРНЫЙ ЛОГИН ИЛИ ПАРОЛЬ === ");
             model.addAttribute("error", "Неверный логин или пароль");
             return "sign-in";
         }
@@ -42,6 +48,7 @@ public class AuthController {
     public String showRegisterPage(Model model) {
         model.addAttribute("user", new User());
         model.addAttribute("departments", departmentService.findAll());
+        logger.info("=== ПЕРЕХОД НА СТРАНИЦУ РЕГИСТРАЦИИ === ");
         return "sign-up";
     }
 
@@ -49,13 +56,19 @@ public class AuthController {
     public String showRegisterPage(@ModelAttribute User user, Model model) {
         User u = userService.findByLogin(user.getLogin()).orElse(null);
         if (u != null) {
+            logger.warn("=== ПОЛЬЗОВАТЕЛЬ С ID {} УЖЕ СУЩЕСТВУЕТ === ", u.getId());
             model.addAttribute("error", "Логин уже занят");
             model.addAttribute("departments", departmentService.findAll());
             return "sign-up";
         }
         userService.processDepartment(user);
+        logger.debug("=== УСПЕШНАЯ ОБРАБОТКА ПРИВЯЗКИ ПОЛЬЗВАТЕЛЯ К ФАКУЛЬТЕТУ ===");
+
         userService.hashPassword(user);
+        logger.debug("=== УСПЕШНОЕ ХЕШИРОВАНИЕ ПАРОЛЯ ===");
+
         userService.save(user);
+        logger.debug("=== УСПЕШНОЕ СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЯ В БАЗУ ДАННЫХ ===");
         return getPageFromUser(user);
     }
 

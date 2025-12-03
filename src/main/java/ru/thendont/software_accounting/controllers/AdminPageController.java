@@ -2,6 +2,8 @@ package ru.thendont.software_accounting.controllers;
 
 import com.itextpdf.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +20,8 @@ import java.util.NoSuchElementException;
 @Controller
 @RequestMapping("/admin")
 public class AdminPageController {
+
+    private static final Logger logger = LogManager.getLogger(AdminPageController.class);
 
     private final UserService userService;
     private final DepartmentService departmentService;
@@ -55,14 +59,31 @@ public class AdminPageController {
         }
         try {
             User user = userService.findById(userId).orElseThrow();
+            logger.debug("=== ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАШЕЛСЯ ===", user.getId());
+
             List<Department> departments = departmentService.findAll();
+            logger.debug("=== СПИСОК ФАКУЛЬТЕТОВ УСПЕШНО НАШЕЛСЯ ===");
+
             List<User> users = userService.findAll();
+            logger.debug("=== СПИСОК ПОЛЬЗОВАТЕЛЕЙ УСПЕШНО НАШЕЛСЯ ===");
+
             List<Developer> developers = developerService.findAll();
+            logger.debug("=== СПИСОК РАЗРАБОТЧИКОВ УСПЕШНО НАШЕЛСЯ ===");
+
             List<Device> devices = deviceService.findAll();
+            logger.debug("=== СПИСОК УСТРОЙСТВ УСПЕШНО НАШЕЛСЯ ===");
+
             List<InstallationRequest> installationRequests = installationRequestService.findAll();
+            logger.debug("=== СПИСОК ЗАЯВОК УСПЕШНО НАШЕЛСЯ ===");
+
             List<License> licenses = licenseService.findAll();
+            logger.debug("=== СПИСОК ЛИЦЕНЗИЙ УСПЕШНО НАШЕЛСЯ ===");
+
             List<Software> softwareList = softwareService.findAll();
+            logger.debug("=== СПИСОК ПО УСПЕШНО НАШЕЛСЯ ===");
+
             List<SoftwareInstallation> softwareInstallations = softwareInstallationService.findAll();
+            logger.debug("=== СПИСОК УСТАНОВОК ПО УСПЕШНО НАШЕЛСЯ ===");
 
             model.addAttribute("user", user);
             model.addAttribute("userCount", users.size());
@@ -78,6 +99,7 @@ public class AdminPageController {
             return "admin-page";
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Не найден пользователь", "Пользователь не найден в системе", model);
         }
     }
@@ -99,12 +121,15 @@ public class AdminPageController {
             }
         }
         catch (IOException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             handleException("Ошибка генерации отчета", "При генерации отчета возникла ошибка", model);
         }
         catch (DocumentException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             handleException("Ошибка создания документа", "При создании документа возникла ошибка", model);
         }
         catch (NullPointerException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             handleException("Не найден факультет", "Не найден факультет в системе", model);
         }
     }
@@ -116,22 +141,28 @@ public class AdminPageController {
             model.addAttribute("user", userService.findById(id).orElseThrow());
             model.addAttribute("departments", departmentService.findAll());
             model.addAttribute("currentUserId", currentUserId);
+            logger.debug("=== НАЧАЛО РЕДАКТИРОВАНИЯ ПОЛЬЗОВАТЕЛЯ ===");
             return "edit-user";
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Не найден пользователь", "Пользователь не найден в системе", model);
         }
     }
 
     @PostMapping("/edit/users")
     public String editUser(@ModelAttribute User user, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ ПОЛЬЗОВАТЕЛЯ ===");
         userService.save(user);
+        logger.debug("=== ПОЛЬЗОВАТЕЛЬ УСПЕШНО СОХРАНИЛСЯ В БАЗЕ ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/users/{id}")
     public String deleteUser(@PathVariable Long id, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА УДАЛЕНИЯ С ID {} ПОЛЬЗОВАТЕЛЯ ===", id);
         userService.deleteById(id);
+        logger.debug("=== ПОЛЬЗОВАТЕЛЬ УСПЕШНО УДАЛИЛСЯ ИЗ БАЗЫ ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности user ==========================================================================================
@@ -143,22 +174,28 @@ public class AdminPageController {
             model.addAttribute("department", isNewRecord(id) ? new Department() :
                     departmentService.findById(id).orElseThrow());
             model.addAttribute("currentUserId", currentUserId);
+            logger.debug("=== НАЧАЛО РЕДАКТИРОВАНИЯ ФАКУЛЬТЕТА ===");
             return "edit-department";
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Не найден факультет", "Факультет не найден в системе", model);
         }
     }
 
     @PostMapping("/edit/departments")
     public String editDepartment(@ModelAttribute Department department, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ ФАКУЛЬТЕТА ===");
         departmentService.save(department);
+        logger.debug("=== УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ФАКУЛЬТЕТА ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/departments/{id}")
     public String deleteDepartment(@PathVariable Long id, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА УДАЛЕНИЯ ФАКУЛЬТЕТА ===");
         departmentService.deleteById(id);
+        logger.debug("=== УСПЕШНОЕ УДАЛЕНИЕ ФАКУЛЬТЕТА ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности department ==========================================================================================
@@ -170,22 +207,28 @@ public class AdminPageController {
             model.addAttribute("device", isNewRecord(id) ? new Device() : deviceService.findById(id).orElseThrow());
             model.addAttribute("departments", departmentService.findAll());
             model.addAttribute("currentUserId", currentUserId);
+            logger.debug("=== НАЧАЛО РЕДАКТИРОВАНИЯ УСТРОЙСТВА ===");
             return "edit-device";
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Не найдено устройство", "Устройство не найдено в системе", model);
         }
     }
 
     @PostMapping("/edit/devices")
     public String editDevice(@ModelAttribute Device device, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ УСТРОЙСТВА ===");
         deviceService.save(device);
+        logger.debug("=== УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ УСТРОЙСТВА ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/devices/{id}")
     public String deleteDevice(@PathVariable Long id, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА УДАЛЕНИЯ УСТРОЙСТВА ===");
         deviceService.deleteById(id);
+        logger.debug("=== УСПЕШНОЕ УДАЛЕНИЕ УСТРОЙСТВА ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности device ==========================================================================================
@@ -198,22 +241,28 @@ public class AdminPageController {
                     softwareService.findById(id).orElseThrow());
             model.addAttribute("developers", developerService.findAll());
             model.addAttribute("currentUserId", currentUserId);
+            logger.debug("=== НАЧАЛО РЕДАКТИРОВАНИЯ ПО ===");
             return "edit-software";
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Не найдено программное обеспечение", "Программное обеспечение не найдено в системе", model);
         }
     }
 
     @PostMapping("/edit/software")
     public String editSoftware(@ModelAttribute Software software, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ ПО ===");
         softwareService.save(software);
+        logger.debug("=== УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ПО ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/software/{id}")
     public String deleteSoftware(@PathVariable Long id, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА УДАЛЕНИЯ ПО ===");
         softwareService.deleteById(id);
+        logger.debug("=== УСПЕШНОЕ УДАЛЕНИЕ ПО ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности software ==========================================================================================
@@ -225,22 +274,28 @@ public class AdminPageController {
             model.addAttribute("developer", isNewRecord(id) ? new Developer() :
                     developerService.findById(id).orElseThrow());
             model.addAttribute("currentUserId", currentUserId);
+            logger.debug("=== НАЧАЛО РЕДАКТИРОВАНИЯ РАЗРАБОТЧИКА ===");
             return "edit-developer";
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Не найден разработчик", "Разработчик не найден в системе", model);
         }
     }
 
     @PostMapping("/edit/developers")
     public String editDeveloper(@ModelAttribute Developer developer, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ РАЗРАБОТЧИКА ===");
         developerService.save(developer);
+        logger.debug("=== УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ РАЗРАБОТЧИКА ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/developers/{id}")
     public String deleteDeveloper(@PathVariable Long id, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА УДАЛЕНИЯ РАЗРАБОТЧИКА ===");
         developerService.deleteById(id);
+        logger.debug("=== УСПЕШНОЕ УДАЛЕНИЕ РАЗРАБОТЧИКА ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности developer ==========================================================================================
@@ -253,22 +308,28 @@ public class AdminPageController {
                     licenseService.findById(id).orElseThrow());
             model.addAttribute("software", softwareService.findAll());
             model.addAttribute("currentUserId", currentUserId);
+            logger.debug("=== НАЧАЛО РЕДАКТИРОВАНИЯ ЛИЦЕНЗИИ ===");
             return "edit-license";
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Не найдена лицензия", "Лицензия не найдена в системе", model);
         }
     }
 
     @PostMapping("/edit/licenses")
     public String editLicense(@ModelAttribute License license, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ ЛИЦЕНЗИИ ===");
         licenseService.save(license);
+        logger.debug("=== УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ЛИЦЕНЗИИ ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/licenses/{id}")
     public String deleteLicense(@PathVariable Long id, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА УДАЛЕНИЯ ЛИЦЕНЗИИ ===");
         licenseService.deleteById(id);
+        logger.debug("=== УСПЕШНОЕ УДАЛЕНИЕ ЛИЦЕНЗИИ ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности license ==========================================================================================
@@ -282,22 +343,28 @@ public class AdminPageController {
             model.addAttribute("devices", deviceService.findAll());
             model.addAttribute("users", userService.findAll());
             model.addAttribute("currentUserId", currentUserId);
+            logger.debug("=== НАЧАЛО РЕДАКТИРОВАНИЯ ЗАЯВКИ ===");
             return "edit-installation-request";
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Не найдена заявка на установку ПО", "Заявка не найдена в системе", model);
         }
     }
 
     @PostMapping("/edit/installation_requests")
     public String editInstallationRequest(@ModelAttribute InstallationRequest installationRequest, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ ЗАЯВКИ ===");
         installationRequestService.save(installationRequest);
+        logger.debug("=== УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ЗАЯВКИ ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/installation_requests/{id}")
     public String deleteInstallationRequest(@PathVariable Long id, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА УДАЛЕНИЯ ЗАЯВКИ ===");
         installationRequestService.deleteById(id);
+        logger.debug("=== УСПЕШНОЕ УДАЛЕНИЕ ЗАЯВКИ ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности InstallationRequest ==========================================================================================
@@ -312,22 +379,28 @@ public class AdminPageController {
             model.addAttribute("devices", deviceService.findAll());
             model.addAttribute("users", userService.findAll());
             model.addAttribute("currentUserId", currentUserId);
+            logger.debug("=== НАЧАЛО РЕДАКТИРОВАНИЯ УСТАНОВКИ ПО ===");
             return "edit-software-installation";
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Не найдена установка", "Установка не найдена в системе", model);
         }
     }
 
     @PostMapping("/edit/software_installations")
     public String editSoftwareInstallation(@ModelAttribute SoftwareInstallation softwareInstallation, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ УСТАНОВКИ ПО ===");
         softwareInstallationService.save(softwareInstallation);
+        logger.debug("=== УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ УСТАНОВКИ ПО ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 
     @PostMapping("/delete/software_installations/{id}")
     public String deleteSoftwareInstallation(@PathVariable Long id, Model model) {
+        logger.debug("=== ВЫЗОВ МЕТОДА УДАЛЕНИЯ УСТАНОВКИ ПО ===");
         softwareInstallationService.deleteById(id);
+        logger.debug("=== УСПЕШНОЕ УДАЛЕНИЕ УСТАНОВКИ ПО ===");
         return Urls.ADMIN_URL + currentUserId;
     }
 // Для сущности SoftwareInstallation ==========================================================================================

@@ -1,5 +1,7 @@
 package ru.thendont.software_accounting.controllers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,8 @@ import java.util.NoSuchElementException;
 @Controller
 @RequestMapping("/accountant")
 public class AccountantPageController {
+
+    private static final Logger logger = LogManager.getLogger(AccountantPageController.class);
 
     private final UserService userService;
     private final DepartmentService departmentService;
@@ -36,10 +40,19 @@ public class AccountantPageController {
     public String showDashboard(@RequestParam Long userId, Model model) {
         try {
             User user = userService.findById(userId).orElseThrow();
+            logger.debug("=== ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАШЕЛСЯ ===", user.getId());
+
             List<Department> departments = departmentService.findAll();
+            logger.debug("=== СПИСОК ФАКУЛЬТЕТОВ УСПЕШНО НАШЕЛСЯ ===");
+
             List<License> licenses = licenseService.findAll();
+            logger.debug("=== СПИСОК ЛИЦЕНЗИЙ УСПЕШНО НАШЕЛСЯ ===");
+
             List<Developer> developers = developerService.findAll();
+            logger.debug("=== СПИСОК РАЗРАБОТЧИКОВ УСПЕШНО НАШЕЛСЯ ===");
+
             List<Software> allSoftware = softwareInstallationService.findAllInstalledSoftware();
+            logger.debug("=== СПИСОК УСТАНОВЛЕННЫХ ПО УСПЕШНО НАШЕЛСЯ ===");
 
             model.addAttribute("user", user);
             model.addAttribute("departments", departments);
@@ -51,6 +64,7 @@ public class AccountantPageController {
             return "accountant-page";
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Не найден объект", ex.getMessage(), model);
         }
     }

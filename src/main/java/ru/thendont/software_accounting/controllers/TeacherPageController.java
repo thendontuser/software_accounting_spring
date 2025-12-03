@@ -1,5 +1,7 @@
 package ru.thendont.software_accounting.controllers;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +27,8 @@ import java.util.NoSuchElementException;
 @RequestMapping("/teacher")
 public class TeacherPageController {
 
+    private static final Logger logger = LogManager.getLogger(TeacherPageController.class);
+
     private final UserService userService;
     private final SoftwareService softwareService;
     private final DeviceService deviceService;
@@ -44,11 +48,13 @@ public class TeacherPageController {
     public String showDashboard(@RequestParam Long userId, Model model) {
         try {
             User user = userService.findById(userId).orElseThrow();
+            logger.debug("=== ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", user.getId());
             model.addAttribute("user", user);
             model.addAttribute("software", softwareService.findAll());
             return "teacher-page";
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Пользователь не найден", "Система не нашла данного пользователя", model);
         }
     }
@@ -58,16 +64,23 @@ public class TeacherPageController {
                               @RequestParam(required = false) String comment, Model model) {
         try {
             User user = userService.findById(userId).orElseThrow();
+            logger.debug("=== ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", user.getId());
+
             Software software = softwareService.findById(softwareId).orElseThrow();
+            logger.debug("=== ПО С ID {} УСПЕШНО НАЙДЕНО ===", software.getId());
+
             Device device = deviceService.findById(deviceId).orElseThrow();
+            logger.debug("=== УСТРОЙСТВО С ID {} УСПЕШНО НАЙДЕНО ===", device.getId());
 
             InstallationRequest request = new InstallationRequest(null, software, device, user, LocalDate.now(),
                     InstallationRequestsStatus.PENDING, comment);
 
             installationRequestService.save(request);
+            logger.debug("=== ЗАЯВКА УСПЕШНО СОХРАНЕНА ===");
             return Urls.TEACHER_URL + userId;
         }
         catch (NoSuchElementException ex) {
+            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
             return handleException("Не найден требуемый объект", ex.getMessage(), model);
         }
     }
