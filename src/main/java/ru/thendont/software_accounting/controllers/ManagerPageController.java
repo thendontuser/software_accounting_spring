@@ -33,6 +33,8 @@ public class ManagerPageController {
     private final InstallationRequestService installationRequestService;
     private final EmailHelper emailHelper;
 
+    private String username;
+
     public ManagerPageController(UserService userService,
                                  SoftwareInstallationService softwareInstallationService,
                                  InstallationRequestService installationRequestService,
@@ -47,12 +49,13 @@ public class ManagerPageController {
     public String showDashboard(@RequestParam Long userId, Model model) {
         try {
             User user = userService.findById(userId).orElseThrow();
-            logger.debug("=== ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", user.getId());
+            username = user.getLogin();
+            logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", username, user.getId());
 
             List<InstallationRequest> requests = installationRequestService.findByDepartmentNumber(
                     user.getDepartment().getDepNumber()
             );
-            logger.debug("=== ЗАЯВКИ ПОЛЬЗОВАТЕЛЕЙ УСПЕШНО НАЙДЕНЫ ===");
+            logger.info("@{}: === ЗАЯВКИ ПОЛЬЗОВАТЕЛЕЙ УСПЕШНО НАЙДЕНЫ ===", username);
 
             model.addAttribute("user", user);
             model.addAttribute("departmentRequests", requests);
@@ -66,7 +69,7 @@ public class ManagerPageController {
             return "manager-page";
         }
         catch (NoSuchElementException ex) {
-            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
+            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
             return handleException("Не найден объект", ex.getMessage(), model);
         }
     }
@@ -76,7 +79,7 @@ public class ManagerPageController {
                                  @RequestParam String status, Model model) {
         try {
             InstallationRequest request = installationRequestService.findById(requestId).orElseThrow();
-            logger.debug("=== ЗАЯВКА С ID {} УСПЕШНО НАЙДЕНА ===", request.getId());
+            logger.info("@{}: === ЗАЯВКА С ID {} УСПЕШНО НАЙДЕНА ===", username, request.getId());
 
             if (status.equals(InstallationRequestsStatus.APPROVED)) {
                 if (!installationRequestService.isPossibleInstallSoftware(request)) {
@@ -85,16 +88,16 @@ public class ManagerPageController {
                             "Нельзя установить ПО \"" + request.getSoftware().getTitle() +
                             "\" на устройство \"" + request.getDevice().getTitle() + "\"\nЗаявка автоматически отклонена");
                     status = InstallationRequestsStatus.REJECTED;
-                    logger.debug("=== СТАТУС ЗАЯВКИ ИЗМЕНЕН НА \"{}\" ===", status);
+                    logger.info("@{}: === СТАТУС ЗАЯВКИ ИЗМЕНЕН НА \"{}\" ===", username, status);
                 } else {
                     softwareInstallationService.save(new SoftwareInstallation(null, request.getSoftware(),
                             request.getDevice(), request.getUser(), LocalDate.now()));
-                    logger.debug("=== НОВАЯ УСТАНОВКА СПЕШНО СОХРАНЕНА ===");
+                    logger.info("@{}: === НОВАЯ УСТАНОВКА СПЕШНО СОХРАНЕНА ===", username);
                 }
             }
             request.setStatus(status);
             installationRequestService.save(request);
-            logger.debug("=== ЗАЯВКА УСПЕШНО ИЗМЕНЕНА ===");
+            logger.info("@{}: === ЗАЯВКА УСПЕШНО ИЗМЕНЕНА ===", username);
 
             String toAddress = request.getUser().getEmail();
             String subject = "Решение по заявке \"Установка " + request.getSoftware().getTitle() +
@@ -104,11 +107,11 @@ public class ManagerPageController {
             return showDashboard(userId, model);
         }
         catch (NoSuchElementException ex) {
-            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
+            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
             return handleException("Заявка не найдена", "Не найдена требуемая заявка", model);
         }
         catch (MailException ex) {
-            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
+            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
             return handleException("Ошибка отправки сообщения на почту", "Плохое подключение к сети", model);
         }
     }

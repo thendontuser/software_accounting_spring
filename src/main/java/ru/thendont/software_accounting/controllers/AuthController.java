@@ -62,13 +62,13 @@ public class AuthController {
             return "sign-up";
         }
         userService.processDepartment(user);
-        logger.debug("=== УСПЕШНАЯ ОБРАБОТКА ПРИВЯЗКИ ПОЛЬЗВАТЕЛЯ К ФАКУЛЬТЕТУ ===");
+        logger.info("=== УСПЕШНАЯ ОБРАБОТКА ПРИВЯЗКИ ПОЛЬЗВАТЕЛЯ К ФАКУЛЬТЕТУ ===");
 
         userService.hashPassword(user);
-        logger.debug("=== УСПЕШНОЕ ХЕШИРОВАНИЕ ПАРОЛЯ ===");
+        logger.info("=== УСПЕШНОЕ ХЕШИРОВАНИЕ ПАРОЛЯ ===");
 
         userService.save(user);
-        logger.debug("=== УСПЕШНОЕ СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЯ В БАЗУ ДАННЫХ ===");
+        logger.info("=== УСПЕШНОЕ СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЯ В БАЗУ ДАННЫХ ===");
         return getPageFromUser(user);
     }
 

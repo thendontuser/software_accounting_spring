@@ -34,6 +34,8 @@ public class TeacherPageController {
     private final DeviceService deviceService;
     private final InstallationRequestService installationRequestService;
 
+    private String username;
+
     public TeacherPageController(UserService userService,
                                  SoftwareService softwareService,
                                  DeviceService deviceService,
@@ -48,13 +50,14 @@ public class TeacherPageController {
     public String showDashboard(@RequestParam Long userId, Model model) {
         try {
             User user = userService.findById(userId).orElseThrow();
-            logger.debug("=== ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", user.getId());
+            username = user.getLogin();
+            logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", username, user.getId());
             model.addAttribute("user", user);
             model.addAttribute("software", softwareService.findAll());
             return "teacher-page";
         }
         catch (NoSuchElementException ex) {
-            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
+            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
             return handleException("Пользователь не найден", "Система не нашла данного пользователя", model);
         }
     }
@@ -64,23 +67,23 @@ public class TeacherPageController {
                               @RequestParam(required = false) String comment, Model model) {
         try {
             User user = userService.findById(userId).orElseThrow();
-            logger.debug("=== ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", user.getId());
+            logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", username, user.getId());
 
             Software software = softwareService.findById(softwareId).orElseThrow();
-            logger.debug("=== ПО С ID {} УСПЕШНО НАЙДЕНО ===", software.getId());
+            logger.info("@{}: === ПО С ID {} УСПЕШНО НАЙДЕНО ===", username, software.getId());
 
             Device device = deviceService.findById(deviceId).orElseThrow();
-            logger.debug("=== УСТРОЙСТВО С ID {} УСПЕШНО НАЙДЕНО ===", device.getId());
+            logger.info("@{}: === УСТРОЙСТВО С ID {} УСПЕШНО НАЙДЕНО ===", username, device.getId());
 
             InstallationRequest request = new InstallationRequest(null, software, device, user, LocalDate.now(),
                     InstallationRequestsStatus.PENDING, comment);
 
             installationRequestService.save(request);
-            logger.debug("=== ЗАЯВКА УСПЕШНО СОХРАНЕНА ===");
+            logger.info("@{}: === ЗАЯВКА УСПЕШНО СОХРАНЕНА ===", username);
             return Urls.TEACHER_URL + userId;
         }
         catch (NoSuchElementException ex) {
-            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
+            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
             return handleException("Не найден требуемый объект", ex.getMessage(), model);
         }
     }

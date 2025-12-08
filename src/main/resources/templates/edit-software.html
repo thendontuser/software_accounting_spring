@@ -296,23 +296,160 @@
             </div>
 
             <div class="form-group">
-                <label for="logoPath">Путь к логотипу</label>
-                <div class="logo-upload">
-                    <input type="text" class="form-control" id="logoPath" th:field="*{logoPath}"
-                           placeholder="/images/logo.png" maxlength="500">
+                <label for="logoFile">Логотип ПО</label>
+
+                <input type="hidden" th:field="*{logoPath}" id="logoFilename">
+
+                <div class="input-group">
+                    <input type="file" class="form-control-file" id="logoFile"
+                           accept=".jpg,.jpeg,.png" style="display: none;">
+                    <button type="button" class="btn btn-outline-secondary" id="browseBtn">
+                        <i class="fas fa-folder-open"></i> Выбрать файл
+                    </button>
+                    <button type="button" class="btn btn-outline-danger" id="clearBtn" style="display: none;">
+                        <i class="fas fa-times"></i> Очистить
+                    </button>
                 </div>
-                <!-- Превью логотипа -->
-                <div class="logo-preview" th:if="${software.logoPath != null and software.logoPath != ''}">
-                    <img th:src="${software.logoPath}" alt="Логотип ПО"
-                         onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\'fas fa-image\' style=\'font-size: 24px; color: #a0aec0;\'></i>'">
+
+                <div class="mt-2" id="fileNameDisplay" style="display: none;">
+                    <small class="text-muted">Выбран файл: <span id="displayFileName"></span></small>
                 </div>
-                <div class="logo-preview" th:unless="${software.logoPath != null and software.logoPath != ''}">
-                    <i class="fas fa-image" style="font-size: 24px; color: #a0aec0;"></i>
+
+                <div class="logo-preview mt-3" id="logoPreview">
+                    <div id="imagePreview" style="display: none;">
+                        <img id="previewImage" src="#" alt="Превью"
+                             style="max-width: 150px; max-height: 75px; object-fit: contain;">
+                    </div>
+                    <div id="noPreview">
+                        <i class="fas fa-image" style="font-size: 48px; color: #a0aec0;"></i>
+                    </div>
                 </div>
-                <small style="color: #718096; font-size: 12px; margin-top: 0.25rem; display: block;">
-                    Укажите путь к изображению логотипа (например: /images/logo.png)
+
+                <small class="text-muted">
+                    Поддерживаемые форматы: JPG, PNG
                 </small>
             </div>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                document.addEventListener('DOMContentLoaded', function() {
+                    const logoFileInput = document.getElementById('logoFile');
+                    const logoFilenameInput = document.getElementById('logoFilename');
+                    const browseBtn = document.getElementById('browseBtn');
+                    const clearBtn = document.getElementById('clearBtn');
+                    const previewImage = document.getElementById('previewImage');
+                    const imagePreview = document.getElementById('imagePreview');
+                    const noPreview = document.getElementById('noPreview');
+                    const fileNameDisplay = document.getElementById('fileNameDisplay');
+                    const displayFileName = document.getElementById('displayFileName');
+
+                    // Если есть уже сохраненное имя файла - показываем его
+                    const currentFilename = logoFilenameInput.value;
+                    if (currentFilename && currentFilename.trim() !== '') {
+                        console.log("Текущий файл:", currentFilename);
+
+                        // Показываем кнопку очистки
+                        clearBtn.style.display = 'inline-block';
+
+                        // Показываем имя файла
+                        displayFileName.textContent = currentFilename;
+                        fileNameDisplay.style.display = 'block';
+
+                        // Пытаемся показать превью существующего файла
+                        // Проверяем, если это полный URL или относительный путь
+                        let previewSrc = currentFilename;
+
+                        // Если это не URL и не начинается с /, добавляем базовый путь
+                        if (!currentFilename.startsWith('http') && !currentFilename.startsWith('/')) {
+                            previewSrc = '/images/logos/' + currentFilename;
+                        }
+
+                        previewImage.src = previewSrc;
+
+                        // Проверяем загрузку изображения
+                        const img = new Image();
+                        img.onload = function() {
+                            console.log("Изображение загружено успешно");
+                            previewImage.src = previewSrc;
+                            imagePreview.style.display = 'block';
+                            noPreview.style.display = 'none';
+                        };
+                        img.onerror = function() {
+                            console.log("Не удалось загрузить изображение");
+                            imagePreview.style.display = 'none';
+                            noPreview.style.display = 'block';
+                        };
+                        img.src = previewSrc;
+                    }
+
+                    // Обработчик кнопки выбора файла
+                    browseBtn.addEventListener('click', function() {
+                        logoFileInput.click();
+                    });
+
+                    // Обработчик выбора файла
+                    logoFileInput.addEventListener('change', function() {
+                        if (this.files && this.files[0]) {
+                            const file = this.files[0];
+
+                            // Извлекаем только имя файла
+                            const fileName = file.name;
+                            console.log("Выбран файл:", fileName);
+
+                            // Записываем имя файла в скрытое поле
+                            logoFilenameInput.value = fileName;
+
+                            // Показываем имя файла
+                            displayFileName.textContent = fileName;
+                            fileNameDisplay.style.display = 'block';
+                            clearBtn.style.display = 'inline-block';
+
+                            // Создаем превью из выбранного файла
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                previewImage.src = e.target.result;
+                                imagePreview.style.display = 'block';
+                                noPreview.style.display = 'none';
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+
+                    // Обработчик кнопки очистки
+                    clearBtn.addEventListener('click', function() {
+                        logoFileInput.value = '';
+                        logoFilenameInput.value = '';
+                        fileNameDisplay.style.display = 'none';
+                        clearBtn.style.display = 'none';
+                        imagePreview.style.display = 'none';
+                        noPreview.style.display = 'block';
+                    });
+
+                    // Валидация при отправке
+                    const form = document.querySelector('form');
+                    form.addEventListener('submit', function(e) {
+                        const filename = logoFilenameInput.value;
+                        if (filename && filename.trim() !== '') {
+                            // Проверяем расширение файла
+                            const validExtensions = ['.jpg', '.jpeg', '.png'];
+                            const fileExt = filename.toLowerCase();
+
+                            // Проверяем, заканчивается ли на одно из разрешенных расширений
+                            const hasValidExtension = validExtensions.some(ext =>
+                                fileExt.endsWith(ext.toLowerCase())
+                            );
+
+                            if (!hasValidExtension) {
+                                alert('Пожалуйста, выберите файл с правильным расширением (JPG, JPEG, PNG)');
+                                e.preventDefault();
+                                return false;
+                            }
+                        }
+                        return true;
+                    });
+                });
+                /*]]>*/
+            </script>
 
             <!-- Статистика (только для редактирования существующего ПО) -->
             <div th:if="${software.id != null}">

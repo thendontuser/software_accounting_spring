@@ -26,6 +26,8 @@ public class AccountantPageController {
     private final DeveloperService developerService;
     private final SoftwareInstallationService softwareInstallationService;
 
+    private String username;
+
     public AccountantPageController(UserService userService, DepartmentService departmentService,
                                     LicenseService licenseService, DeveloperService developerService,
                                     SoftwareInstallationService softwareInstallationService) {
@@ -40,19 +42,20 @@ public class AccountantPageController {
     public String showDashboard(@RequestParam Long userId, Model model) {
         try {
             User user = userService.findById(userId).orElseThrow();
-            logger.debug("=== ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАШЕЛСЯ ===", user.getId());
+            username = user.getLogin();
+            logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАШЕЛСЯ ===", username, user.getId());
 
             List<Department> departments = departmentService.findAll();
-            logger.debug("=== СПИСОК ФАКУЛЬТЕТОВ УСПЕШНО НАШЕЛСЯ ===");
+            logger.info("@{}: === СПИСОК ФАКУЛЬТЕТОВ УСПЕШНО НАШЕЛСЯ ===", username);
 
             List<License> licenses = licenseService.findAll();
-            logger.debug("=== СПИСОК ЛИЦЕНЗИЙ УСПЕШНО НАШЕЛСЯ ===");
+            logger.info("@{}: === СПИСОК ЛИЦЕНЗИЙ УСПЕШНО НАШЕЛСЯ ===", username);
 
             List<Developer> developers = developerService.findAll();
-            logger.debug("=== СПИСОК РАЗРАБОТЧИКОВ УСПЕШНО НАШЕЛСЯ ===");
+            logger.info("@{}: === СПИСОК РАЗРАБОТЧИКОВ УСПЕШНО НАШЕЛСЯ ===", username);
 
             List<Software> allSoftware = softwareInstallationService.findAllInstalledSoftware();
-            logger.debug("=== СПИСОК УСТАНОВЛЕННЫХ ПО УСПЕШНО НАШЕЛСЯ ===");
+            logger.info("@{}: === СПИСОК УСТАНОВЛЕННЫХ ПО УСПЕШНО НАШЕЛСЯ ===", username);
 
             model.addAttribute("user", user);
             model.addAttribute("departments", departments);
@@ -64,7 +67,7 @@ public class AccountantPageController {
             return "accountant-page";
         }
         catch (NoSuchElementException ex) {
-            logger.error("=== ПРОИЗОШЛА ОШИБКА ===", ex);
+            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
             return handleException("Не найден объект", ex.getMessage(), model);
         }
     }
