@@ -4,10 +4,12 @@ import com.itextpdf.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.thendont.software_accounting.entity.*;
+import ru.thendont.software_accounting.error.ErrorHandler;
 import ru.thendont.software_accounting.service.*;
 import ru.thendont.software_accounting.service.report.ReportService;
 import ru.thendont.software_accounting.util.ConstantStrings;
@@ -24,35 +26,33 @@ public class AdminPageController {
 
     private static final Logger logger = LogManager.getLogger(AdminPageController.class);
 
-    private final UserService userService;
-    private final DepartmentService departmentService;
-    private final DeveloperService developerService;
-    private final DeviceService deviceService;
-    private final InstallationRequestService installationRequestService;
-    private final LicenseService licenseService;
-    private final SoftwareService softwareService;
-    private final SoftwareInstallationService softwareInstallationService;
-
     private Long currentUserId;
+
     private String username;
 
-    public AdminPageController(UserService userService,
-                               DepartmentService departmentService,
-                               DeveloperService developerService,
-                               DeviceService deviceService,
-                               InstallationRequestService installationRequestService,
-                               LicenseService licenseService,
-                               SoftwareService softwareService,
-                               SoftwareInstallationService softwareInstallationService) {
-        this.userService = userService;
-        this.departmentService = departmentService;
-        this.developerService = developerService;
-        this.deviceService = deviceService;
-        this.installationRequestService = installationRequestService;
-        this.licenseService = licenseService;
-        this.softwareService = softwareService;
-        this.softwareInstallationService = softwareInstallationService;
-    }
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private DepartmentService departmentService;
+
+    @Autowired
+    private DeveloperService developerService;
+
+    @Autowired
+    private DeviceService deviceService;
+
+    @Autowired
+    private InstallationRequestService installationRequestService;
+
+    @Autowired
+    private LicenseService licenseService;
+
+    @Autowired
+    private SoftwareService softwareService;
+
+    @Autowired
+    private SoftwareInstallationService softwareInstallationService;
 
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
@@ -103,7 +103,7 @@ public class AdminPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Не найден пользователь", "Пользователь не найден в системе", model);
+            return ErrorHandler.errorPage("Не найден пользователь", "Пользователь не найден в системе", model);
         }
     }
 
@@ -125,15 +125,15 @@ public class AdminPageController {
         }
         catch (IOException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            handleException("Ошибка генерации отчета", "При генерации отчета возникла ошибка", model);
+            ErrorHandler.errorPage("Ошибка генерации отчета", "При генерации отчета возникла ошибка", model);
         }
         catch (DocumentException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            handleException("Ошибка создания документа", "При создании документа возникла ошибка", model);
+            ErrorHandler.errorPage("Ошибка создания документа", "При создании документа возникла ошибка", model);
         }
         catch (NullPointerException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            handleException("Не найден факультет", "Не найден факультет в системе", model);
+            ErrorHandler.errorPage("Не найден факультет", "Не найден факультет в системе", model);
         }
     }
 
@@ -149,7 +149,7 @@ public class AdminPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Не найден пользователь", "Пользователь не найден в системе", model);
+            return ErrorHandler.errorPage("Не найден пользователь", "Пользователь не найден в системе", model);
         }
     }
 
@@ -182,7 +182,7 @@ public class AdminPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Не найден факультет", "Факультет не найден в системе", model);
+            return ErrorHandler.errorPage("Не найден факультет", "Факультет не найден в системе", model);
         }
     }
 
@@ -215,7 +215,7 @@ public class AdminPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Не найдено устройство", "Устройство не найдено в системе", model);
+            return ErrorHandler.errorPage("Не найдено устройство", "Устройство не найдено в системе", model);
         }
     }
 
@@ -249,7 +249,8 @@ public class AdminPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Не найдено программное обеспечение", "Программное обеспечение не найдено в системе", model);
+            return ErrorHandler.errorPage("Не найдено программное обеспечение",
+                    "Программное обеспечение не найдено в системе", model);
         }
     }
 
@@ -283,7 +284,7 @@ public class AdminPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Не найден разработчик", "Разработчик не найден в системе", model);
+            return ErrorHandler.errorPage("Не найден разработчик", "Разработчик не найден в системе", model);
         }
     }
 
@@ -317,7 +318,7 @@ public class AdminPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Не найдена лицензия", "Лицензия не найдена в системе", model);
+            return ErrorHandler.errorPage("Не найдена лицензия", "Лицензия не найдена в системе", model);
         }
     }
 
@@ -352,7 +353,7 @@ public class AdminPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Не найдена заявка на установку ПО", "Заявка не найдена в системе", model);
+            return ErrorHandler.errorPage("Не найдена заявка на установку ПО", "Заявка не найдена в системе", model);
         }
     }
 
@@ -388,7 +389,7 @@ public class AdminPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Не найдена установка", "Установка не найдена в системе", model);
+            return ErrorHandler.errorPage("Не найдена установка", "Установка не найдена в системе", model);
         }
     }
 
@@ -411,12 +412,5 @@ public class AdminPageController {
 
     private boolean isNewRecord(Long id) {
         return id == 0;
-    }
-
-    private String handleException(String title, String message, Model model) {
-        model.addAttribute("errorTitle", title);
-        model.addAttribute("errorMessage", message);
-        model.addAttribute("timestamp", LocalDate.now());
-        return "error-page";
     }
 }

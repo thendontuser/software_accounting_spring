@@ -1,5 +1,6 @@
 package ru.thendont.software_accounting.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.User;
@@ -12,11 +13,8 @@ import java.util.Optional;
 @Service
 public class UserService {
 
-    private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    @Autowired
+    private UserRepository userRepository;
 
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);

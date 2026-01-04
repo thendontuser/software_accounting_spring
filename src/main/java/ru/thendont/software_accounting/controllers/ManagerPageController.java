@@ -2,6 +2,7 @@ package ru.thendont.software_accounting.controllers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.thendont.software_accounting.entity.InstallationRequest;
 import ru.thendont.software_accounting.entity.SoftwareInstallation;
 import ru.thendont.software_accounting.entity.User;
+import ru.thendont.software_accounting.error.ErrorHandler;
 import ru.thendont.software_accounting.service.InstallationRequestService;
 import ru.thendont.software_accounting.service.SoftwareInstallationService;
 import ru.thendont.software_accounting.service.UserService;
@@ -28,22 +30,19 @@ public class ManagerPageController {
 
     private static final Logger logger = LogManager.getLogger(ManagerPageController.class);
 
-    private final UserService userService;
-    private final SoftwareInstallationService softwareInstallationService;
-    private final InstallationRequestService installationRequestService;
-    private final EmailHelper emailHelper;
-
     private String username;
 
-    public ManagerPageController(UserService userService,
-                                 SoftwareInstallationService softwareInstallationService,
-                                 InstallationRequestService installationRequestService,
-                                 EmailHelper emailHelper) {
-        this.userService = userService;
-        this.softwareInstallationService = softwareInstallationService;
-        this.installationRequestService = installationRequestService;
-        this.emailHelper = emailHelper;
-    }
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private SoftwareInstallationService softwareInstallationService;
+
+    @Autowired
+    private InstallationRequestService installationRequestService;
+
+    @Autowired
+    private EmailHelper emailHelper;
 
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
@@ -70,7 +69,7 @@ public class ManagerPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Не найден объект", ex.getMessage(), model);
+            return ErrorHandler.errorPage("Не найден объект", ex.getMessage(), model);
         }
     }
 
@@ -108,18 +107,11 @@ public class ManagerPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Заявка не найдена", "Не найдена требуемая заявка", model);
+            return ErrorHandler.errorPage("Заявка не найдена", "Не найдена требуемая заявка", model);
         }
         catch (MailException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Ошибка отправки сообщения на почту", "Плохое подключение к сети", model);
+            return ErrorHandler.errorPage("Ошибка отправки сообщения на почту", "Плохое подключение к сети", model);
         }
-    }
-
-    private String handleException(String title, String message, Model model) {
-        model.addAttribute("errorTitle", title);
-        model.addAttribute("errorMessage", message);
-        model.addAttribute("timestamp", LocalDate.now());
-        return "error-page";
     }
 }

@@ -17,8 +17,8 @@ public class DepartmentServiceTest {
     public void testCreateDepartment() {
         Department department = new Department(null, "test");
         Department saved = departmentService.save(department);
-        assertEquals(department.getTitle(), saved.getTitle());
 
+        assertEquals(department.getTitle(), saved.getTitle());
         assertNotNull(saved.getDepNumber());
 
         departmentService.deleteById(saved.getDepNumber());

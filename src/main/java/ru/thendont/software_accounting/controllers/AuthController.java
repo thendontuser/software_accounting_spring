@@ -2,6 +2,7 @@ package ru.thendont.software_accounting.controllers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +19,11 @@ public class AuthController {
 
     private static final Logger logger = LogManager.getLogger(AuthController.class);
 
-    private final DepartmentService departmentService;
-    private final UserService userService;
+    @Autowired
+    private DepartmentService departmentService;
 
-    public AuthController(DepartmentService departmentService, UserService userService) {
-        this.departmentService = departmentService;
-        this.userService = userService;
-    }
+    @Autowired
+    private UserService userService;
 
     @GetMapping("/login")
     public String showLoginPage(Model model) {

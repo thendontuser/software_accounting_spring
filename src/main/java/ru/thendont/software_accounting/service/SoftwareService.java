@@ -1,5 +1,6 @@
 package ru.thendont.software_accounting.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.Software;
 import ru.thendont.software_accounting.repository.SoftwareRepository;
@@ -10,11 +11,8 @@ import java.util.Optional;
 @Service
 public class SoftwareService {
 
-    private final SoftwareRepository softwareRepository;
-
-    public SoftwareService(SoftwareRepository softwareRepository) {
-        this.softwareRepository = softwareRepository;
-    }
+    @Autowired
+    private SoftwareRepository softwareRepository;
 
     public Optional<Software> findById(Long id) {
         return softwareRepository.findById(id);

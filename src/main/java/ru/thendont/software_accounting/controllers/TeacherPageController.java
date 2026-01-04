@@ -2,6 +2,7 @@ package ru.thendont.software_accounting.controllers;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import ru.thendont.software_accounting.entity.Device;
 import ru.thendont.software_accounting.entity.InstallationRequest;
 import ru.thendont.software_accounting.entity.Software;
 import ru.thendont.software_accounting.entity.User;
+import ru.thendont.software_accounting.error.ErrorHandler;
 import ru.thendont.software_accounting.service.DeviceService;
 import ru.thendont.software_accounting.service.InstallationRequestService;
 import ru.thendont.software_accounting.service.SoftwareService;
@@ -29,22 +31,19 @@ public class TeacherPageController {
 
     private static final Logger logger = LogManager.getLogger(TeacherPageController.class);
 
-    private final UserService userService;
-    private final SoftwareService softwareService;
-    private final DeviceService deviceService;
-    private final InstallationRequestService installationRequestService;
-
     private String username;
 
-    public TeacherPageController(UserService userService,
-                                 SoftwareService softwareService,
-                                 DeviceService deviceService,
-                                 InstallationRequestService installationRequestService) {
-        this.userService = userService;
-        this.softwareService = softwareService;
-        this.deviceService = deviceService;
-        this.installationRequestService = installationRequestService;
-    }
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private SoftwareService softwareService;
+
+    @Autowired
+    private DeviceService deviceService;
+
+    @Autowired
+    private InstallationRequestService installationRequestService;
 
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
@@ -58,7 +57,7 @@ public class TeacherPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Пользователь не найден", "Система не нашла данного пользователя", model);
+            return ErrorHandler.errorPage("Пользователь не найден", "Система не нашла данного пользователя", model);
         }
     }
 
@@ -84,14 +83,7 @@ public class TeacherPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return handleException("Не найден требуемый объект", ex.getMessage(), model);
+            return ErrorHandler.errorPage("Не найден требуемый объект", ex.getMessage(), model);
         }
-    }
-
-    private String handleException(String title, String message, Model model) {
-        model.addAttribute("errorTitle", title);
-        model.addAttribute("errorMessage", message);
-        model.addAttribute("timestamp", LocalDate.now());
-        return "error-page";
     }
 }
