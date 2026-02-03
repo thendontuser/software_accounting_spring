@@ -5,4 +5,6 @@ public final class ConstantStrings {
     public static final String LOGO_DIRECTORY_PATH = "/logos/";
 
     public static final String ERROR_PAGE = "error-page";
+
+    public static final String LOGGER_NAME = "SoftwareAccountingLogger";
 }

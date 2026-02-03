@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Учет ПО - Информационная система</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .logo-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo-icon i {
+        color: white;
+        font-size: 24px;
+    }
+
+    .logo-text h1 {
+        font-size: 24px;
+        color: #2d3748;
+        font-weight: 700;
+    }
+
+    .logo-text p {
+        font-size: 14px;
+        color: #718096;
+    }
+
+    /* Auth Buttons for Guests */
+    .auth-buttons {
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn-login {
+        padding: 10px 25px;
+        background: transparent;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-login:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+    }
+
+    .btn-register {
+        padding: 10px 25px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    /* User Info for Registered Users */
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .user-avatar {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+    }
+
+    /* Hero Section */
+    .hero-section {
+        padding: 5rem 2rem;
+        text-align: center;
+        color: white;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .hero-title {
+        font-size: 48px;
+        font-weight: 800;
+        margin-bottom: 1.5rem;
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 20px;
+        opacity: 0.9;
+        max-width: 800px;
+        margin: 0 auto 3rem;
+        line-height: 1.6;
+    }
+
+    /* Main Content */
+    .main-content {
+        background: white;
+        border-radius: 30px 30px 0 0;
+        padding: 4rem 2rem;
+        min-height: calc(100vh - 400px);
+    }
+
+    .content-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Guest Content */
+    .guest-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 4rem;
+    }
+
+    .feature-card {
+        background: #f8f9fa;
+        border-radius: 20px;
+        padding: 2.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        background: white;
+    }
+
+    .feature-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+
+    .feature-icon i {
+        color: white;
+        font-size: 32px;
+    }
+
+    .feature-title {
+        font-size: 24px;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .feature-description {
+        color: #4a5568;
+        line-height: 1.6;
+        font-size: 16px;
+    }
+
+    /* Welcome Card for Registered Users */
+    .welcome-card {
+        background: white;
+        border-radius: 25px;
+        padding: 3rem;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        text-align: center;
+        margin-bottom: 3rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    .status-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #f6ad55, #ed8936);
+        color: white;
+        padding: 10px 25px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 2rem;
+    }
+
+    .status-badge.confirmed {
+        background: linear-gradient(135deg, #48bb78, #38a169);
+    }
+
+    .welcome-title {
+        font-size: 36px;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        font-weight: 700;
+    }
+
+    .welcome-text {
+        font-size: 18px;
+        color: #4a5568;
+        line-height: 1.7;
+        max-width: 800px;
+        margin: 0 auto 2rem;
+    }
+
+    .user-greeting {
+        font-size: 28px;
+        color: #667eea;
+        margin-top: 2rem;
+        font-weight: 600;
+    }
+
+    /* Info Cards for Registered Users */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+    }
+
+    .info-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+    }
+
+    .card-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .card-icon i {
+        color: white;
+        font-size: 28px;
+    }
+
+    .card-title {
+        font-size: 22px;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .card-text {
+        color: #4a5568;
+        line-height: 1.6;
+        font-size: 16px;
+    }
+
+    /* System Description */
+    .system-description {
+        background: #f8f9fa;
+        border-radius: 25px;
+        padding: 3rem;
+        margin-top: 3rem;
+        border: 1px solid #e2e8f0;
+    }
+
+    .section-title {
+        font-size: 32px;
+        color: #2d3748;
+        margin-bottom: 2rem;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .features-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 15px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .feature-icon-small {
+        color: #667eea;
+        font-size: 24px;
+        margin-top: 3px;
+    }
+
+    .feature-text {
+        color: #4a5568;
+        line-height: 1.6;
+        font-size: 16px;
+    }
+
+    .feature-text strong {
+        color: #2d3748;
+        font-size: 17px;
+    }
+
+    /* Contact Info */
+    .contact-info {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-radius: 20px;
+        padding: 3rem;
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    .contact-title {
+        font-size: 24px;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+
+    .contact-details {
+        font-size: 18px;
+        line-height: 1.8;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 3rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-large {
+        padding: 15px 40px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 12px;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+    }
+
+    .btn-secondary:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+    }
+
+    /* Logout Section */
+    .logout-section {
+        text-align: center;
+        margin-top: 3rem;
+        padding-top: 3rem;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .btn-logout {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 30px;
+        background: transparent;
+        color: #f56565;
+        border: 2px solid #f56565;
+        border-radius: 10px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .btn-logout:hover {
+        background: #f56565;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(245, 101, 101, 0.2);
+    }
+
+    /* Footer */
+    .footer {
+        background: #2d3748;
+        color: #cbd5e0;
+        padding: 3rem 2rem;
+        text-align: center;
+        margin-top: 4rem;
+    }
+
+    .footer-content {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .footer-links {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .footer-link {
+        color: #cbd5e0;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .footer-link:hover {
+        color: white;
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.8s ease forwards;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 36px;
+        }
+
+        .hero-subtitle {
+            font-size: 18px;
+        }
+
+        .header {
+            padding: 1rem;
+        }
+
+        .auth-buttons {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-login, .btn-register {
+            padding: 8px 20px;
+            font-size: 14px;
+        }
+
+        .main-content {
+            padding: 2rem 1rem;
+        }
+
+        .feature-card, .info-card {
+            padding: 1.5rem;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-large {
+            width: 100%;
+            max-width: 300px;
+            justify-content: center;
+        }
+    }
+  </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">
+      <i class="fas fa-laptop-code"></i>
+    </div>
+    <div class="logo-text">
+      <h1>Учет ПО</h1>
+      <p>Информационная система учебной организации</p>
+    </div>
+  </div>
+
+  <!-- Для гостей показываем кнопки входа/регистрации -->
+  <div th:unless="${user != null}" class="auth-buttons">
+    <a th:href="@{/auth/login}" class="btn-login">
+      <i class="fas fa-sign-in-alt"></i> Войти
+    </a>
+    <a th:href="@{/auth/register}" class="btn-register">
+      <i class="fas fa-user-plus"></i> Регистрация
+    </a>
+  </div>
+
+  <!-- Для зарегистрированных пользователей показываем информацию -->
+  <div th:if="${user != null}" class="user-info">
+    <div class="user-avatar">
+      <span th:text="${#strings.substring(user.lastName, 0, 1) + #strings.substring(user.firstName, 0, 1)}">НП</span>
+    </div>
+    <div>
+      <div style="font-weight: 600; color: #2d3748;" th:text="${user.lastName + ' ' + user.firstName + ' ' + (user.patronymic != null ? user.patronymic : '')}">
+        Пользователь
+      </div>
+      <div style="font-size: 12px; color: #718096;">Ожидание подтверждения</div>
+    </div>
+  </div>
+</header>
+
+<!-- Hero Section (только для гостей) -->
+<div th:unless="${user != null}" class="hero-section fade-in">
+  <h1 class="hero-title">Автоматизированная система учета программного обеспечения</h1>
+  <p class="hero-subtitle">
+    Современное решение для управления лицензиями, контроля установок и обработки заявок
+    на программное обеспечение в учебных организациях
+  </p>
+</div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <div class="content-container">
+
+    <!-- Контент для гостей -->
+    <div th:unless="${user != null}" class="guest-content">
+      <div class="guest-features">
+        <div class="feature-card fade-in" style="animation-delay: 0.1s;">
+          <div class="feature-icon">
+            <i class="fas fa-laptop"></i>
+          </div>
+          <h3 class="feature-title">Учет ПО</h3>
+          <p class="feature-description">
+            Централизованная база всех лицензионных программных продуктов
+            с детальной информацией о версиях, разработчиках и условиях лицензирования
+          </p>
+        </div>
+
+        <div class="feature-card fade-in" style="animation-delay: 0.2s;">
+          <div class="feature-icon">
+            <i class="fas fa-file-contract"></i>
+          </div>
+          <h3 class="feature-title">Управление лицензиями</h3>
+          <p class="feature-description">
+            Контроль сроков действия лицензий, количества доступных установок
+            и автоматические уведомления об истечении срока действия
+          </p>
+        </div>
+
+        <div class="feature-card fade-in" style="animation-delay: 0.3s;">
+          <div class="feature-icon">
+            <i class="fas fa-tasks"></i>
+          </div>
+          <h3 class="feature-title">Заявки на установку</h3>
+          <p class="feature-description">
+            Упрощенная система подачи заявок на установку программного обеспечения
+            с автоматической маршрутизацией и отслеживанием статуса
+          </p>
+        </div>
+      </div>
+
+      <div class="system-description fade-in" style="animation-delay: 0.4s;">
+        <h2 class="section-title">О системе "Учет ПО"</h2>
+
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-icon-small">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="feature-text">
+              <strong>Централизованный учет</strong> - единая база всех программных продуктов организации
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon-small">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="feature-text">
+              <strong>Контроль лицензий</strong> - предотвращение нарушений лицензионных соглашений
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon-small">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="feature-text">
+              <strong>Аналитика и отчеты</strong> - детальная статистика использования ПО
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon-small">
+              <i class="fas fa-user-check"></i>
+            </div>
+            <div class="feature-text">
+              <strong>Ролевая модель</strong> - гибкое управление правами доступа пользователей
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <a th:href="@{/auth/register}" class="btn-large btn-primary">
+            <i class="fas fa-user-plus"></i> Зарегистрироваться
+          </a>
+          <a th:href="@{/auth/login}" class="btn-large btn-secondary">
+            <i class="fas fa-sign-in-alt"></i> Войти в систему
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Контент для зарегистрированных пользователей -->
+    <div th:if="${user != null}" class="user-content">
+      <!-- Карточка приветствия -->
+      <div class="welcome-card fade-in">
+        <div class="status-badge">
+          <i class="fas fa-clock"></i> Ожидание подтверждения аккаунта
+        </div>
+
+        <h1 class="welcome-title">
+          <span>Добро пожаловать в систему учета ПО!</span>
+        </h1>
+
+        <p class="welcome-text">
+          Ваш аккаунт успешно создан и находится на рассмотрении администратора.
+          После подтверждения вы получите доступ ко всем функциям системы в соответствии
+          с вашей ролью в учебной организации.
+        </p>
+
+        <div class="user-greeting" th:text="'Здравствуйте, ' + ${user.firstName} + ' ' + ${user.lastName} + '!'">
+          Здравствуйте!
+        </div>
+      </div>
+
+      <!-- Информационные карточки -->
+      <div class="info-grid">
+        <div class="info-card fade-in" style="animation-delay: 0.1s;">
+          <div class="card-icon">
+            <i class="fas fa-info-circle"></i>
+          </div>
+          <h3 class="card-title">Что сейчас происходит?</h3>
+          <p class="card-text">
+            Администратор системы проверяет ваши данные. Обычно это занимает
+            1-2 рабочих дня. Вы получите уведомление на указанный email, когда
+            ваш аккаунт будет подтвержден.
+          </p>
+        </div>
+
+        <div class="info-card fade-in" style="animation-delay: 0.2s;">
+          <div class="card-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 class="card-title">Почему требуется подтверждение?</h3>
+          <p class="card-text">
+            Это необходимая мера безопасности для защиты системы. Администратор
+            назначает роли пользователям вручную, чтобы обеспечить корректный
+            доступ к функциям системы согласно должностным обязанностям.
+          </p>
+        </div>
+
+        <div class="info-card fade-in" style="animation-delay: 0.3s;">
+          <div class="card-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <h3 class="card-title">Контакты для связи</h3>
+          <p class="card-text">
+            Если у вас возникли вопросы или проблемы, свяжитесь с администратором системы:
+            <br><br>
+            <strong>Email:</strong> admin@university.edu
+            <br>
+            <strong>Телефон:</strong> +7 (952) 449-97-36
+            <br>
+            <strong>Кабинет:</strong> Главный корпус, каб. 101
+          </p>
+        </div>
+      </div>
+
+      <!-- Системное описание -->
+      <div class="system-description fade-in" style="animation-delay: 0.4s;">
+        <h2 class="section-title">О системе "Учет ПО"</h2>
+
+        <div class="features-list">
+          <div class="feature-item">
+            <div class="feature-icon-small">
+              <i class="fas fa-database"></i>
+            </div>
+            <div class="feature-text">
+              <strong>База программного обеспечения</strong> - полный каталог всех доступных программ
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon-small">
+              <i class="fas fa-laptop-house"></i>
+            </div>
+            <div class="feature-text">
+              <strong>Инвентаризация оборудования</strong> - учет компьютеров и установленного ПО
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon-small">
+              <i class="fas fa-tasks"></i>
+            </div>
+            <div class="feature-text">
+              <strong>Заявки на установку</strong> - упрощенная процедура запроса ПО
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="feature-icon-small">
+              <i class="fas fa-chart-pie"></i>
+            </div>
+            <div class="feature-text">
+              <strong>Отчетность</strong> - детальные отчеты по использованию программ
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-info">
+          <div class="contact-title">
+            <i class="fas fa-headset"></i> Техническая поддержка
+          </div>
+          <div class="contact-details">
+            <p>По вопросам работы системы обращайтесь:</p>
+            <p><strong>Отдел IT-поддержки:</strong> support@university.edu</p>
+            <p><strong>Внутренний телефон:</strong> 1234</p>
+            <p><strong>Рабочие часы:</strong> Пн-Пт, 9:00-18:00</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Кнопка выхода -->
+      <div class="logout-section fade-in" style="animation-delay: 0.5s;">
+        <a th:href="@{/auth/logout}" class="btn-logout">
+          <i class="fas fa-sign-out-alt"></i> Выйти из системы
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-links">
+      <a href="#" class="footer-link">О системе</a>
+      <a href="#" class="footer-link">Документация</a>
+      <a href="#" class="footer-link">Контакты</a>
+      <a href="#" class="footer-link">Политика конфиденциальности</a>
+    </div>
+    <p>© <span th:text="${#dates.year(#dates.createNow())}">2026</span>
+      Учет ПО. Информационная система учебной организации. Все права защищены.
+    </p>
+    <p style="font-size: 14px; margin-top: 1rem; color: #a0aec0;">
+      Система разработана для автоматизации учета программного обеспечения
+    </p>
+  </div>
+</footer>
+
+<script>
+  // Анимация появления элементов при загрузке
+  document.addEventListener('DOMContentLoaded', function() {
+      const fadeElements = document.querySelectorAll('.fade-in');
+
+      fadeElements.forEach((element, index) => {
+          element.style.opacity = '0';
+          setTimeout(() => {
+              element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+              element.style.opacity = '1';
+          }, 100 + (index * 100));
+      });
+  });
+</script>
+</body>
+</html>

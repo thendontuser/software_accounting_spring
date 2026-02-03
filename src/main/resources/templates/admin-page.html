@@ -490,7 +490,7 @@
 
         <div class="nav-section">
             <div class="nav-title">Аккаунт</div>
-            <a th:href="@{/auth/login}" class="nav-item">
+            <a th:href="@{/auth/logout}" class="nav-item">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Выйти</span>
             </a>
@@ -586,7 +586,7 @@
                             <th>Имя</th>
                             <th>Отчество</th>
                             <th>Почта</th>
-                            <th>Логин</th>
+                            <th>Имя пользователя</th>
                             <th>Роль</th>
                             <th>Факультет</th>
                             <th>Действия</th>
@@ -598,7 +598,7 @@
                             <td th:text="${user.firstName}">Иван</td>
                             <td th:text="${user.patronymic}">Иванович</td>
                             <td th:text="${user.email}">Почта</td>
-                            <td th:text="${user.login}">ivanov</td>
+                            <td th:text="${user.username}">ivanov</td>
                             <td th:text="${user.role}">ADMIN</td>
                             <td>
                                 <span th:if="${user.department != null}" th:text="${user.department.title}">Факультет</span>

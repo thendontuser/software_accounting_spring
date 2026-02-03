@@ -26,7 +26,7 @@ public class User {
     private String email;
 
     @Column(name = "login")
-    private String login;
+    private String username;
 
     @Column(name = "password_hash")
     private String password;
@@ -49,13 +49,13 @@ public class User {
     }
 
     public User(Long id, String lastName, String firstName, String patronymic, String email,
-                String login, String password, String role, Department department) {
+                String username, String password, String role, Department department) {
         this.id = id;
         this.lastName = lastName;
         this.firstName = firstName;
         this.patronymic = patronymic;
         this.email = email;
-        this.login = login;
+        this.username = username;
         this.password = password;
         this.role = role;
         this.department = department;
@@ -81,8 +81,8 @@ public class User {
         this.email = email;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setPassword(String password) {
@@ -117,8 +117,8 @@ public class User {
         return email;
     }
 
-    public String getLogin() {
-        return login;
+    public String getUsername() {
+        return username;
     }
 
     public String getPassword() {

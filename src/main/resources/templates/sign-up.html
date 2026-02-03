@@ -177,6 +177,13 @@
             transform: translateY(0);
         }
 
+        .btn-register:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
         .login-section {
             text-align: center;
             margin-top: 25px;
@@ -225,14 +232,6 @@
             box-shadow: 0 5px 15px rgba(245, 101, 101, 0.2);
         }
 
-        .field-hint {
-            font-size: 12px;
-            color: #94a3b8;
-            margin-top: 5px;
-            margin-left: 5px;
-            font-style: italic;
-        }
-
         @keyframes slideDown {
             from {
                 opacity: 0;
@@ -276,6 +275,12 @@
             box-shadow: 0 5px 20px rgba(245, 101, 101, 0.1) !important;
         }
 
+        /* Стиль для успешного поля */
+        .input-success {
+            border-color: #48bb78 !important;
+            background: #f0fff4 !important;
+        }
+
         /* Стиль для сообщения об ошибке под полем */
         .field-error {
             display: none;
@@ -288,6 +293,21 @@
         }
 
         .field-error i {
+            margin-right: 5px;
+        }
+
+        /* Стиль для успешного сообщения */
+        .field-success {
+            display: none;
+            color: #48bb78;
+            font-size: 12px;
+            margin-top: 5px;
+            margin-left: 5px;
+            font-weight: 500;
+            animation: slideDown 0.3s ease;
+        }
+
+        .field-success i {
             margin-right: 5px;
         }
     </style>
@@ -372,11 +392,11 @@
                 <i class="fas fa-at"></i>
             </div>
             <input
-                    th:field="*{login}"
+                    th:field="*{username}"
                     type="text"
                     class="form-input"
                     id="login"
-                    placeholder="Логин"
+                    placeholder="Имя пользователя"
                     required
                     th:classappend="${error} ? 'input-error' : ''"
             >
@@ -386,6 +406,7 @@
             </div>
         </div>
 
+        <!-- Поле для пароля -->
         <div class="input-group">
             <div class="input-icon">
                 <i class="fas fa-lock"></i>
@@ -398,41 +419,41 @@
                     name="password"
                     placeholder="Пароль"
                     required
+                    oninput="validatePasswordMatch()"
             >
-            <button type="button" class="password-toggle" onclick="togglePassword()">
+            <button type="button" class="password-toggle" onclick="togglePassword('password', this)">
                 <i class="fas fa-eye"></i>
             </button>
         </div>
 
+        <!-- Поле для подтверждения пароля -->
         <div class="input-group">
             <div class="input-icon">
-                <i class="fas fa-user-tag"></i>
+                <i class="fas fa-lock"></i>
             </div>
-            <select class="form-select" th:field="*{role}" name="role" id="role"
-                    required onchange="toggleDepartmentSelect()">
-                <option value="">Выберите роль</option>
-                <option value="ADMIN">Администратор</option>
-                <option value="ACCOUNTANT">Бухгалтер</option>
-                <option value="MANAGER">Руководитель факультета</option>
-                <option value="TEACHER">Преподаватель/Сотрудник</option>
-            </select>
+            <input
+                    type="password"
+                    class="form-input"
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    placeholder="Подтверждение пароля"
+                    required
+                    oninput="validatePasswordMatch()"
+            >
+            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', this)">
+                <i class="fas fa-eye"></i>
+            </button>
+            <div class="field-error" id="passwordMatchError">
+                <i class="fas fa-exclamation-triangle"></i>
+                Пароли не совпадают
+            </div>
+            <div class="field-success" id="passwordMatchSuccess">
+                <i class="fas fa-check-circle"></i>
+                Пароли совпадают
+            </div>
         </div>
 
-        <div class="input-group">
-            <div class="input-icon">
-                <i class="fas fa-building"></i>
-            </div>
-            <select class="form-select" th:field="*{department}" name="department" id="department" disabled>
-                <option value="">Выберите факультет</option>
-                <option th:each="department : ${departments}"
-                        th:value="${department.depNumber}"
-                        th:text="${department.title}">
-                </option>
-            </select>
-            <div class="field-hint">Доступно только для руководителей и преподавателей</div>
-        </div>
-
-        <button type="submit" class="btn-register">
+        <button type="submit" class="btn-register" id="submitButton">
             <i class="fas fa-user-plus"></i> Зарегистрироваться
         </button>
     </form>
@@ -446,9 +467,9 @@
 </div>
 
 <script>
-    function togglePassword() {
-        const passwordInput = document.getElementById('password');
-        const toggleIcon = document.querySelector('.password-toggle i');
+    function togglePassword(fieldId, button) {
+        const passwordInput = document.getElementById(fieldId);
+        const toggleIcon = button.querySelector('i');
 
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
@@ -459,39 +480,64 @@
         }
     }
 
-    function toggleDepartmentSelect() {
-        const roleSelect = document.getElementById('role');
-        const departmentSelect = document.getElementById('department');
-        const selectedRole = roleSelect.value;
+    function validatePasswordMatch() {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const errorElement = document.getElementById('passwordMatchError');
+        const successElement = document.getElementById('passwordMatchSuccess');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const submitButton = document.getElementById('submitButton');
 
-        // Факультет доступен только для руководителей и преподавателей
-        if (selectedRole === 'MANAGER' || selectedRole === 'TEACHER') {
-            departmentSelect.disabled = false;
-            departmentSelect.required = true;
+        if (confirmPassword.length === 0) {
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+            confirmPasswordInput.classList.remove('input-error');
+            confirmPasswordInput.classList.remove('input-success');
+            submitButton.disabled = false;
+            return false;
+        }
+
+        if (password !== confirmPassword) {
+            errorElement.style.display = 'block';
+            successElement.style.display = 'none';
+            confirmPasswordInput.classList.add('input-error');
+            confirmPasswordInput.classList.remove('input-success');
+            submitButton.disabled = true;
+            return false;
         } else {
-            departmentSelect.disabled = true;
-            departmentSelect.required = false;
-            departmentSelect.value = '';
+            errorElement.style.display = 'none';
+            successElement.style.display = 'block';
+            confirmPasswordInput.classList.remove('input-error');
+            confirmPasswordInput.classList.add('input-success');
+            submitButton.disabled = false;
+            return true;
         }
     }
 
-    // Валидация формы
-    document.getElementById('registerForm').addEventListener('submit', function(e) {
-
-        const roleSelect = document.getElementById('role');
-        const departmentSelect = document.getElementById('department');
+    // Валидация формы перед отправкой
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
         const errorMessage = document.getElementById('errorMessage');
         const errorText = document.getElementById('errorText');
 
-        // Проверка, что для ролей MANAGER и TEACHER выбран факультет
-        if ((roleSelect.value === 'MANAGER' || roleSelect.value === 'TEACHER') && !departmentSelect.value) {
-            errorText.textContent = 'Для выбранной роли необходимо указать факультет';
+        // Проверка совпадения паролей
+        if (password !== confirmPassword) {
+            event.preventDefault();
+            errorText.textContent = 'Пароли не совпадают';
             errorMessage.style.display = 'block';
             return;
         }
 
-        // Если все ок, скрываем ошибку и отправляем форму
-        errorMessage.style.display = 'none';
+        // Проверка что пароль не пустой
+        if (password.length === 0) {
+            event.preventDefault();
+            errorText.textContent = 'Пароль не может быть пустым';
+            errorMessage.style.display = 'block';
+            return;
+        }
+
+        // Если все проверки пройдены, форма отправится автоматически
     });
 
     // Плавное появление
@@ -506,16 +552,6 @@
             container.style.transform = 'translateY(0)';
         }, 100);
     });
-
-    // Динамическая загрузка факультетов (заглушка)
-    function loadDepartments() {
-        // Здесь будет AJAX запрос к вашему API
-        // fetch('/api/departments').then(...)
-        console.log('Загрузка списка факультетов...');
-    }
-
-    // Загружаем факультеты при загрузке страницы
-    window.addEventListener('load', loadDepartments);
 </script>
 </body>
 </html>

@@ -1,7 +1,11 @@
 package ru.thendont.software_accounting.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.repository.UserRepository;
@@ -11,17 +15,20 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }
 
-    public Optional<User> findByLogin(String login) {
-        return userRepository.findByLogin(login);
+    public Optional<User> findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     public List<User> findAll() {
@@ -37,7 +44,6 @@ public class UserService {
     }
 
     public void hashPassword(User user) {
-        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String passwordEncoded = passwordEncoder.encode(user.getPassword());
         user.setPassword(passwordEncoded);
     }
@@ -49,7 +55,7 @@ public class UserService {
     }
 
     public Optional<User> isAuthorise(User user) {
-        User userFromDB = userRepository.findByLogin(user.getLogin()).orElse(null);
+        User userFromDB = userRepository.findByUsername(user.getUsername()).orElse(null);
         if (userFromDB != null) {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             if (passwordEncoder.matches(user.getPassword(), userFromDB.getPassword())) {
@@ -57,5 +63,16 @@ public class UserService {
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = findByUsername(username).orElseThrow(() ->
+                new UsernameNotFoundException("Пользователь не найден: " + username));
+        return org.springframework.security.core.userdetails.User.builder()
+                .username(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRole() != null ? user.getRole() : "VISITOR")
+                .build();
     }
 }

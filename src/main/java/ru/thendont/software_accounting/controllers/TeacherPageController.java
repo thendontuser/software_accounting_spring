@@ -1,6 +1,5 @@
 package ru.thendont.software_accounting.controllers;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -29,7 +28,8 @@ import java.util.NoSuchElementException;
 @RequestMapping("/teacher")
 public class TeacherPageController {
 
-    private static final Logger logger = LogManager.getLogger(TeacherPageController.class);
+    @Autowired
+    private Logger logger;
 
     private String username;
 
@@ -49,7 +49,7 @@ public class TeacherPageController {
     public String showDashboard(@RequestParam Long userId, Model model) {
         try {
             User user = userService.findById(userId).orElseThrow();
-            username = user.getLogin();
+            username = user.getUsername();
             logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", username, user.getId());
             model.addAttribute("user", user);
             model.addAttribute("software", softwareService.findAll());

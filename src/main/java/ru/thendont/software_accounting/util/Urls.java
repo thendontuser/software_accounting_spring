@@ -9,4 +9,6 @@ public final class Urls {
     public static final String MANAGER_URL = "redirect:/manager/dashboard?userId=";
 
     public static final String TEACHER_URL = "redirect:/teacher/dashboard?userId=";
+
+    public static final String VISITOR_URL = "redirect:/visitor/dashboard?userId=";
 }

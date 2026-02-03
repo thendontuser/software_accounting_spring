@@ -70,6 +70,37 @@
         font-weight: 400;
     }
 
+    /* Сообщения */
+    .alert-message {
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        animation: slideDown 0.5s ease;
+    }
+
+    .alert-error {
+        background: linear-gradient(135deg, #fc8181, #f56565);
+        color: white;
+        box-shadow: 0 5px 15px rgba(245, 101, 101, 0.2);
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #68d391, #48bb78);
+        color: white;
+        box-shadow: 0 5px 15px rgba(72, 187, 120, 0.2);
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, #76e4f7, #4299e1);
+        color: white;
+        box-shadow: 0 5px 15px rgba(66, 153, 225, 0.2);
+    }
+
     .input-group {
         position: relative;
         margin-bottom: 25px;
@@ -121,9 +152,17 @@
         cursor: pointer;
         font-size: 18px;
         transition: all 0.3s ease;
+        padding: 5px;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
     }
 
     .password-toggle:hover {
+        background: rgba(102, 126, 234, 0.1);
         transform: translateY(-50%) scale(1.1);
     }
 
@@ -186,23 +225,10 @@
         box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
     }
 
-    .error-message {
-        background: linear-gradient(135deg, #fc8181, #f56565);
-        color: white;
-        padding: 15px 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        font-size: 14px;
-        font-weight: 500;
-        display: none;
-        animation: slideDown 0.3s ease;
-        box-shadow: 0 5px 15px rgba(245, 101, 101, 0.2);
-    }
-
     @keyframes slideDown {
         from {
             opacity: 0;
-            transform: translateY(-10px);
+            transform: translateY(-20px);
         }
         to {
             opacity: 1;
@@ -229,6 +255,48 @@
         font-size: 14px;
     }
 
+    /* Стили для чекбокса "Запомнить меня" */
+    .remember-me {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 10px 0;
+    }
+
+    .remember-me input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin-right: 10px;
+        cursor: pointer;
+        accent-color: #667eea;
+    }
+
+    .remember-me label {
+        color: #4a5568;
+        font-size: 14px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    /* Ссылка "Забыли пароль?" */
+    .forgot-password {
+        text-align: center;
+        margin-top: 15px;
+    }
+
+    .forgot-password a {
+        color: #667eea;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .forgot-password a:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+
     /* Адаптивность */
     @media (max-width: 480px) {
         .glass-container {
@@ -243,6 +311,17 @@
         .form-input {
             padding: 16px 20px 16px 50px;
         }
+
+        .alert-message {
+            padding: 12px 15px;
+            font-size: 13px;
+        }
+
+        .features {
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+        }
     }
 
     /* Стиль для поля с ошибкой */
@@ -254,21 +333,6 @@
     .input-error:focus {
         border-color: #f56565 !important;
         box-shadow: 0 5px 20px rgba(245, 101, 101, 0.1) !important;
-    }
-
-    /* Стиль для сообщения об ошибке под полем */
-    .field-error {
-        display: none;
-        color: #f56565;
-        font-size: 12px;
-        margin-top: 5px;
-        margin-left: 5px;
-        font-weight: 500;
-        animation: slideDown 0.3s ease;
-    }
-
-    .field-error i {
-        margin-right: 5px;
     }
   </style>
 </head>
@@ -282,26 +346,34 @@
     <p>Войдите в систему управления</p>
   </div>
 
-  <div th:if="${error}" class="error-message" style="display: block;">
-    <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+  <!-- Сообщение об ошибке входа -->
+  <div th:if="${error != null}" class="alert-message alert-error">
+    <i class="fas fa-exclamation-circle"></i>
+    <span th:text="${error}">Неверный логин или пароль</span>
   </div>
 
-  <div id="errorMessage" class="error-message" th:if="${param.error}">
-    <i class="fas fa-exclamation-circle"></i> Неправильный логин или пароль
+  <!-- Сообщение об успешном выходе или регистрации -->
+  <div th:if="${message != null}" class="alert-message alert-success">
+    <i class="fas fa-check-circle"></i>
+    <span th:text="${message}"></span>
   </div>
 
-  <form th:action="@{/auth/login}" th:object="${user}" method="post" id="loginForm">
+  <form th:action="@{/auth/login}" method="post" id="loginForm">
+    <!-- CSRF токен -->
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+
     <div class="input-group">
       <div class="input-icon">
         <i class="fas fa-user"></i>
       </div>
       <input
-              th:field="*{login}"
               type="text"
               class="form-input"
-              name="login"
-              placeholder="Введите ваш логин"
+              id="username"
+              name="username"
+              placeholder="Имя пользователя"
               required
+              th:classappend="${error != null} ? 'input-error' : ''"
       >
     </div>
 
@@ -310,22 +382,31 @@
         <i class="fas fa-lock"></i>
       </div>
       <input
-              th:field="*{password}"
               type="password"
               class="form-input"
               id="password"
               name="password"
-              placeholder="Введите ваш пароль"
+              placeholder="Пароль"
               required
+              th:classappend="${error != null} ? 'input-error' : ''"
       >
       <button type="button" class="password-toggle" onclick="togglePassword()">
         <i class="fas fa-eye"></i>
       </button>
     </div>
 
+    <div class="remember-me">
+      <input type="checkbox" id="remember-me" name="remember-me">
+      <label for="remember-me">Запомнить меня</label>
+    </div>
+
     <button type="submit" class="btn-login">
       <i class="fas fa-sign-in-alt"></i> Войти в систему
     </button>
+
+    <div class="forgot-password">
+      <a href="#">Забыли пароль?</a>
+    </div>
   </form>
 
   <div class="features">
@@ -365,7 +446,7 @@
       }
   }
 
-  // Плавное появление элементов
+  // Автоматический фокус на поле ввода логина
   document.addEventListener('DOMContentLoaded', function() {
       const container = document.querySelector('.glass-container');
       container.style.opacity = '0';
@@ -376,6 +457,20 @@
           container.style.opacity = '1';
           container.style.transform = 'translateY(0)';
       }, 100);
+
+      // Автофокус на поле ввода логина
+      const usernameInput = document.getElementById('username');
+      if (usernameInput) {
+          setTimeout(() => usernameInput.focus(), 300);
+      }
+  });
+
+  // Обработка нажатия Enter
+  document.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter' && !event.target.matches('button, a, .btn-register')) {
+          event.preventDefault();
+          document.getElementById('loginForm').submit();
+      }
   });
 </script>
 </body>
