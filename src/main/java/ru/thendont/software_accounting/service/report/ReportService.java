@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.thendont.software_accounting.entity.Software;
+import ru.thendont.software_accounting.util.ConstantStrings;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public final class ReportService {
 
-    private static final Logger logger = LogManager.getLogger(ReportService.class);
+    private static final Logger logger = LogManager.getLogger(ConstantStrings.LOGGER_NAME);
 
     public static void generateSoftwareReport(HttpServletResponse response, List<Software> softwareList, String title)
             throws IOException, DocumentException {

@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailHelper {
 
-    private static final Logger logger = LogManager.getLogger(EmailHelper.class);
+    @Autowired
+    private Logger logger;
 
     @Autowired
     private JavaMailSender javaMailSender;

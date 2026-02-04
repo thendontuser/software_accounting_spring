@@ -18,22 +18,28 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(
-                        "/css/**",
-                        "/js/**",
-                        "/images/**",
-                        "/webjars/**"
-                    ).permitAll()
-                    .requestMatchers(
-                        "/",
-                        "/auth/**",
-                        "/visitor/**"
-                    ).permitAll()
-                    .requestMatchers("/admin/**").hasRole(UserRoles.ADMIN)
-                    .requestMatchers("/teacher/**").hasRole(UserRoles.TEACHER)
-                    .requestMatchers("/accountant/**").hasRole(UserRoles.ACCOUNTANT)
-                    .requestMatchers("/manager/**").hasRole(UserRoles.MANAGER)
-                    .anyRequest().authenticated()
+                .requestMatchers(
+                    "/css/**",
+                    "/js/**",
+                    "/images/**",
+                    "/webjars/**"
+                )
+                .permitAll()
+                .requestMatchers(
+                    "/",
+                    "/auth/**",
+                    "/visitor/**"
+                ).permitAll()
+                .requestMatchers("/admin/**").hasRole(UserRoles.ADMIN)
+                .requestMatchers("/teacher/**").hasRole(UserRoles.TEACHER)
+                .requestMatchers("/accountant/**").hasRole(UserRoles.ACCOUNTANT)
+                .requestMatchers("/manager/**").hasRole(UserRoles.MANAGER)
+                .anyRequest().authenticated()
+            )
+            .csrf(csrf -> csrf
+                // Разрешаем DELETE запросы без CSRF
+                .ignoringRequestMatchers("/admin/delete/**")
+                //.ignoringRequestMatchers("/api/**") // если у вас REST API
             )
             .formLogin(form -> form
                 .loginPage("/auth/login")
@@ -48,13 +54,9 @@ public class SecurityConfig {
                 .permitAll()
             )
             .rememberMe(remember -> remember
-                    .key("uniqueAndSecret")
-                    .tokenValiditySeconds(86400)
-            )
-            // Настройки CSRF
-            /*.csrf(csrf -> csrf
-                    .ignoringRequestMatchers("/api/**") // если у вас REST API
-            )*/;
+                .key("uniqueAndSecret")
+                .tokenValiditySeconds(86400)
+            );
         return http.build();
     }
 

@@ -65,7 +65,8 @@ public class AuthController {
     }
 
     @GetMapping("/register")
-    public String showRegisterPage(Model model) {
+    public String showRegisterPage(Model model, HttpServletRequest request) {
+        HttpSession session = request.getSession(true);
         model.addAttribute("user", new User());
         logger.info("=== ПЕРЕХОД НА СТРАНИЦУ РЕГИСТРАЦИИ === ");
         return "sign-up";
