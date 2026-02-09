@@ -218,12 +218,13 @@
             </div>
 
             <div class="form-group">
-                <label for="role">Роль *</label>
-                <select class="form-control" id="role" th:field="*{role}" required onchange="toggleDepartmentField()">
-                    <option value="ADMIN">Администратор</option>
-                    <option value="ACCOUNTANT">Бухгалтер</option>
-                    <option value="MANAGER">Управляющий факультетом</option>
-                    <option value="TEACHER">Сотрудник/Преподаватель</option>
+                <label for="role">Роль</label>
+                <select class="form-control" id="role" th:field="*{role}" onchange="toggleDepartmentField()">
+                    <option value="">Не назначена</option>
+                    <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).ADMIN}">Администратор</option>
+                    <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).MANAGER}">Управляющий факультетом</option>
+                    <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).TEACHER}">Преподаватель</option>
+                    <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).ACCOUNTANT}">Бухгалтер</option>
                 </select>
             </div>
 
@@ -267,7 +268,7 @@
         const departmentInfo = document.getElementById('department-info');
 
         // Роли, для которых факультет не требуется
-        const rolesWithoutDepartment = ['ADMIN', 'ACCOUNTANT'];
+        const rolesWithoutDepartment = ['ADMIN', 'ACCOUNTANT', ''];
 
         if (rolesWithoutDepartment.includes(roleSelect.value)) {
             // Блокируем выбор факультета

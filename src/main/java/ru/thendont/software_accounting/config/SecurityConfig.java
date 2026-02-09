@@ -30,7 +30,7 @@ public class SecurityConfig {
                     "/auth/**",
                     "/visitor/**"
                 ).permitAll()
-                .requestMatchers("/admin/**").hasRole(UserRoles.ADMIN)
+                .requestMatchers("/admin/**", "/pending-users/**").hasRole(UserRoles.ADMIN)
                 .requestMatchers("/teacher/**").hasRole(UserRoles.TEACHER)
                 .requestMatchers("/accountant/**").hasRole(UserRoles.ACCOUNTANT)
                 .requestMatchers("/manager/**").hasRole(UserRoles.MANAGER)
@@ -38,7 +38,7 @@ public class SecurityConfig {
             )
             .csrf(csrf -> csrf
                 // Разрешаем DELETE запросы без CSRF
-                .ignoringRequestMatchers("/admin/delete/**")
+                .ignoringRequestMatchers("/admin/delete/**", "/pending-users/reject-user/**")
                 //.ignoringRequestMatchers("/api/**") // если у вас REST API
             )
             .formLogin(form -> form

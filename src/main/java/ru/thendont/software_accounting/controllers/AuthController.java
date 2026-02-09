@@ -80,10 +80,7 @@ public class AuthController {
             model.addAttribute("error", "Логин уже занят");
             return "sign-up";
         }
-
         userService.hashPassword(user);
-        logger.info("=== УСПЕШНОЕ ХЕШИРОВАНИЕ ПАРОЛЯ ===");
-
         userService.save(user);
         logger.info("=== УСПЕШНОЕ СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЯ В БАЗУ ДАННЫХ ===");
         return "redirect:/auth/login?registered";

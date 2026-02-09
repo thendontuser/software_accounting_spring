@@ -11,4 +11,6 @@ public final class Urls {
     public static final String TEACHER_URL = "redirect:/teacher/dashboard?userId=";
 
     public static final String VISITOR_URL = "redirect:/visitor/dashboard?userId=";
+
+    public static final String PENDING_USERS_URL = "redirect:/pending-users/dashboard?userId=";
 }

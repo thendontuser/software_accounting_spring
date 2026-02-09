@@ -43,19 +43,11 @@ public class AccountantPageController {
         try {
             User user = userService.findById(userId).orElseThrow();
             username = user.getUsername();
-            logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАШЕЛСЯ ===", username, user.getId());
 
             List<Department> departments = departmentService.findAll();
-            logger.info("@{}: === СПИСОК ФАКУЛЬТЕТОВ УСПЕШНО НАШЕЛСЯ ===", username);
-
             List<License> licenses = licenseService.findAll();
-            logger.info("@{}: === СПИСОК ЛИЦЕНЗИЙ УСПЕШНО НАШЕЛСЯ ===", username);
-
             List<Developer> developers = developerService.findAll();
-            logger.info("@{}: === СПИСОК РАЗРАБОТЧИКОВ УСПЕШНО НАШЕЛСЯ ===", username);
-
             List<Software> allSoftware = softwareInstallationService.findAllInstalledSoftware();
-            logger.info("@{}: === СПИСОК УСТАНОВЛЕННЫХ ПО УСПЕШНО НАШЕЛСЯ ===", username);
 
             model.addAttribute("user", user);
             model.addAttribute("departments", departments);

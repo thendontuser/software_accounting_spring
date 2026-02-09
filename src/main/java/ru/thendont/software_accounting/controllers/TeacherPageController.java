@@ -50,7 +50,6 @@ public class TeacherPageController {
         try {
             User user = userService.findById(userId).orElseThrow();
             username = user.getUsername();
-            logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", username, user.getId());
             model.addAttribute("user", user);
             model.addAttribute("software", softwareService.findAll());
             return "teacher-page";
@@ -66,14 +65,8 @@ public class TeacherPageController {
                               @RequestParam(required = false) String comment, Model model) {
         try {
             User user = userService.findById(userId).orElseThrow();
-            logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", username, user.getId());
-
             Software software = softwareService.findById(softwareId).orElseThrow();
-            logger.info("@{}: === ПО С ID {} УСПЕШНО НАЙДЕНО ===", username, software.getId());
-
             Device device = deviceService.findById(deviceId).orElseThrow();
-            logger.info("@{}: === УСТРОЙСТВО С ID {} УСПЕШНО НАЙДЕНО ===", username, device.getId());
-
             InstallationRequest request = new InstallationRequest(null, software, device, user, LocalDate.now(),
                     InstallationRequestsStatus.PENDING, comment);
 

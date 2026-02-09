@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.User;
@@ -35,6 +34,10 @@ public class UserService implements UserDetailsService {
         return (List<User>) userRepository.findAll();
     }
 
+    public List<User> findPendingUsers() {
+        return (List<User>) userRepository.findPendingUsers();
+    }
+
     public User save(User user) {
         return userRepository.save(user);
     }
@@ -52,17 +55,6 @@ public class UserService implements UserDetailsService {
         if (!user.getRole().equals(UserRoles.MANAGER) && !user.getRole().equals(UserRoles.TEACHER)) {
             user.setDepartment(null);
         }
-    }
-
-    public Optional<User> isAuthorise(User user) {
-        User userFromDB = userRepository.findByUsername(user.getUsername()).orElse(null);
-        if (userFromDB != null) {
-            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            if (passwordEncoder.matches(user.getPassword(), userFromDB.getPassword())) {
-                return Optional.of(userFromDB);
-            }
-        }
-        return Optional.empty();
     }
 
     @Override

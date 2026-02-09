@@ -16,6 +16,7 @@
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: #f8f9fa;
             min-height: 100vh;
+            transition: margin-left 0.3s ease;
         }
 
         /* Header */
@@ -26,6 +27,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .logo {
@@ -42,6 +46,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
         }
 
         .logo-icon i {
@@ -49,15 +54,21 @@
             font-size: 20px;
         }
 
+        .logo-text {
+            transition: opacity 0.3s ease;
+        }
+
         .logo-text h1 {
             font-size: 20px;
             color: #2d3748;
             font-weight: 600;
+            white-space: nowrap;
         }
 
         .logo-text p {
             font-size: 12px;
             color: #718096;
+            white-space: nowrap;
         }
 
         .user-info {
@@ -76,6 +87,24 @@
             justify-content: center;
             color: white;
             font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        /* Toggle Button */
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+
+        .sidebar-toggle:hover {
+            background: #f7fafc;
         }
 
         /* Main Layout */
@@ -90,10 +119,50 @@
             background: white;
             padding: 2rem 1.5rem;
             border-right: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            position: sticky;
+            top: 80px;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+            z-index: 99;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+            padding: 2rem 1rem;
+        }
+
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+        }
+
+        .sidebar.collapsed .nav-title {
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+        }
+
+        .sidebar.collapsed .nav-item span {
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding: 12px;
+        }
+
+        .sidebar.collapsed .nav-item .badge {
+            display: none;
         }
 
         .nav-section {
             margin-bottom: 2rem;
+            transition: all 0.3s ease;
         }
 
         .nav-title {
@@ -103,6 +172,8 @@
             font-weight: 600;
             margin-bottom: 1rem;
             letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .nav-item {
@@ -115,6 +186,8 @@
             text-decoration: none;
             margin-bottom: 5px;
             transition: all 0.3s ease;
+            position: relative;
+            white-space: nowrap;
         }
 
         .nav-item:hover, .nav-item.active {
@@ -125,12 +198,67 @@
         .nav-item i {
             width: 20px;
             text-align: center;
+            flex-shrink: 0;
+        }
+
+        .nav-item span {
+            transition: all 0.3s ease;
+        }
+
+        .nav-item .badge {
+            margin-left: auto;
+            background: #e53e3e;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        /* Tooltip for collapsed sidebar */
+        .nav-item .tooltip {
+            position: absolute;
+            left: calc(100% + 15px);
+            background: #2d3748;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-item .tooltip::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-right: 6px solid #2d3748;
+            border-top: 6px solid transparent;
+            border-bottom: 6px solid transparent;
+        }
+
+        .sidebar.collapsed .nav-item:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
             padding: 2rem;
+            transition: all 0.3s ease;
+            min-width: 0; /* Для правильного сжатия при flex */
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
         }
 
         .page-header {
@@ -138,6 +266,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .page-title {
@@ -163,6 +293,7 @@
             display: flex;
             flex-direction: column;
             gap: 0.5rem;
+            min-width: 200px;
         }
 
         .control-group label {
@@ -178,6 +309,7 @@
             font-size: 14px;
             background: white;
             min-width: 200px;
+            width: 100%;
         }
 
         /* Tabs */
@@ -207,6 +339,7 @@
             transition: all 0.3s ease;
             white-space: nowrap;
             border-bottom: 2px solid transparent;
+            flex-shrink: 0;
         }
 
         .tab-button:hover {
@@ -223,6 +356,7 @@
         .tab-content {
             display: none;
             padding: 1.5rem;
+            overflow-x: auto;
         }
 
         .tab-content.active {
@@ -235,6 +369,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .table-title {
@@ -255,6 +391,7 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap;
         }
 
         .btn-primary {
@@ -323,11 +460,13 @@
             background: white;
             border-radius: 10px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
         }
 
         .data-table {
             width: 100%;
             border-collapse: collapse;
+            min-width: 1200px; /* Минимальная ширина таблицы */
         }
 
         .data-table th,
@@ -335,6 +474,7 @@
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid #e2e8f0;
+            white-space: nowrap;
         }
 
         .data-table th {
@@ -353,7 +493,7 @@
         .action-buttons {
             display: flex;
             gap: 8px;
-            justify-content: center;
+            flex-wrap: wrap;
         }
 
         /* Form styles */
@@ -437,25 +577,49 @@
             color: #718096;
         }
 
-        /* Form styles */
-        .report-form {
-            display: flex;
-            gap: 1rem;
-            align-items: flex-end;
-            flex-wrap: wrap;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 80px;
+                height: calc(100vh - 80px);
+                z-index: 1000;
+            }
+
+            .sidebar.show {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+
+            .header {
+                padding: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
 <!-- Header -->
 <header class="header">
-    <div class="logo">
-        <div class="logo-icon">
-            <i class="fas fa-laptop-code"></i>
-        </div>
-        <div class="logo-text">
-            <h1>Учет ПО</h1>
-            <p>Панель администратора</p>
+    <div style="display: flex; align-items: center;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-laptop-code"></i>
+            </div>
+            <div class="logo-text">
+                <h1>Учет ПО</h1>
+                <p>Панель администратора</p>
+            </div>
         </div>
     </div>
     <div class="user-info">
@@ -471,12 +635,19 @@
 
 <div class="container">
     <!-- Sidebar -->
-    <nav class="sidebar">
+    <nav class="sidebar" id="sidebar">
         <div class="nav-section">
             <div class="nav-title">Навигация</div>
             <a th:href="@{/admin/dashboard(userId=${user.id})}" class="nav-item active">
                 <i class="fas fa-th-large"></i>
                 <span>Управление БД</span>
+                <div class="tooltip">Управление БД</div>
+            </a>
+            <a th:href="@{/pending-users/dashboard(userId=${user.id})}" class="nav-item">
+                <i class="fas fa-user-clock"></i>
+                <span>Новые пользователи</span>
+                <div class="tooltip">Подтверждение пользователей</div>
+                <span th:if="${pendingUserCount > 0}" class="badge" th:text="${pendingUserCount}"></span>
             </a>
         </div>
 
@@ -485,6 +656,7 @@
             <div class="nav-item" style="cursor: default;">
                 <i class="fas fa-database"></i>
                 <span>Таблиц: 8</span>
+                <div class="tooltip">Таблиц: 8</div>
             </div>
         </div>
 
@@ -493,16 +665,17 @@
             <a th:href="@{/auth/logout}" class="nav-item">
                 <i class="fas fa-sign-out-alt"></i>
                 <span>Выйти</span>
+                <div class="tooltip">Выйти</div>
             </a>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content" id="mainContent">
         <!-- Page Header -->
         <div class="page-header">
             <h1 class="page-title">Управление базой данных</h1>
-            <div style="font-size: 16px; color: #718096;">
+            <div style="font-size: 16px; color: #718096; display: flex; align-items: center; gap: 10px;">
                 <i class="fas fa-calendar-alt"></i>
                 <span th:text="${#temporals.format(#temporals.createToday(), 'dd.MM.yyyy')}"></span>
             </div>
@@ -526,6 +699,13 @@
             </div>
             <div class="stat-card">
                 <div class="stat-icon">
+                    <i class="fas fa-user-clock"></i>
+                </div>
+                <div class="stat-number" th:text="${pendingUserCount}">0</div>
+                <div class="stat-label">Новых пользователей</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
                     <i class="fas fa-cube"></i>
                 </div>
                 <div class="stat-number" th:text="${softwareCount}">0</div>
@@ -535,7 +715,7 @@
 
         <!-- Report Controls -->
         <div class="report-controls">
-            <form th:action="@{/admin/reports/software}" method="get" target="_blank" class="report-form">
+            <form th:action="@{/admin/reports/software}" method="get" target="_blank" class="report-form" style="display: contents;">
                 <div class="control-group">
                     <label for="report-type">Тип отчета</label>
                     <select id="report-type" name="type" class="form-select" onchange="toggleDepartmentSelect()">
@@ -577,6 +757,12 @@
             <div id="tab-users" class="tab-content active">
                 <div class="table-actions">
                     <h3 class="table-title">Таблица: Пользователи</h3>
+                    <a th:href="@{/pending-users/dashboard(userId=${user.id})}" class="btn btn-primary">
+                        <i class="fas fa-user-check"></i> Подтвердить новых пользователей
+                        <span th:if="${pendingUserCount > 0}"
+                              style="margin-left: 8px; background: #e53e3e; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px;"
+                              th:text="${pendingUserCount}"></span>
+                    </a>
                 </div>
                 <div class="table-container">
                     <table class="data-table">
@@ -599,7 +785,10 @@
                             <td th:text="${user.patronymic}">Иванович</td>
                             <td th:text="${user.email}">Почта</td>
                             <td th:text="${user.username}">ivanov</td>
-                            <td th:text="${user.role}">ADMIN</td>
+                            <td>
+                                <span th:if="${user.role != null}" th:text="${user.role}">ADMIN</span>
+                                <span th:unless="${user.role != null}" style="color: #718096; font-style: italic;">Не назначена</span>
+                            </td>
                             <td>
                                 <span th:if="${user.department != null}" th:text="${user.department.title}">Факультет</span>
                                 <span th:unless="${user.department != null}" style="color: #718096; font-style: italic;">Не назначен</span>
@@ -942,15 +1131,46 @@
                         </tbody>
                     </table>
                 </div>
-            </div>-
+            </div>
         </div>
     </main>
 </div>
 
 <script>
-    // Текущая таблица и ID записи для редактирования
-    let currentTable = null;
-    let currentRecordId = null;
+    // Состояние сайдбара (по умолчанию развернут)
+    let sidebarCollapsed = false;
+
+    function toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleIcon = document.querySelector('.sidebar-toggle i');
+
+        sidebarCollapsed = !sidebarCollapsed;
+
+        if (sidebarCollapsed) {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+            toggleIcon.classList.remove('fa-bars');
+            toggleIcon.classList.add('fa-chevron-right');
+            // Сохраняем состояние в localStorage
+            localStorage.setItem('sidebarCollapsed', 'true');
+        } else {
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('expanded');
+            toggleIcon.classList.remove('fa-chevron-right');
+            toggleIcon.classList.add('fa-bars');
+            // Сохраняем состояние в localStorage
+            localStorage.setItem('sidebarCollapsed', 'false');
+        }
+    }
+
+    // Восстанавливаем состояние сайдбара при загрузке страницы
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedState = localStorage.getItem('sidebarCollapsed');
+        if (savedState === 'true') {
+            toggleSidebar(); // Применяем свернутое состояние
+        }
+    });
 
     // Функции для работы с вкладками
     function showTab(tableName) {
@@ -985,20 +1205,6 @@
         }
     }
 
-    function toggleDepartmentRequirement() {
-        const role = document.getElementById('role').value;
-        const departmentField = document.getElementById('department_id');
-
-        // Роли, для которых факультет обязателен
-        const rolesRequiringDepartment = ['MANAGER', 'TEACHER'];
-
-        if (rolesRequiringDepartment.includes(role)) {
-            departmentField.required = true;
-        } else {
-            departmentField.required = false;
-        }
-    }
-
     function confirmDelete(tableName, recordId) {
         if (confirm('Вы уверены, что хотите удалить эту запись?')) {
             // Создаем форму для отправки POST запроса на удаление
@@ -1009,6 +1215,19 @@
             form.submit();
         }
     }
+
+    // Адаптивность для мобильных устройств
+    function checkMobile() {
+        const sidebar = document.getElementById('sidebar');
+        if (window.innerWidth <= 768) {
+            sidebar.classList.remove('collapsed');
+            document.querySelector('.sidebar-toggle i').classList.remove('fa-chevron-right');
+            document.querySelector('.sidebar-toggle i').classList.add('fa-bars');
+        }
+    }
+
+    window.addEventListener('resize', checkMobile);
+    document.addEventListener('DOMContentLoaded', checkMobile);
 </script>
 </body>
 </html>

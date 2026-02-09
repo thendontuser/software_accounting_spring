@@ -49,16 +49,12 @@ public class ManagerPageController {
         try {
             User user = userService.findById(userId).orElseThrow();
             username = user.getUsername();
-            logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАЙДЕН ===", username, user.getId());
-
             List<InstallationRequest> requests = installationRequestService.findByDepartmentNumber(
                     user.getDepartment().getDepNumber()
             );
-            logger.info("@{}: === ЗАЯВКИ ПОЛЬЗОВАТЕЛЕЙ УСПЕШНО НАЙДЕНЫ ===", username);
 
             model.addAttribute("user", user);
             model.addAttribute("departmentRequests", requests);
-
             model.addAttribute("pendingRequests", installationRequestService.findByStatusFromList(
                     requests, InstallationRequestsStatus.PENDING
             ));
@@ -78,7 +74,6 @@ public class ManagerPageController {
                                  @RequestParam String status, Model model) {
         try {
             InstallationRequest request = installationRequestService.findById(requestId).orElseThrow();
-            logger.info("@{}: === ЗАЯВКА С ID {} УСПЕШНО НАЙДЕНА ===", username, request.getId());
 
             if (status.equals(InstallationRequestsStatus.APPROVED)) {
                 if (!installationRequestService.isPossibleInstallSoftware(request)) {

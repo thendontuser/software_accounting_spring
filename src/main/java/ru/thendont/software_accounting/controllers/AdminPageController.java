@@ -61,31 +61,16 @@ public class AdminPageController {
         try {
             User user = userService.findById(userId).orElseThrow();
             username = user.getUsername();
-            logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ С ID {} УСПЕШНО НАШЕЛСЯ ===", username, user.getId());
 
             List<Department> departments = departmentService.findAll();
-            logger.info("@{}: === СПИСОК ФАКУЛЬТЕТОВ УСПЕШНО НАШЕЛСЯ ===", username);
-
             List<User> users = userService.findAll();
-            logger.info("@{}: === СПИСОК ПОЛЬЗОВАТЕЛЕЙ УСПЕШНО НАШЕЛСЯ ===", username);
-
             List<Developer> developers = developerService.findAll();
-            logger.info("@{}: === СПИСОК РАЗРАБОТЧИКОВ УСПЕШНО НАШЕЛСЯ ===", username);
-
             List<Device> devices = deviceService.findAll();
-            logger.info("@{}: === СПИСОК УСТРОЙСТВ УСПЕШНО НАШЕЛСЯ ===", username);
-
             List<InstallationRequest> installationRequests = installationRequestService.findAll();
-            logger.info("@{}: === СПИСОК ЗАЯВОК УСПЕШНО НАШЕЛСЯ ===", username);
-
             List<License> licenses = licenseService.findAll();
-            logger.info("@{}: === СПИСОК ЛИЦЕНЗИЙ УСПЕШНО НАШЕЛСЯ ===", username);
-
             List<Software> softwareList = softwareService.findAll();
-            logger.info("@{}: === СПИСОК ПО УСПЕШНО НАШЕЛСЯ ===", username);
-
             List<SoftwareInstallation> softwareInstallations = softwareInstallationService.findAll();
-            logger.info("@{}: === СПИСОК УСТАНОВОК ПО УСПЕШНО НАШЕЛСЯ ===", username);
+            int pendingUserCount = userService.findPendingUsers().size();
 
             model.addAttribute("user", user);
             model.addAttribute("userCount", users.size());
@@ -98,6 +83,7 @@ public class AdminPageController {
             model.addAttribute("licenses", licenses);
             model.addAttribute("installationRequests", installationRequests);
             model.addAttribute("softwareInstallations", softwareInstallations);
+            model.addAttribute("pendingUserCount", pendingUserCount);
             return "admin-page";
         }
         catch (NoSuchElementException ex) {
@@ -154,7 +140,9 @@ public class AdminPageController {
 
     @PostMapping("/edit/users")
     public String editUser(@ModelAttribute User user, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ ПОЛЬЗОВАТЕЛЯ ===", username);
+        if (user.getRole().isEmpty()) {
+            user.setRole(null);
+        }
         userService.save(user);
         logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ УСПЕШНО СОХРАНИЛСЯ В БАЗЕ ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -162,7 +150,6 @@ public class AdminPageController {
 
     @PostMapping("/delete/users/{id}")
     public String deleteUser(@PathVariable Long id, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА УДАЛЕНИЯ С ID {} ПОЛЬЗОВАТЕЛЯ ===", username, id);
         userService.deleteById(id);
         logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ УСПЕШНО УДАЛИЛСЯ ИЗ БАЗЫ ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -187,7 +174,6 @@ public class AdminPageController {
 
     @PostMapping("/edit/departments")
     public String editDepartment(@ModelAttribute Department department, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ ФАКУЛЬТЕТА ===", username);
         departmentService.save(department);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ФАКУЛЬТЕТА ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -195,7 +181,6 @@ public class AdminPageController {
 
     @PostMapping("/delete/departments/{id}")
     public String deleteDepartment(@PathVariable Long id, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА УДАЛЕНИЯ ФАКУЛЬТЕТА ===", username);
         departmentService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ФАКУЛЬТЕТА ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -220,7 +205,6 @@ public class AdminPageController {
 
     @PostMapping("/edit/devices")
     public String editDevice(@ModelAttribute Device device, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ УСТРОЙСТВА ===", username);
         deviceService.save(device);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ УСТРОЙСТВА ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -228,7 +212,6 @@ public class AdminPageController {
 
     @PostMapping("/delete/devices/{id}")
     public String deleteDevice(@PathVariable Long id, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА УДАЛЕНИЯ УСТРОЙСТВА ===", username);
         deviceService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ УСТРОЙСТВА ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -255,7 +238,6 @@ public class AdminPageController {
 
     @PostMapping("/edit/software")
     public String editSoftware(@ModelAttribute Software software, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ ПО ===", username);
         software.setLogoPath(ConstantStrings.LOGO_DIRECTORY_PATH + software.getLogoPath());
         softwareService.save(software);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ПО ===", username);
@@ -264,7 +246,6 @@ public class AdminPageController {
 
     @PostMapping("/delete/software/{id}")
     public String deleteSoftware(@PathVariable Long id, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА УДАЛЕНИЯ ПО ===", username);
         softwareService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ПО ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -289,7 +270,6 @@ public class AdminPageController {
 
     @PostMapping("/edit/developers")
     public String editDeveloper(@ModelAttribute Developer developer, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ РАЗРАБОТЧИКА ===", username);
         developerService.save(developer);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ РАЗРАБОТЧИКА ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -297,7 +277,6 @@ public class AdminPageController {
 
     @PostMapping("/delete/developers/{id}")
     public String deleteDeveloper(@PathVariable Long id, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА УДАЛЕНИЯ РАЗРАБОТЧИКА ===", username);
         developerService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ РАЗРАБОТЧИКА ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -323,7 +302,6 @@ public class AdminPageController {
 
     @PostMapping("/edit/licenses")
     public String editLicense(@ModelAttribute License license, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ ЛИЦЕНЗИИ ===", username);
         licenseService.save(license);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ЛИЦЕНЗИИ ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -331,7 +309,6 @@ public class AdminPageController {
 
     @PostMapping("/delete/licenses/{id}")
     public String deleteLicense(@PathVariable Long id, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА УДАЛЕНИЯ ЛИЦЕНЗИИ ===", username);
         licenseService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ЛИЦЕНЗИИ ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -358,7 +335,6 @@ public class AdminPageController {
 
     @PostMapping("/edit/installation_requests")
     public String editInstallationRequest(@ModelAttribute InstallationRequest installationRequest, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ ЗАЯВКИ ===", username);
         installationRequestService.save(installationRequest);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ЗАЯВКИ ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -366,7 +342,6 @@ public class AdminPageController {
 
     @PostMapping("/delete/installation_requests/{id}")
     public String deleteInstallationRequest(@PathVariable Long id, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА УДАЛЕНИЯ ЗАЯВКИ ===", username);
         installationRequestService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ЗАЯВКИ ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -394,7 +369,6 @@ public class AdminPageController {
 
     @PostMapping("/edit/software_installations")
     public String editSoftwareInstallation(@ModelAttribute SoftwareInstallation softwareInstallation, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА СОХРАНЕНИЯ ДАННЫХ УСТАНОВКИ ПО ===", username);
         softwareInstallationService.save(softwareInstallation);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ УСТАНОВКИ ПО ===", username);
         return Urls.ADMIN_URL + currentUserId;
@@ -402,7 +376,6 @@ public class AdminPageController {
 
     @PostMapping("/delete/software_installations/{id}")
     public String deleteSoftwareInstallation(@PathVariable Long id, Model model) {
-        logger.info("@{}: === ВЫЗОВ МЕТОДА УДАЛЕНИЯ УСТАНОВКИ ПО ===", username);
         softwareInstallationService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ УСТАНОВКИ ПО ===", username);
         return Urls.ADMIN_URL + currentUserId;
