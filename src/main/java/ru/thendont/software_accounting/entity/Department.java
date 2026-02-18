@@ -18,7 +18,7 @@ public class Department {
     private String title;
 
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<Device> devices = new ArrayList<>();
+    private final List<Kafedra> kafedraList = new ArrayList<>();
 
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<User> users = new ArrayList<>();
@@ -48,8 +48,8 @@ public class Department {
         return title;
     }
 
-    public List<Device> getDevices() {
-        return devices;
+    public List<Kafedra> getKafedraList() {
+        return kafedraList;
     }
 
     public List<User> getUsers() {

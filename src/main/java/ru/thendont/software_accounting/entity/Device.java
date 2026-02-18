@@ -26,11 +26,8 @@ public class Device {
     private Integer ramSize;
 
     @ManyToOne
-    @JoinColumn(name = "dep_number")
-    private Department department;
-
-    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<InstallationRequest> requests = new ArrayList<>();
+    @JoinColumn(name = "classroom_id")
+    private Classroom classroom;
 
     @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<SoftwareInstallation> installations = new ArrayList<>();
@@ -39,13 +36,13 @@ public class Device {
 
     }
 
-    public Device(Long id, String title, String osTitle, String ipAddress, Integer ramSize, Department department) {
+    public Device(Long id, String title, String osTitle, String ipAddress, Integer ramSize, Classroom classroom) {
         this.id = id;
         this.title = title;
         this.osTitle = osTitle;
         this.ipAddress = ipAddress;
         this.ramSize = ramSize;
-        this.department = department;
+        this.classroom = classroom;
     }
 
     public void setId(Long id) {
@@ -68,8 +65,8 @@ public class Device {
         this.ramSize = ramSize;
     }
 
-    public void setDepartment(Department department) {
-        this.department = department;
+    public void setClassroom(Classroom classroom) {
+        this.classroom = classroom;
     }
 
     public Long getId() {
@@ -92,12 +89,8 @@ public class Device {
         return ramSize;
     }
 
-    public Department getDepartment() {
-        return department;
-    }
-
-    public List<InstallationRequest> getRequests() {
-        return requests;
+    public Classroom getClassroom() {
+        return classroom;
     }
 
     public List<SoftwareInstallation> getInstallations() {

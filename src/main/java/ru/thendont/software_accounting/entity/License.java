@@ -3,6 +3,8 @@ package ru.thendont.software_accounting.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "license")
@@ -27,6 +29,9 @@ public class License {
 
     @Column(name = "price")
     private Integer price;
+
+    @OneToMany(mappedBy = "license", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Purchase> purchases = new ArrayList<>();
 
     public License() {
 
@@ -87,5 +92,9 @@ public class License {
 
     public Integer getPrice() {
         return price;
+    }
+
+    public List<Purchase> getPurchases() {
+        return purchases;
     }
 }

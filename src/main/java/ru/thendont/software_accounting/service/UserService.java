@@ -8,7 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.repository.UserRepository;
-import ru.thendont.software_accounting.util.UserRoles;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,39 +21,17 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
-    }
-
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
-    }
-
-    public List<User> findAll() {
-        return (List<User>) userRepository.findAll();
     }
 
     public List<User> findPendingUsers() {
         return (List<User>) userRepository.findPendingUsers();
     }
 
-    public User save(User user) {
-        return userRepository.save(user);
-    }
-
-    public void deleteById(Long id) {
-        userRepository.deleteById(id);
-    }
-
     public void hashPassword(User user) {
         String passwordEncoded = passwordEncoder.encode(user.getPassword());
         user.setPassword(passwordEncoded);
-    }
-
-    public void processDepartment(User user) {
-        if (!user.getRole().equals(UserRoles.MANAGER) && !user.getRole().equals(UserRoles.TEACHER)) {
-            user.setDepartment(null);
-        }
     }
 
     @Override
@@ -64,7 +41,7 @@ public class UserService implements UserDetailsService {
         return org.springframework.security.core.userdetails.User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .roles(user.getRole() != null ? user.getRole() : "VISITOR")
+                .roles(user.getRole() != null ? user.getRole().name() : "VISITOR")
                 .build();
     }
 }

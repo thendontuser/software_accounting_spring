@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.thendont.software_accounting.entity.Department;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.error.ErrorHandler;
-import ru.thendont.software_accounting.service.DepartmentService;
+import ru.thendont.software_accounting.service.BaseCrudService;
 import ru.thendont.software_accounting.service.UserService;
 import ru.thendont.software_accounting.service.email.EmailHelper;
-import ru.thendont.software_accounting.util.Urls;
+import ru.thendont.software_accounting.service.enums.Urls;
+import ru.thendont.software_accounting.service.enums.UserRoles;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -25,10 +26,13 @@ public class PendingUsersPageController {
     private Logger logger;
 
     @Autowired
-    private UserService userService;
+    private BaseCrudService<User> userBaseCrudService;
 
     @Autowired
-    private DepartmentService departmentService;
+    private BaseCrudService<Department> departmentBaseCrudService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private EmailHelper emailHelper;
@@ -40,11 +44,11 @@ public class PendingUsersPageController {
     @GetMapping("/dashboard")
     public String pendingUsers(@RequestParam Long userId, Model model) {
         try {
-            User user = userService.findById(userId).orElseThrow();
+            User user = userBaseCrudService.findById(userId).orElseThrow();
             currentUserId = user.getId();
             username = user.getUsername();
             List<User> pendingUsers = userService.findPendingUsers();
-            List<Department> departments = departmentService.findAll();
+            List<Department> departments = departmentBaseCrudService.findAll();
             int pendingUserCount = pendingUsers.size();
 
             model.addAttribute("user", user);
@@ -65,18 +69,20 @@ public class PendingUsersPageController {
                               @RequestParam(required = false) Long departmentNumber,
                               Model model) {
         try {
-            User user = userService.findById(userId).orElseThrow();
-            user.setRole(role);
-            user.setDepartment(departmentService.findById(departmentNumber).orElse(null));
-            userService.save(user);
+            User user = userBaseCrudService.findById(userId).orElseThrow();
+            user.setRole(UserRoles.valueOf(UserRoles.class, role));
+            user.setDepartment(departmentNumber != null ?
+                    departmentBaseCrudService.findById(departmentNumber).orElseThrow() : null);
+            userBaseCrudService.save(user);
 
             emailHelper.sendMessage(user.getEmail(), "Регистрация в системе",
                     "Администратор подтвердил вашу заявку на регистрацию в системе");
-            return Urls.PENDING_USERS_URL + currentUserId;
+            return Urls.PENDING_USERS_URL.getUrlString() + currentUserId;
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден пользователь", "Пользователь не найден в системе", model);
+            return ErrorHandler.errorPage("Не найден пользователь или факультет",
+                    "Пользователь или факультет не найден в системе", model);
         }
         catch (MailException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
@@ -87,11 +93,11 @@ public class PendingUsersPageController {
     @PostMapping("/reject-user/{userId}")
     public String rejectUser(@PathVariable Long userId, Model model) {
         try {
-            User user = userService.findById(userId).orElseThrow();
+            User user = userBaseCrudService.findById(userId).orElseThrow();
             emailHelper.sendMessage(user.getEmail(), "Регистрация в системе",
                     "Администратор отклонил вашу заявку на регистрацию в системе");
-            userService.deleteById(userId);
-            return Urls.PENDING_USERS_URL + currentUserId;
+            userBaseCrudService.deleteById(userId);
+            return Urls.PENDING_USERS_URL.getUrlString() + currentUserId;
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);

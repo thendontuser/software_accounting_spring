@@ -1,6 +1,7 @@
 package ru.thendont.software_accounting.entity;
 
 import jakarta.persistence.*;
+import ru.thendont.software_accounting.service.enums.UserRoles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +33,7 @@ public class User {
     private String password;
 
     @Column(name = "role")
-    private String role;
+    private UserRoles role;
 
     @ManyToOne
     @JoinColumn(name = "dep_number")
@@ -44,12 +45,22 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<SoftwareInstallation> installations = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<LicenseRequest> licenseRequests = new ArrayList<>();
+
     public User() {
 
     }
 
-    public User(Long id, String lastName, String firstName, String patronymic, String email,
-                String username, String password, String role, Department department) {
+    public User(Long id,
+                String lastName,
+                String firstName,
+                String patronymic,
+                String email,
+                String username,
+                String password,
+                UserRoles role,
+                Department department) {
         this.id = id;
         this.lastName = lastName;
         this.firstName = firstName;
@@ -89,7 +100,7 @@ public class User {
         this.password = password;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRoles role) {
         this.role = role;
     }
 
@@ -125,7 +136,7 @@ public class User {
         return password;
     }
 
-    public String getRole() {
+    public UserRoles getRole() {
         return role;
     }
 
@@ -139,5 +150,9 @@ public class User {
 
     public List<SoftwareInstallation> getInstallations() {
         return installations;
+    }
+
+    public List<LicenseRequest> getLicenseRequests() {
+        return licenseRequests;
     }
 }

@@ -10,18 +10,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import ru.thendont.software_accounting.entity.Device;
-import ru.thendont.software_accounting.entity.InstallationRequest;
 import ru.thendont.software_accounting.entity.Software;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.error.ErrorHandler;
-import ru.thendont.software_accounting.service.DeviceService;
+import ru.thendont.software_accounting.service.BaseCrudService;
 import ru.thendont.software_accounting.service.InstallationRequestService;
-import ru.thendont.software_accounting.service.SoftwareService;
-import ru.thendont.software_accounting.service.UserService;
-import ru.thendont.software_accounting.util.InstallationRequestsStatus;
-import ru.thendont.software_accounting.util.Urls;
+import ru.thendont.software_accounting.service.enums.Urls;
 
-import java.time.LocalDate;
 import java.util.NoSuchElementException;
 
 @Controller
@@ -34,13 +29,13 @@ public class TeacherPageController {
     private String username;
 
     @Autowired
-    private UserService userService;
+    private BaseCrudService<User> userBaseCrudService;
 
     @Autowired
-    private SoftwareService softwareService;
+    private BaseCrudService<Software> softwareBaseCrudService;
 
     @Autowired
-    private DeviceService deviceService;
+    private BaseCrudService<Device> deviceBaseCrudService;
 
     @Autowired
     private InstallationRequestService installationRequestService;
@@ -48,10 +43,10 @@ public class TeacherPageController {
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
         try {
-            User user = userService.findById(userId).orElseThrow();
+            User user = userBaseCrudService.findById(userId).orElseThrow();
             username = user.getUsername();
             model.addAttribute("user", user);
-            model.addAttribute("software", softwareService.findAll());
+            model.addAttribute("software", softwareBaseCrudService.findAll());
             return "teacher-page";
         }
         catch (NoSuchElementException ex) {
@@ -64,15 +59,15 @@ public class TeacherPageController {
     public String sendRequest(@RequestParam Long userId, @RequestParam Long softwareId, @RequestParam Long deviceId,
                               @RequestParam(required = false) String comment, Model model) {
         try {
-            User user = userService.findById(userId).orElseThrow();
-            Software software = softwareService.findById(softwareId).orElseThrow();
-            Device device = deviceService.findById(deviceId).orElseThrow();
-            InstallationRequest request = new InstallationRequest(null, software, device, user, LocalDate.now(),
-                    InstallationRequestsStatus.PENDING, comment);
+            User user = userBaseCrudService.findById(userId).orElseThrow();
+            Software software = softwareBaseCrudService.findById(softwareId).orElseThrow();
+            Device device = deviceBaseCrudService.findById(deviceId).orElseThrow();
+            /*InstallationRequest request = new InstallationRequest(null, software, device, user, LocalDate.now(),
+                    InstallationRequestStatus.PENDING, comment);
 
-            installationRequestService.save(request);
+            installationRequestService.save(request);*/
             logger.info("@{}: === ЗАЯВКА УСПЕШНО СОХРАНЕНА ===", username);
-            return Urls.TEACHER_URL + userId;
+            return Urls.TEACHER_URL.getUrlString() + userId;
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);

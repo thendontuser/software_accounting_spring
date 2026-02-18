@@ -8,7 +8,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import ru.thendont.software_accounting.util.UserRoles;
+import ru.thendont.software_accounting.service.enums.UserRoles;
 
 @Configuration
 @EnableWebSecurity
@@ -30,10 +30,11 @@ public class SecurityConfig {
                     "/auth/**",
                     "/visitor/**"
                 ).permitAll()
-                .requestMatchers("/admin/**", "/pending-users/**").hasRole(UserRoles.ADMIN)
-                .requestMatchers("/teacher/**").hasRole(UserRoles.TEACHER)
-                .requestMatchers("/accountant/**").hasRole(UserRoles.ACCOUNTANT)
-                .requestMatchers("/manager/**").hasRole(UserRoles.MANAGER)
+                .requestMatchers("/admin/**", "/pending-users/**").hasRole(UserRoles.ADMIN.name())
+                .requestMatchers("/teacher/**").hasRole(UserRoles.TEACHER.name())
+                .requestMatchers("/hol/**").hasRole(UserRoles.HEAD_OF_LABORATORIES.name())
+                .requestMatchers("/assistant/**").hasRole(UserRoles.LABORATORY_ASSISTANT.name())
+                .requestMatchers("/manager/**").hasRole(UserRoles.SAM_MANAGER.name())
                 .anyRequest().authenticated()
             )
             .csrf(csrf -> csrf

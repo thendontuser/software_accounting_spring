@@ -11,41 +11,41 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DepartmentServiceTest {
 
     @Autowired
-    private DepartmentService departmentService;
+    private BaseCrudService<Department> departmentBaseCrudService;
 
     @Test
     public void testCreateDepartment() {
         Department department = new Department(null, "test");
-        Department saved = departmentService.save(department);
+        Department saved = departmentBaseCrudService.save(department);
 
         assertEquals(department.getTitle(), saved.getTitle());
         assertNotNull(saved.getDepNumber());
 
-        departmentService.deleteById(saved.getDepNumber());
+        departmentBaseCrudService.deleteById(saved.getDepNumber());
     }
 
     @Test
     public void testUpdateDepartment() {
         Department department = new Department(null, "test");
-        Department saved = departmentService.save(department);
-        Department target = departmentService.findById(Long.valueOf(saved.getDepNumber())).orElse(null);
+        Department saved = departmentBaseCrudService.save(department);
+        Department target = departmentBaseCrudService.findById(Long.valueOf(saved.getDepNumber())).orElse(null);
 
         target.setTitle("testUpdate");
-        target = departmentService.save(target);
+        target = departmentBaseCrudService.save(target);
 
         assertNotEquals(department.getTitle(), target.getTitle());
 
-        departmentService.deleteById(saved.getDepNumber());
+        departmentBaseCrudService.deleteById(saved.getDepNumber());
     }
 
     @Test
     public void testDeleteDepartment() {
         Department department = new Department(null, "testTitle");
-        Department saved = departmentService.save(department);
+        Department saved = departmentBaseCrudService.save(department);
         Long savedDepNumber = saved.getDepNumber();
 
-        departmentService.deleteById(savedDepNumber);
+        departmentBaseCrudService.deleteById(savedDepNumber);
 
-        assertNull(departmentService.findById(savedDepNumber).orElse(null));
+        assertNull(departmentBaseCrudService.findById(savedDepNumber).orElse(null));
     }
 }

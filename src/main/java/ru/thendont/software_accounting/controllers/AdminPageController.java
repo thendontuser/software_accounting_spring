@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.thendont.software_accounting.entity.*;
 import ru.thendont.software_accounting.error.ErrorHandler;
 import ru.thendont.software_accounting.service.*;
+import ru.thendont.software_accounting.service.enums.Urls;
 import ru.thendont.software_accounting.service.report.ReportService;
 import ru.thendont.software_accounting.util.ConstantStrings;
-import ru.thendont.software_accounting.util.Urls;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,25 +33,34 @@ public class AdminPageController {
     private UserService userService;
 
     @Autowired
-    private DepartmentService departmentService;
-
-    @Autowired
-    private DeveloperService developerService;
-
-    @Autowired
-    private DeviceService deviceService;
+    private SoftwareInstallationService softwareInstallationService;
 
     @Autowired
     private InstallationRequestService installationRequestService;
 
     @Autowired
-    private LicenseService licenseService;
+    private BaseCrudService<User> userBaseCrudService;
 
     @Autowired
-    private SoftwareService softwareService;
+    private BaseCrudService<Department> departmentBaseCrudService;
 
     @Autowired
-    private SoftwareInstallationService softwareInstallationService;
+    private BaseCrudService<Developer> developerBaseCrudService;
+
+    @Autowired
+    private BaseCrudService<Software> softwareBaseCrudService;
+
+    @Autowired
+    private BaseCrudService<Device> deviceBaseCrudService;
+
+    @Autowired
+    private BaseCrudService<InstallationRequest> installationRequestBaseCrudService;
+
+    @Autowired
+    private BaseCrudService<License> licenseBaseCrudService;
+
+    @Autowired
+    private BaseCrudService<SoftwareInstallation> softwareInstallationBaseCrudService;
 
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
@@ -59,17 +68,17 @@ public class AdminPageController {
             currentUserId = userId;
         }
         try {
-            User user = userService.findById(userId).orElseThrow();
+            User user = userBaseCrudService.findById(userId).orElseThrow();
             username = user.getUsername();
 
-            List<Department> departments = departmentService.findAll();
-            List<User> users = userService.findAll();
-            List<Developer> developers = developerService.findAll();
-            List<Device> devices = deviceService.findAll();
-            List<InstallationRequest> installationRequests = installationRequestService.findAll();
-            List<License> licenses = licenseService.findAll();
-            List<Software> softwareList = softwareService.findAll();
-            List<SoftwareInstallation> softwareInstallations = softwareInstallationService.findAll();
+            List<Department> departments = departmentBaseCrudService.findAll();
+            List<User> users = userBaseCrudService.findAll();
+            List<Developer> developers = developerBaseCrudService.findAll();
+            List<Device> devices = deviceBaseCrudService.findAll();
+            List<InstallationRequest> installationRequests = installationRequestBaseCrudService.findAll();
+            List<License> licenses = licenseBaseCrudService.findAll();
+            List<Software> softwareList = softwareBaseCrudService.findAll();
+            List<SoftwareInstallation> softwareInstallations = softwareInstallationBaseCrudService.findAll();
             int pendingUserCount = userService.findPendingUsers().size();
 
             model.addAttribute("user", user);
@@ -105,7 +114,7 @@ public class AdminPageController {
                 ReportService.generateSoftwareReport(response,
                         softwareInstallationService.findByDepartmentNumber(departmentNumber),
                         "Перечень программного обеспечения в " +
-                                departmentService.findById(departmentNumber).orElse(null).getTitle());
+                                departmentBaseCrudService.findById(departmentNumber).orElse(null).getTitle());
             }
         }
         catch (IOException ex) {
@@ -126,8 +135,8 @@ public class AdminPageController {
     @GetMapping("/edit/users/{id}")
     public String editUser(@PathVariable Long id, Model model) {
         try {
-            model.addAttribute("user", userService.findById(id).orElseThrow());
-            model.addAttribute("departments", departmentService.findAll());
+            model.addAttribute("user", userBaseCrudService.findById(id).orElseThrow());
+            model.addAttribute("departments", departmentBaseCrudService.findAll());
             model.addAttribute("currentUserId", currentUserId);
             logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ ПОЛЬЗОВАТЕЛЯ ===", username);
             return "edit-user";
@@ -140,19 +149,19 @@ public class AdminPageController {
 
     @PostMapping("/edit/users")
     public String editUser(@ModelAttribute User user, Model model) {
-        if (user.getRole().isEmpty()) {
+        /*if (user.getRole().isEmpty()) {
             user.setRole(null);
-        }
-        userService.save(user);
+        }*/
+        userBaseCrudService.save(user);
         logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ УСПЕШНО СОХРАНИЛСЯ В БАЗЕ ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
     @PostMapping("/delete/users/{id}")
     public String deleteUser(@PathVariable Long id, Model model) {
-        userService.deleteById(id);
+        userBaseCrudService.deleteById(id);
         logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ УСПЕШНО УДАЛИЛСЯ ИЗ БАЗЫ ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 // Для сущности user ==========================================================================================
 
@@ -161,7 +170,7 @@ public class AdminPageController {
     public String editDepartment(@PathVariable Long id, Model model) {
         try {
             model.addAttribute("department", isNewRecord(id) ? new Department() :
-                    departmentService.findById(id).orElseThrow());
+                    departmentBaseCrudService.findById(id).orElseThrow());
             model.addAttribute("currentUserId", currentUserId);
             logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ ФАКУЛЬТЕТА ===", username);
             return "edit-department";
@@ -174,16 +183,16 @@ public class AdminPageController {
 
     @PostMapping("/edit/departments")
     public String editDepartment(@ModelAttribute Department department, Model model) {
-        departmentService.save(department);
+        departmentBaseCrudService.save(department);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ФАКУЛЬТЕТА ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
     @PostMapping("/delete/departments/{id}")
     public String deleteDepartment(@PathVariable Long id, Model model) {
-        departmentService.deleteById(id);
+        departmentBaseCrudService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ФАКУЛЬТЕТА ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 // Для сущности department ==========================================================================================
 
@@ -191,8 +200,8 @@ public class AdminPageController {
     @GetMapping("/edit/devices/{id}")
     public String editDevice(@PathVariable Long id, Model model) {
         try {
-            model.addAttribute("device", isNewRecord(id) ? new Device() : deviceService.findById(id).orElseThrow());
-            model.addAttribute("departments", departmentService.findAll());
+            model.addAttribute("device", isNewRecord(id) ? new Device() : deviceBaseCrudService.findById(id).orElseThrow());
+            model.addAttribute("departments", departmentBaseCrudService.findAll());
             model.addAttribute("currentUserId", currentUserId);
             logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ УСТРОЙСТВА ===", username);
             return "edit-device";
@@ -205,16 +214,16 @@ public class AdminPageController {
 
     @PostMapping("/edit/devices")
     public String editDevice(@ModelAttribute Device device, Model model) {
-        deviceService.save(device);
+        deviceBaseCrudService.save(device);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ УСТРОЙСТВА ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
     @PostMapping("/delete/devices/{id}")
     public String deleteDevice(@PathVariable Long id, Model model) {
-        deviceService.deleteById(id);
+        deviceBaseCrudService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ УСТРОЙСТВА ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 // Для сущности device ==========================================================================================
 
@@ -223,8 +232,8 @@ public class AdminPageController {
     public String editSoftware(@PathVariable Long id, Model model) {
         try {
             model.addAttribute("software", isNewRecord(id) ? new Software() :
-                    softwareService.findById(id).orElseThrow());
-            model.addAttribute("developers", developerService.findAll());
+                    softwareBaseCrudService.findById(id).orElseThrow());
+            model.addAttribute("developers", developerBaseCrudService.findAll());
             model.addAttribute("currentUserId", currentUserId);
             logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ ПО ===", username);
             return "edit-software";
@@ -239,16 +248,16 @@ public class AdminPageController {
     @PostMapping("/edit/software")
     public String editSoftware(@ModelAttribute Software software, Model model) {
         software.setLogoPath(ConstantStrings.LOGO_DIRECTORY_PATH + software.getLogoPath());
-        softwareService.save(software);
+        softwareBaseCrudService.save(software);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ПО ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
     @PostMapping("/delete/software/{id}")
     public String deleteSoftware(@PathVariable Long id, Model model) {
-        softwareService.deleteById(id);
+        softwareBaseCrudService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ПО ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 // Для сущности software ==========================================================================================
 
@@ -257,7 +266,7 @@ public class AdminPageController {
     public String editDeveloper(@PathVariable Long id, Model model) {
         try {
             model.addAttribute("developer", isNewRecord(id) ? new Developer() :
-                    developerService.findById(id).orElseThrow());
+                    developerBaseCrudService.findById(id).orElseThrow());
             model.addAttribute("currentUserId", currentUserId);
             logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ РАЗРАБОТЧИКА ===", username);
             return "edit-developer";
@@ -270,16 +279,16 @@ public class AdminPageController {
 
     @PostMapping("/edit/developers")
     public String editDeveloper(@ModelAttribute Developer developer, Model model) {
-        developerService.save(developer);
+        developerBaseCrudService.save(developer);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ РАЗРАБОТЧИКА ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
     @PostMapping("/delete/developers/{id}")
     public String deleteDeveloper(@PathVariable Long id, Model model) {
-        developerService.deleteById(id);
+        developerBaseCrudService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ РАЗРАБОТЧИКА ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 // Для сущности developer ==========================================================================================
 
@@ -288,8 +297,8 @@ public class AdminPageController {
     public String editLicense(@PathVariable Long id, Model model) {
         try {
             model.addAttribute("license", isNewRecord(id) ? new License() :
-                    licenseService.findById(id).orElseThrow());
-            model.addAttribute("software", softwareService.findAll());
+                    licenseBaseCrudService.findById(id).orElseThrow());
+            model.addAttribute("software", softwareBaseCrudService.findAll());
             model.addAttribute("currentUserId", currentUserId);
             logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ ЛИЦЕНЗИИ ===", username);
             return "edit-license";
@@ -302,16 +311,16 @@ public class AdminPageController {
 
     @PostMapping("/edit/licenses")
     public String editLicense(@ModelAttribute License license, Model model) {
-        licenseService.save(license);
+        licenseBaseCrudService.save(license);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ЛИЦЕНЗИИ ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
     @PostMapping("/delete/licenses/{id}")
     public String deleteLicense(@PathVariable Long id, Model model) {
-        licenseService.deleteById(id);
+        licenseBaseCrudService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ЛИЦЕНЗИИ ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 // Для сущности license ==========================================================================================
 
@@ -319,10 +328,10 @@ public class AdminPageController {
     @GetMapping("/edit/installation_requests/{id}")
     public String editInstallationRequest(@PathVariable Long id, Model model) {
         try {
-            model.addAttribute("request", installationRequestService.findById(id).orElseThrow());
-            model.addAttribute("software", softwareService.findAll());
-            model.addAttribute("devices", deviceService.findAll());
-            model.addAttribute("users", userService.findAll());
+            model.addAttribute("request", installationRequestBaseCrudService.findById(id).orElseThrow());
+            model.addAttribute("software", softwareBaseCrudService.findAll());
+            model.addAttribute("devices", deviceBaseCrudService.findAll());
+            model.addAttribute("users", userBaseCrudService.findAll());
             model.addAttribute("currentUserId", currentUserId);
             logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ ЗАЯВКИ ===", username);
             return "edit-installation-request";
@@ -335,16 +344,16 @@ public class AdminPageController {
 
     @PostMapping("/edit/installation_requests")
     public String editInstallationRequest(@ModelAttribute InstallationRequest installationRequest, Model model) {
-        installationRequestService.save(installationRequest);
+        installationRequestBaseCrudService.save(installationRequest);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ЗАЯВКИ ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
     @PostMapping("/delete/installation_requests/{id}")
     public String deleteInstallationRequest(@PathVariable Long id, Model model) {
-        installationRequestService.deleteById(id);
+        installationRequestBaseCrudService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ЗАЯВКИ ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 // Для сущности InstallationRequest ==========================================================================================
 
@@ -353,10 +362,10 @@ public class AdminPageController {
     public String editSoftwareInstallation(@PathVariable Long id, Model model) {
         try {
             model.addAttribute("installation", isNewRecord(id) ? new SoftwareInstallation() :
-                    softwareInstallationService.findById(id).orElseThrow());
-            model.addAttribute("software", softwareService.findAll());
-            model.addAttribute("devices", deviceService.findAll());
-            model.addAttribute("users", userService.findAll());
+                    softwareInstallationBaseCrudService.findById(id).orElseThrow());
+            model.addAttribute("software", softwareBaseCrudService.findAll());
+            model.addAttribute("devices", deviceBaseCrudService.findAll());
+            model.addAttribute("users", userBaseCrudService.findAll());
             model.addAttribute("currentUserId", currentUserId);
             logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ УСТАНОВКИ ПО ===", username);
             return "edit-software-installation";
@@ -369,16 +378,16 @@ public class AdminPageController {
 
     @PostMapping("/edit/software_installations")
     public String editSoftwareInstallation(@ModelAttribute SoftwareInstallation softwareInstallation, Model model) {
-        softwareInstallationService.save(softwareInstallation);
+        softwareInstallationBaseCrudService.save(softwareInstallation);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ УСТАНОВКИ ПО ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
     @PostMapping("/delete/software_installations/{id}")
     public String deleteSoftwareInstallation(@PathVariable Long id, Model model) {
-        softwareInstallationService.deleteById(id);
+        softwareInstallationBaseCrudService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ УСТАНОВКИ ПО ===", username);
-        return Urls.ADMIN_URL + currentUserId;
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 // Для сущности SoftwareInstallation ==========================================================================================
 

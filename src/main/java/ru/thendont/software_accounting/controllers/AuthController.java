@@ -10,9 +10,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import ru.thendont.software_accounting.entity.User;
+import ru.thendont.software_accounting.service.BaseCrudService;
 import ru.thendont.software_accounting.service.UserService;
-import ru.thendont.software_accounting.util.Urls;
-import ru.thendont.software_accounting.util.UserRoles;
+import ru.thendont.software_accounting.service.enums.Urls;
 
 @Controller
 @RequestMapping("/auth")
@@ -20,6 +20,9 @@ public class AuthController {
 
     @Autowired
     private Logger logger;
+
+    @Autowired
+    private BaseCrudService<User> userBaseCrudService;
 
     @Autowired
     private UserService userService;
@@ -81,19 +84,19 @@ public class AuthController {
             return "sign-up";
         }
         userService.hashPassword(user);
-        userService.save(user);
+        userBaseCrudService.save(user);
         logger.info("=== УСПЕШНОЕ СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЯ В БАЗУ ДАННЫХ ===");
         return "redirect:/auth/login?registered";
     }
 
     private String getPageFromUser(User user) {
-        return user.getRole() == null ? Urls.VISITOR_URL + user.getId() :
-                switch (user.getRole()) {
-                    case UserRoles.ADMIN -> Urls.ADMIN_URL + user.getId();
-                    case UserRoles.ACCOUNTANT -> Urls.ACCOUNTANT_URL + user.getId();
-                    case UserRoles.MANAGER -> Urls.MANAGER_URL + user.getId();
-                    case UserRoles.TEACHER -> Urls.TEACHER_URL + user.getId();
-                    default -> "";
-                };
+        return user.getRole() == null ? Urls.VISITOR_URL.getUrlString() + user.getId() :
+            switch (user.getRole()) {
+                case ADMIN -> Urls.ADMIN_URL.getUrlString() + user.getId();
+                case TEACHER -> Urls.TEACHER_URL.getUrlString() + user.getId();
+                case HEAD_OF_LABORATORIES -> Urls.HEAD_OF_LABORATORIES_URL.getUrlString() + user.getId();
+                case LABORATORY_ASSISTANT -> Urls.LABORATORY_ASSISTANT.getUrlString() + user.getId();
+                case SAM_MANAGER -> Urls.SAM_MANAGER.getUrlString() + user.getId();
+            };
     }
 }

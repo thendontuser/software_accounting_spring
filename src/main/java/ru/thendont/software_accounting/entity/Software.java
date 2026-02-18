@@ -35,6 +35,9 @@ public class Software {
     @OneToMany(mappedBy = "software", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<SoftwareInstallation> installations = new ArrayList<>();
 
+    @OneToMany(mappedBy = "software", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<LicenseRequest> licenseRequests = new ArrayList<>();
+
     public Software() {
 
     }
@@ -97,5 +100,9 @@ public class Software {
 
     public List<License> getLicenses() {
         return licenses;
+    }
+
+    public List<LicenseRequest> getLicenseRequests() {
+        return licenseRequests;
     }
 }

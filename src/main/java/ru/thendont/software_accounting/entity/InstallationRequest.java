@@ -1,8 +1,11 @@
 package ru.thendont.software_accounting.entity;
 
 import jakarta.persistence.*;
+import ru.thendont.software_accounting.service.enums.InstallationRequestStatus;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "installation_request")
@@ -17,8 +20,8 @@ public class InstallationRequest {
     private Software software;
 
     @ManyToOne
-    @JoinColumn(name = "device_id")
-    private Device device;
+    @JoinColumn(name = "classroom_id")
+    private Classroom classroom;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -28,20 +31,28 @@ public class InstallationRequest {
     private LocalDate date;
 
     @Column(name = "status")
-    private String status;
+    private InstallationRequestStatus status;
 
     @Column(name = "comment")
     private String comment;
+
+    @OneToMany(mappedBy = "installationRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<InstallationTask> tasks = new ArrayList<>();
 
     public InstallationRequest() {
 
     }
 
-    public InstallationRequest(Long id, Software software, Device device, User user, LocalDate date,
-                               String status, String comment) {
+    public InstallationRequest(Long id,
+                               Software software,
+                               Classroom classroom,
+                               User user,
+                               LocalDate date,
+                               InstallationRequestStatus status,
+                               String comment) {
         this.id = id;
         this.software = software;
-        this.device = device;
+        this.classroom = classroom;
         this.user = user;
         this.date = date;
         this.status = status;
@@ -56,8 +67,8 @@ public class InstallationRequest {
         this.software = software;
     }
 
-    public void setDevice(Device device) {
-        this.device = device;
+    public void setClassroom(Classroom classroom) {
+        this.classroom = classroom;
     }
 
     public void setUser(User user) {
@@ -68,7 +79,7 @@ public class InstallationRequest {
         this.date = date;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(InstallationRequestStatus status) {
         this.status = status;
     }
 
@@ -84,8 +95,8 @@ public class InstallationRequest {
         return software;
     }
 
-    public Device getDevice() {
-        return device;
+    public Classroom getClassroom() {
+        return classroom;
     }
 
     public User getUser() {
@@ -96,11 +107,15 @@ public class InstallationRequest {
         return date;
     }
 
-    public String getStatus() {
+    public InstallationRequestStatus getStatus() {
         return status;
     }
 
     public String getComment() {
         return comment;
+    }
+
+    public List<InstallationTask> getTasks() {
+        return tasks;
     }
 }
