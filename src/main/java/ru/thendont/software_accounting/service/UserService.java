@@ -21,6 +21,22 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    public Optional<User> findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    public List<User> findAll() {
+        return (List<User>) userRepository.findAll();
+    }
+
+    public User save(User user) {
+        return userRepository.save(user);
+    }
+
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
+    }
+
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }

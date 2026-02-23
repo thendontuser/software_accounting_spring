@@ -32,6 +32,7 @@ public class User {
     @Column(name = "password_hash")
     private String password;
 
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "role")
     private UserRoles role;
 
@@ -45,7 +46,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<SoftwareInstallation> installations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "requestedBy", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<LicenseRequest> licenseRequests = new ArrayList<>();
 
     public User() {

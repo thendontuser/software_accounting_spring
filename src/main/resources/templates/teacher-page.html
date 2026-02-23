@@ -504,11 +504,11 @@
                 </select>
             </div>
             <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Устройство для установки</label>
+                <label style="display: block; margin-bottom: 5px; font-weight: 600;">Аудитория</label>
                 <select name="deviceId" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px;">
-                    <option th:each="device : ${user.department.devices}"
-                            th:value="${device.id}"
-                            th:text="|${device.title} (инв. номер - №${device.id})|">Устройство</option>
+                    <option th:each="classroom : ${classroomList}"
+                            th:value="${classroom.id}"
+                            th:text="|Номер - №${classroom.number})|">Устройство</option>
                 </select>
             </div>
             <div style="margin-bottom: 1.5rem;">

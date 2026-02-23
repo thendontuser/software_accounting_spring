@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.thendont.software_accounting.entity.User;
-import ru.thendont.software_accounting.service.BaseCrudService;
+import ru.thendont.software_accounting.service.UserService;
 
 @Controller
 @RequestMapping("/visitor")
@@ -18,12 +18,12 @@ public class VisitorPageController {
     private Logger logger;
 
     @Autowired
-    private BaseCrudService<User> userBaseCrudService;
+    private UserService userService;
 
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam(required = false) Long userId, Model model) {
         logger.info("=== ПЕРЕХОД НА ГОСТЕВУЮ СТРАНИЦУ ===");
-        User user = userId != null ? userBaseCrudService.findById(userId).orElse(null) : null;
+        User user = userId != null ? userService.findById(userId).orElse(null) : null;
         model.addAttribute("user", user);
         return "visitor-page";
     }

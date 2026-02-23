@@ -439,10 +439,19 @@
                 <select id="role-${pendingUser.id}" name="role" class="form-control" required
                         onchange="toggleDepartmentAccess(this, 'dept-${pendingUser.id}')">
                   <option value="">Выберите роль</option>
-                  <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).ADMIN}">Администратор</option>
-                  <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).MANAGER}">Управляющий факультетом</option>
-                  <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).TEACHER}">Преподаватель</option>
-                  <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).ACCOUNTANT}">Бухгалтер</option>
+                  <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).ADMIN}">Администратор</option>
+                  <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).SAM_MANAGER}">
+                    Менеджер по управлению программными активами
+                  </option>
+                  <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).HEAD_OF_LABORATORIES}">
+                    Заведующий лабораториями
+                  </option>
+                  <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).LABORATORY_ASSISTANT}">
+                    Лаборант
+                  </option>
+                  <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).TEACHER}">
+                    Преподаватель
+                  </option>
                 </select>
               </div>
 

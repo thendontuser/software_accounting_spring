@@ -30,6 +30,7 @@ public class InstallationRequest {
     @Column(name = "request_date")
     private LocalDate date;
 
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "status")
     private InstallationRequestStatus status;
 

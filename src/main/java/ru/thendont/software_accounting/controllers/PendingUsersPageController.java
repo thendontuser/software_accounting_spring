@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 import ru.thendont.software_accounting.entity.Department;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.error.ErrorHandler;
-import ru.thendont.software_accounting.service.BaseCrudService;
+import ru.thendont.software_accounting.service.DepartmentService;
 import ru.thendont.software_accounting.service.UserService;
-import ru.thendont.software_accounting.service.email.EmailHelper;
+import ru.thendont.software_accounting.service.email.EmailService;
 import ru.thendont.software_accounting.service.enums.Urls;
 import ru.thendont.software_accounting.service.enums.UserRoles;
 
@@ -26,16 +26,13 @@ public class PendingUsersPageController {
     private Logger logger;
 
     @Autowired
-    private BaseCrudService<User> userBaseCrudService;
-
-    @Autowired
-    private BaseCrudService<Department> departmentBaseCrudService;
+    private DepartmentService departmentService;
 
     @Autowired
     private UserService userService;
 
     @Autowired
-    private EmailHelper emailHelper;
+    private EmailService emailService;
 
     private String username;
 
@@ -44,11 +41,11 @@ public class PendingUsersPageController {
     @GetMapping("/dashboard")
     public String pendingUsers(@RequestParam Long userId, Model model) {
         try {
-            User user = userBaseCrudService.findById(userId).orElseThrow();
+            User user = userService.findById(userId).orElseThrow();
             currentUserId = user.getId();
             username = user.getUsername();
             List<User> pendingUsers = userService.findPendingUsers();
-            List<Department> departments = departmentBaseCrudService.findAll();
+            List<Department> departments = departmentService.findAll();
             int pendingUserCount = pendingUsers.size();
 
             model.addAttribute("user", user);
@@ -69,13 +66,12 @@ public class PendingUsersPageController {
                               @RequestParam(required = false) Long departmentNumber,
                               Model model) {
         try {
-            User user = userBaseCrudService.findById(userId).orElseThrow();
+            User user = userService.findById(userId).orElseThrow();
             user.setRole(UserRoles.valueOf(UserRoles.class, role));
-            user.setDepartment(departmentNumber != null ?
-                    departmentBaseCrudService.findById(departmentNumber).orElseThrow() : null);
-            userBaseCrudService.save(user);
+            user.setDepartment(departmentNumber != null ? departmentService.findById(departmentNumber).orElseThrow() : null);
+            userService.save(user);
 
-            emailHelper.sendMessage(user.getEmail(), "Регистрация в системе",
+            emailService.sendMessage(user.getEmail(), "Регистрация в системе",
                     "Администратор подтвердил вашу заявку на регистрацию в системе");
             return Urls.PENDING_USERS_URL.getUrlString() + currentUserId;
         }
@@ -93,10 +89,10 @@ public class PendingUsersPageController {
     @PostMapping("/reject-user/{userId}")
     public String rejectUser(@PathVariable Long userId, Model model) {
         try {
-            User user = userBaseCrudService.findById(userId).orElseThrow();
-            emailHelper.sendMessage(user.getEmail(), "Регистрация в системе",
+            User user = userService.findById(userId).orElseThrow();
+            emailService.sendMessage(user.getEmail(), "Регистрация в системе",
                     "Администратор отклонил вашу заявку на регистрацию в системе");
-            userBaseCrudService.deleteById(userId);
+            userService.deleteById(userId);
             return Urls.PENDING_USERS_URL.getUrlString() + currentUserId;
         }
         catch (NoSuchElementException ex) {

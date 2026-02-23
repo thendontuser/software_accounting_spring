@@ -29,6 +29,7 @@ public class InstallationTask {
     @Column(name = "created_at")
     private LocalDate createdAt;
 
+    @Enumerated(value = EnumType.STRING)
     @Column(name = "status")
     private InstallationTaskStatus status;
 

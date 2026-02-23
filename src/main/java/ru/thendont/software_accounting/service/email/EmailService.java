@@ -9,7 +9,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailHelper {
+public class EmailService {
 
     @Autowired
     private Logger logger;

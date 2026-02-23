@@ -15,53 +15,50 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LicenseServiceTest {
 
     @Autowired
-    private BaseCrudService<License> licenseBaseCrudService;
+    private LicenseService licenseService;
 
     @Autowired
-    private BaseCrudService<Software> softwareBaseCrudService;
+    private SoftwareService softwareService;
 
     @Autowired
     private SoftwareInstallationService softwareInstallationService;
 
-    @Autowired
-    private LicenseService licenseService;
-
     @Test
     public void testCreateLicense() {
-        Software software = softwareBaseCrudService.findById(Long.valueOf(1)).orElse(null);
+        Software software = softwareService.findById(Long.valueOf(1)).orElse(null);
         License license = new License(null, "test", software, LocalDate.now(), LocalDate.now(), 5000);
-        License saved = licenseBaseCrudService.save(license);
+        License saved = licenseService.save(license);
 
         assertNotNull(saved.getId());
         assertEquals(license.getPrice().intValue(), saved.getPrice().intValue());
 
-        licenseBaseCrudService.deleteById(saved.getId());
+        licenseService.deleteById(saved.getId());
     }
 
     @Test
     public void testUpdateLicense() {
-        Software software = softwareBaseCrudService.findById(Long.valueOf(1)).orElse(null);
+        Software software = softwareService.findById(Long.valueOf(1)).orElse(null);
         License license = new License(null, "test", software, LocalDate.now(), LocalDate.now(), 5000);
-        License saved = licenseBaseCrudService.save(license);
-        License target = licenseBaseCrudService.findById(saved.getId()).orElse(null);
+        License saved = licenseService.save(license);
+        License target = licenseService.findById(saved.getId()).orElse(null);
 
         target.setType("testUpdate");
-        target = licenseBaseCrudService.save(target);
+        target = licenseService.save(target);
 
         assertNotEquals(license.getType(), target.getType());
 
-        licenseBaseCrudService.deleteById(saved.getId());
+        licenseService.deleteById(saved.getId());
     }
 
     @Test
     public void testDeleteLicense() {
-        Software software = softwareBaseCrudService.findById(Long.valueOf(1)).orElse(null);
+        Software software = softwareService.findById(Long.valueOf(1)).orElse(null);
         License license = new License(null, "test", software, LocalDate.now(), LocalDate.now(), 5000);
-        License saved = licenseBaseCrudService.save(license);
+        License saved = licenseService.save(license);
 
-        licenseBaseCrudService.deleteById(saved.getId());
+        licenseService.deleteById(saved.getId());
 
-        assertNull(licenseBaseCrudService.findById(saved.getId()).orElse(null));
+        assertNull(licenseService.findById(saved.getId()).orElse(null));
     }
 
     @Test
@@ -69,7 +66,7 @@ public class LicenseServiceTest {
         List<Software> installedSoftware = softwareInstallationService.findAllInstalledSoftware();
         int totalPrice = 0;
 
-        for (License license : licenseBaseCrudService.findAll()) {
+        for (License license : licenseService.findAll()) {
             for (Software software : installedSoftware) {
                 if (license.getSoftware().getId().equals(software.getId())) {
                     totalPrice += license.getPrice();

@@ -10,7 +10,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import ru.thendont.software_accounting.entity.User;
-import ru.thendont.software_accounting.service.BaseCrudService;
 import ru.thendont.software_accounting.service.UserService;
 import ru.thendont.software_accounting.service.enums.Urls;
 
@@ -20,9 +19,6 @@ public class AuthController {
 
     @Autowired
     private Logger logger;
-
-    @Autowired
-    private BaseCrudService<User> userBaseCrudService;
 
     @Autowired
     private UserService userService;
@@ -84,7 +80,7 @@ public class AuthController {
             return "sign-up";
         }
         userService.hashPassword(user);
-        userBaseCrudService.save(user);
+        userService.save(user);
         logger.info("=== УСПЕШНОЕ СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЯ В БАЗУ ДАННЫХ ===");
         return "redirect:/auth/login?registered";
     }

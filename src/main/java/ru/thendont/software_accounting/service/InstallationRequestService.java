@@ -7,12 +7,29 @@ import ru.thendont.software_accounting.repository.InstallationRequestRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InstallationRequestService {
 
     @Autowired
     private InstallationRequestRepository installationRequestRepository;
+
+    public Optional<InstallationRequest> findById(Long id) {
+        return installationRequestRepository.findById(id);
+    }
+
+    public List<InstallationRequest> findAll() {
+        return (List<InstallationRequest>) installationRequestRepository.findAll();
+    }
+
+    public InstallationRequest save(InstallationRequest installationRequest) {
+        return installationRequestRepository.save(installationRequest);
+    }
+
+    public void deleteById(Long id) {
+        installationRequestRepository.deleteById(id);
+    }
 
     public List<InstallationRequest> findByDepartmentNumber(Long depNumber) {
         List<InstallationRequest> requests = new ArrayList<>();

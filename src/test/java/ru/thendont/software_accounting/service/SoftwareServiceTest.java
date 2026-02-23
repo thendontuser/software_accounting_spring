@@ -12,46 +12,46 @@ import static org.junit.jupiter.api.Assertions.*;
 public class SoftwareServiceTest {
 
     @Autowired
-    private BaseCrudService<Software> softwareBaseCrudService;
+    private SoftwareService softwareService;
 
     @Autowired
-    private BaseCrudService<Developer> developerBaseCrudService;
+    private DeveloperService developerService;
 
     @Test
     public void testCreateSoftware() {
-        Developer developer = developerBaseCrudService.findById(Long.valueOf(3)).orElse(null);
+        Developer developer = developerService.findById(Long.valueOf(3)).orElse(null);
         Software software = new Software(null, "testTitle", "testVersion", developer, "testLogo");
-        Software saved = softwareBaseCrudService.save(software);
+        Software saved = softwareService.save(software);
 
         assertNotNull(saved.getId());
         assertEquals("testTitle", saved.getTitle());
 
-        softwareBaseCrudService.deleteById(saved.getId());
+        softwareService.deleteById(saved.getId());
     }
 
     @Test
     public void testUpdateSoftware() {
-        Developer developer = developerBaseCrudService.findById(Long.valueOf(3)).orElse(null);
+        Developer developer = developerService.findById(Long.valueOf(3)).orElse(null);
         Software software = new Software(null, "testTitle", "testVersion", developer, "testLogo");
-        Software saved = softwareBaseCrudService.save(software);
-        Software target = softwareBaseCrudService.findById(Long.valueOf(saved.getId())).orElse(null);
+        Software saved = softwareService.save(software);
+        Software target = softwareService.findById(Long.valueOf(saved.getId())).orElse(null);
 
         target.setVersion("1.5");
-        target = softwareBaseCrudService.save(target);
+        target = softwareService.save(target);
 
         assertNotEquals(software.getVersion(), target.getVersion());
 
-        softwareBaseCrudService.deleteById(saved.getId());
+        softwareService.deleteById(saved.getId());
     }
 
     @Test
     public void testDeleteSoftware() {
-        Developer developer = developerBaseCrudService.findById(Long.valueOf(3)).orElse(null);
+        Developer developer = developerService.findById(Long.valueOf(3)).orElse(null);
         Software software = new Software(null, "testTitle", "testVersion", developer, "testLogo");
-        Software saved = softwareBaseCrudService.save(software);
+        Software saved = softwareService.save(software);
 
-        softwareBaseCrudService.deleteById(saved.getId());
+        softwareService.deleteById(saved.getId());
 
-        assertNull(softwareBaseCrudService.findById(saved.getId()).orElse(null));
+        assertNull(softwareService.findById(saved.getId()).orElse(null));
     }
 }
