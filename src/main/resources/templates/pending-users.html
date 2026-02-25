@@ -437,7 +437,7 @@
               <div class="form-group">
                 <label for="role-${pendingUser.id}">Роль *</label>
                 <select id="role-${pendingUser.id}" name="role" class="form-control" required
-                        onchange="toggleDepartmentAccess(this, 'dept-${pendingUser.id}')">
+                        onchange="toggleKafedraAccess(this, 'kaf-${pendingUser.id}')">
                   <option value="">Выберите роль</option>
                   <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).ADMIN}">Администратор</option>
                   <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).SAM_MANAGER}">
@@ -456,15 +456,15 @@
               </div>
 
               <div class="form-group">
-                <label for="dept-${pendingUser.id}">Факультет</label>
-                <select id="dept-${pendingUser.id}" name="departmentNumber" class="form-control">
-                  <option value="">Не назначен</option>
-                  <option th:each="dept : ${departments}"
-                          th:value="${dept.depNumber}"
-                          th:text="${dept.title}">Отдел</option>
+                <label for="kaf-${pendingUser.id}">Кафедра</label>
+                <select id="kaf-${pendingUser.id}" name="kafId" class="form-control">
+                  <option value="">Не назначена</option>
+                  <option th:each="kaf : ${kafedraList}"
+                          th:value="${kaf.id}"
+                          th:text="${kaf.title}">Отдел</option>
                 </select>
-                <div id="dept-helper-${pendingUser.id}" class="helper-text" style="display: none;">
-                  Для этой роли не требуется факультет
+                <div id="kaf-helper-${pendingUser.id}" class="helper-text" style="display: none;">
+                  Для этой роли не требуется кафедра
                 </div>
               </div>
 
@@ -486,52 +486,53 @@
 </div>
 
 <script>
-  // Роли, для которых НЕ требуется факультет
-  const rolesWithoutDepartment = [
+  // Роли, для которых НЕ требуется кафедра
+  const rolesWithoutKafedra = [
     'ADMIN',
-    'ACCOUNTANT'
+    'SAM_MANAGER'
   ];
 
-  // Роли, для которых требуется факультет
-  const rolesWithDepartment = [
-    'MANAGER',
+  // Роли, для которых требуется кафедра
+  const rolesWithKafedra = [
+    'HEAD_OF_LABORATORIES',
+    'LABORATORY_ASSISTANT',
     'TEACHER'
   ];
 
-  function toggleDepartmentAccess(roleSelect) {
+  function toggleKafedraAccess(roleSelect) {
     const userId = roleSelect.id.replace('role-', '');
-    const departmentSelect = document.getElementById('dept-' + userId);
-    const helperText = document.getElementById('dept-helper-' + userId);
+    const kafedraSelect = document.getElementById('kaf-' + userId);
+    const helperText = document.getElementById('kaf-helper-' + userId);
     const selectedRole = roleSelect.value;
 
     // Сбрасываем значение при каждом изменении роли
-    if (departmentSelect) {
-      departmentSelect.value = '';
+    if (kafedraSelect) {
+      kafedraSelect.value = '';
     }
 
     if (selectedRole === '') {
       // Если роль не выбрана
-      if (departmentSelect) {
-        departmentSelect.disabled = false;
-        departmentSelect.required = false;
+      if (kafedraSelect) {
+        kafedraSelect.disabled = false;
+        kafedraSelect.required = false;
       }
       if (helperText) {
         helperText.style.display = 'none';
       }
-    } else if (rolesWithoutDepartment.includes(selectedRole)) {
-      // Если роль не требует факультета
-      if (departmentSelect) {
-        departmentSelect.disabled = true;
-        departmentSelect.required = false;
+    } else if (rolesWithoutKafedra.includes(selectedRole)) {
+      // Если роль не требует кафедры
+      if (kafedraSelect) {
+        kafedraSelect.disabled = true;
+        kafedraSelect.required = false;
       }
       if (helperText) {
         helperText.style.display = 'block';
       }
-    } else if (rolesWithDepartment.includes(selectedRole)) {
+    } else if (rolesWithKafedra.includes(selectedRole)) {
       // Если роль требует факультета
-      if (departmentSelect) {
-        departmentSelect.disabled = false;
-        departmentSelect.required = true;
+      if (kafedraSelect) {
+        kafedraSelect.disabled = false;
+        kafedraSelect.required = true;
       }
       if (helperText) {
         helperText.style.display = 'none';
@@ -553,7 +554,7 @@
   // При загрузке страницы устанавливаем состояние для всех селектов
   document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('[id^="role-"]').forEach(roleSelect => {
-      toggleDepartmentAccess(roleSelect);
+      toggleKafedraAccess(roleSelect);
     });
   });
 </script>

@@ -12,6 +12,6 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     Optional<User> findByUsername(String username);
 
-    @Query(value = "SELECT * FROM users WHERE role IS NULL AND dep_number IS NULL", nativeQuery = true)
+    @Query(value = "SELECT * FROM users WHERE role IS NULL AND kaf_id IS NULL", nativeQuery = true)
     Iterable<User> findPendingUsers();
 }

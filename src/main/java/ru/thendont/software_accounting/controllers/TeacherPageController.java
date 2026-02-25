@@ -49,7 +49,7 @@ public class TeacherPageController {
             username = user.getUsername();
             model.addAttribute("user", user);
             model.addAttribute("software", softwareService.findAll());
-            model.addAttribute("classroomList", classroomService.findByDepartment(user.getDepartment()));
+            model.addAttribute("classroomList", classroomService.findByKafedra(user.getKafedra()));
             return "teacher-page";
         }
         catch (NoSuchElementException ex) {

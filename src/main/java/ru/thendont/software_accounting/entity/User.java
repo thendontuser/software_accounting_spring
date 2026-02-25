@@ -37,8 +37,8 @@ public class User {
     private UserRoles role;
 
     @ManyToOne
-    @JoinColumn(name = "dep_number")
-    private Department department;
+    @JoinColumn(name = "kaf_id")
+    private Kafedra kafedra;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<InstallationRequest> requests = new ArrayList<>();
@@ -61,7 +61,7 @@ public class User {
                 String username,
                 String password,
                 UserRoles role,
-                Department department) {
+                Kafedra kafedra) {
         this.id = id;
         this.lastName = lastName;
         this.firstName = firstName;
@@ -70,7 +70,7 @@ public class User {
         this.username = username;
         this.password = password;
         this.role = role;
-        this.department = department;
+        this.kafedra = kafedra;
     }
 
     public void setId(Long id) {
@@ -105,8 +105,8 @@ public class User {
         this.role = role;
     }
 
-    public void setDepartment(Department department) {
-        this.department = department;
+    public void setKafedra(Kafedra kafedra) {
+        this.kafedra = kafedra;
     }
 
     public Long getId() {
@@ -141,8 +141,8 @@ public class User {
         return role;
     }
 
-    public Department getDepartment() {
-        return department;
+    public Kafedra getKafedra() {
+        return kafedra;
     }
 
     public List<InstallationRequest> getRequests() {

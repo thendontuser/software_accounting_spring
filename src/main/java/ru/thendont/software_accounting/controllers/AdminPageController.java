@@ -92,7 +92,7 @@ public class AdminPageController {
         }
     }
 
-    @GetMapping("/reports/software")
+    /*@GetMapping("/reports/software")
     public void generateReport(@RequestParam String type, @RequestParam(required = false) Long departmentNumber,
                                HttpServletResponse response, Model model) {
         try {
@@ -120,7 +120,7 @@ public class AdminPageController {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
             ErrorHandler.errorPage("Не найден факультет", "Не найден факультет в системе", model);
         }
-    }
+    }*/
 
 // Для сущности user ==========================================================================================
     @GetMapping("/edit/users/{id}")

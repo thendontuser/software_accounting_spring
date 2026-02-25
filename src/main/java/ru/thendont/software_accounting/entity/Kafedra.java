@@ -2,6 +2,9 @@ package ru.thendont.software_accounting.entity;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "kafedra")
 public class Kafedra {
@@ -17,6 +20,12 @@ public class Kafedra {
     @ManyToOne
     @JoinColumn(name = "dep_number")
     private Department department;
+
+    @OneToMany(mappedBy = "kafedra", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<User> users = new ArrayList<>();
+
+    @OneToMany(mappedBy = "kafedra", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Classroom> classrooms = new ArrayList<>();
 
     public Kafedra() {
 
@@ -50,5 +59,13 @@ public class Kafedra {
 
     public Department getDepartment() {
         return department;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public List<Classroom> getClassrooms() {
+        return classrooms;
     }
 }

@@ -3,7 +3,7 @@ package ru.thendont.software_accounting.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.Classroom;
-import ru.thendont.software_accounting.entity.Department;
+import ru.thendont.software_accounting.entity.Kafedra;
 import ru.thendont.software_accounting.repository.ClassroomRepository;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class ClassroomService {
         classroomRepository.deleteById(id);
     }
 
-    public List<Classroom> findByDepartment(Department department) {
-        return classroomRepository.findByDepartmentNumber(department.getDepNumber());
+    public List<Classroom> findByKafedra(Kafedra kafedra) {
+        return (List<Classroom>) classroomRepository.findByKafId(kafedra.getId());
     }
 }

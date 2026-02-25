@@ -377,7 +377,7 @@
         </div>
         <div>
             <div style="font-weight: 600; color: #2d3748;" th:text="${user.lastName + ' ' + user.firstName + ' ' + user.patronymic}"> Неизвестный пользователь</div>
-            <div style="font-size: 12px; color: #718096;" th:text="${user.department.title}"></div>
+            <div style="font-size: 12px; color: #718096;" th:text="'Кафедра: ' + ${user.kafedra.title}"></div>
         </div>
     </div>
 </header>

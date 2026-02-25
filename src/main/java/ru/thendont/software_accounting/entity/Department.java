@@ -20,9 +20,6 @@ public class Department {
     @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Kafedra> kafedraList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<User> users = new ArrayList<>();
-
     public Department() {
 
     }
@@ -50,9 +47,5 @@ public class Department {
 
     public List<Kafedra> getKafedraList() {
         return kafedraList;
-    }
-
-    public List<User> getUsers() {
-        return users;
     }
 }

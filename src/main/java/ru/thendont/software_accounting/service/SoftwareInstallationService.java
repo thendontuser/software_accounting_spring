@@ -2,7 +2,6 @@ package ru.thendont.software_accounting.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.thendont.software_accounting.entity.Purchase;
 import ru.thendont.software_accounting.entity.Software;
 import ru.thendont.software_accounting.entity.SoftwareInstallation;
 import ru.thendont.software_accounting.repository.SoftwareInstallationRepository;
@@ -33,7 +32,7 @@ public class SoftwareInstallationService {
         softwareInstallationRepository.deleteById(id);
     }
 
-    public List<Software> findByDepartmentNumber(Long depNumber) {
+    /*public List<Software> findByDepartmentNumber(Long depNumber) {
         List<Software> softwareList = new ArrayList<>();
         softwareInstallationRepository.findAll().forEach(softwareInstallation -> {
             if (softwareInstallation.getUser().getDepartment().getDepNumber().equals(depNumber)) {
@@ -41,7 +40,7 @@ public class SoftwareInstallationService {
             }
         });
         return softwareList;
-    }
+    }*/
 
     public List<Software> findAllInstalledSoftware() {
         List<Software> softwareList = new ArrayList<>();
