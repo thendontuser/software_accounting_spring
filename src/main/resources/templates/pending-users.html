@@ -378,14 +378,6 @@
               th:text="${pendingUserCount}"></span>
       </a>
     </div>
-
-    <div class="nav-section">
-      <div class="nav-title">Аккаунт</div>
-      <a th:href="@{/auth/logout}" class="nav-item">
-        <i class="fas fa-sign-out-alt"></i>
-        <span>Выйти</span>
-      </a>
-    </div>
   </nav>
 
   <!-- Main Content -->
@@ -439,7 +431,9 @@
                 <select id="role-${pendingUser.id}" name="role" class="form-control" required
                         onchange="toggleKafedraAccess(this, 'kaf-${pendingUser.id}')">
                   <option value="">Выберите роль</option>
-                  <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).ADMIN}">Администратор</option>
+                  <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).ADMIN}">
+                    Администратор
+                  </option>
                   <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).SAM_MANAGER}">
                     Менеджер по управлению программными активами
                   </option>
@@ -486,63 +480,48 @@
 </div>
 
 <script>
-  // Роли, для которых НЕ требуется кафедра
-  const rolesWithoutKafedra = [
-    'ADMIN',
-    'SAM_MANAGER'
-  ];
-
-  // Роли, для которых требуется кафедра
-  const rolesWithKafedra = [
-    'HEAD_OF_LABORATORIES',
-    'LABORATORY_ASSISTANT',
-    'TEACHER'
-  ];
+  const rolesWithoutKafedra = ['ADMIN', 'SAM_MANAGER'];
+  const rolesWithKafedra = ['HEAD_OF_LABORATORIES', 'LABORATORY_ASSISTANT', 'TEACHER'];
 
   function toggleKafedraAccess(roleSelect) {
-    const userId = roleSelect.id.replace('role-', '');
-    const kafedraSelect = document.getElementById('kaf-' + userId);
-    const helperText = document.getElementById('kaf-helper-' + userId);
-    const selectedRole = roleSelect.value;
+    // Ищем родительский элемент .user-card, чтобы найти связанные элементы в том же блоке
+    const userCard = roleSelect.closest('.user-card');
 
-    // Сбрасываем значение при каждом изменении роли
-    if (kafedraSelect) {
-      kafedraSelect.value = '';
+    if (!userCard) {
+      console.error('Родительский элемент .user-card не найден');
+      return;
     }
 
+    // Ищем элементы внутри этого user-card
+    const kafedraSelect = userCard.querySelector('[id^="kaf-"]');
+    const helperText = userCard.querySelector('[id^="kaf-helper-"]');
+    const selectedRole = roleSelect.value;
+
+    if (!kafedraSelect || !helperText) {
+      console.error('Элементы не найдены в user-card');
+      return;
+    }
+
+    // Сбрасываем значение
+    kafedraSelect.value = '';
+
     if (selectedRole === '') {
-      // Если роль не выбрана
-      if (kafedraSelect) {
-        kafedraSelect.disabled = false;
-        kafedraSelect.required = false;
-      }
-      if (helperText) {
-        helperText.style.display = 'none';
-      }
+      kafedraSelect.disabled = false;
+      kafedraSelect.required = false;
+      helperText.style.display = 'none';
     } else if (rolesWithoutKafedra.includes(selectedRole)) {
-      // Если роль не требует кафедры
-      if (kafedraSelect) {
-        kafedraSelect.disabled = true;
-        kafedraSelect.required = false;
-      }
-      if (helperText) {
-        helperText.style.display = 'block';
-      }
+      kafedraSelect.disabled = true;
+      kafedraSelect.required = false;
+      helperText.style.display = 'block';
     } else if (rolesWithKafedra.includes(selectedRole)) {
-      // Если роль требует факультета
-      if (kafedraSelect) {
-        kafedraSelect.disabled = false;
-        kafedraSelect.required = true;
-      }
-      if (helperText) {
-        helperText.style.display = 'none';
-      }
+      kafedraSelect.disabled = false;
+      kafedraSelect.required = true;
+      helperText.style.display = 'none';
     }
   }
 
   function rejectUser(userId) {
     if (confirm('Вы уверены, что хотите отклонить этого пользователя?')) {
-      // Создаем форму для отклонения пользователя
       const form = document.createElement('form');
       form.method = 'POST';
       form.action = '/pending-users/reject-user/' + userId;
@@ -551,7 +530,6 @@
     }
   }
 
-  // При загрузке страницы устанавливаем состояние для всех селектов
   document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('[id^="role-"]').forEach(roleSelect => {
       toggleKafedraAccess(roleSelect);

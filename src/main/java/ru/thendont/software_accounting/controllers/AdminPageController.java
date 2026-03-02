@@ -1,7 +1,5 @@
 package ru.thendont.software_accounting.controllers;
 
-import com.itextpdf.text.DocumentException;
-import jakarta.servlet.http.HttpServletResponse;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,10 +9,8 @@ import ru.thendont.software_accounting.entity.*;
 import ru.thendont.software_accounting.error.ErrorHandler;
 import ru.thendont.software_accounting.service.*;
 import ru.thendont.software_accounting.service.enums.Urls;
-import ru.thendont.software_accounting.service.report.ReportService;
 import ru.thendont.software_accounting.util.ConstantStrings;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -33,25 +29,25 @@ public class AdminPageController {
     private UserService userService;
 
     @Autowired
-    private SoftwareInstallationService softwareInstallationService;
-
-    @Autowired
-    private InstallationRequestService installationRequestService;
-
-    @Autowired
     private DepartmentService departmentService;
+
+    @Autowired
+    private DeviceService deviceService;
+
+    @Autowired
+    private KafedraService kafedraService;
+
+    @Autowired
+    private ClassroomService classroomService;
+
+    @Autowired
+    private SoftwareInstallationService softwareInstallationService;
 
     @Autowired
     private DeveloperService developerService;
 
     @Autowired
     private SoftwareService softwareService;
-
-    @Autowired
-    private DeviceService deviceService;
-
-    @Autowired
-    private LicenseService licenseService;
 
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
@@ -60,30 +56,35 @@ public class AdminPageController {
         }
         try {
             User user = userService.findById(userId).orElseThrow();
-            username = user.getUsername();
-
-            List<Department> departments = departmentService.findAll();
             List<User> users = userService.findAll();
-            List<Developer> developers = developerService.findAll();
-            List<Device> devices = deviceService.findAll();
-            List<InstallationRequest> installationRequests = installationRequestService.findAll();
-            List<License> licenses = licenseService.findAll();
-            List<Software> softwareList = softwareService.findAll();
-            List<SoftwareInstallation> softwareInstallations = softwareInstallationService.findAll();
+            username = user.getUsername();
             int pendingUserCount = userService.findPendingUsers().size();
 
+            List<Department> departments = departmentService.findAll();
+            List<Device> devices = deviceService.findAll();
+            List<Kafedra> kafedras = kafedraService.findAll();
+            List<Classroom> classrooms = classroomService.findAll();
+
+            List<Software> softwareList = softwareService.findAll();
+            List<SoftwareInstallation> softwareInstallations = softwareInstallationService.findAll();
+            List<Developer> developers = developerService.findAll();
+
             model.addAttribute("user", user);
-            model.addAttribute("userCount", users.size());
-            model.addAttribute("softwareCount", softwareList.size());
-            model.addAttribute("departments", departments);
             model.addAttribute("users", users);
+            model.addAttribute("userCount", users.size());
+            model.addAttribute("pendingUserCount", pendingUserCount);
+
+            model.addAttribute("departments", departments);
             model.addAttribute("devices", devices);
+            model.addAttribute("kafedras", kafedras);
+            model.addAttribute("classrooms", classrooms);
+
             model.addAttribute("softwareList", softwareList);
             model.addAttribute("developers", developers);
-            model.addAttribute("licenses", licenses);
-            model.addAttribute("installationRequests", installationRequests);
             model.addAttribute("softwareInstallations", softwareInstallations);
-            model.addAttribute("pendingUserCount", pendingUserCount);
+            model.addAttribute("softwareCount", softwareList.size());
+            model.addAttribute("installationCount", softwareInstallations.size());
+
             return "admin-page";
         }
         catch (NoSuchElementException ex) {
@@ -92,42 +93,12 @@ public class AdminPageController {
         }
     }
 
-    /*@GetMapping("/reports/software")
-    public void generateReport(@RequestParam String type, @RequestParam(required = false) Long departmentNumber,
-                               HttpServletResponse response, Model model) {
-        try {
-            response.setContentType("application/pdf");
-            response.setHeader("Content-Disposition", "inline; filename=software_report.pdf");
-            if (type.equals("all")) {
-                ReportService.generateSoftwareReport(response, softwareInstallationService.findAllInstalledSoftware(),
-                        "Полный перечень программного обеспечения");
-            } else {
-                ReportService.generateSoftwareReport(response,
-                        softwareInstallationService.findByDepartmentNumber(departmentNumber),
-                        "Перечень программного обеспечения в " +
-                                departmentService.findById(departmentNumber).orElse(null).getTitle());
-            }
-        }
-        catch (IOException ex) {
-            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            ErrorHandler.errorPage("Ошибка генерации отчета", "При генерации отчета возникла ошибка", model);
-        }
-        catch (DocumentException ex) {
-            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            ErrorHandler.errorPage("Ошибка создания документа", "При создании документа возникла ошибка", model);
-        }
-        catch (NullPointerException ex) {
-            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            ErrorHandler.errorPage("Не найден факультет", "Не найден факультет в системе", model);
-        }
-    }*/
-
 // Для сущности user ==========================================================================================
     @GetMapping("/edit/users/{id}")
     public String editUser(@PathVariable Long id, Model model) {
         try {
             model.addAttribute("user", userService.findById(id).orElseThrow());
-            model.addAttribute("departments", departmentService.findAll());
+            model.addAttribute("kafedras", kafedraService.findAll());
             model.addAttribute("currentUserId", currentUserId);
             logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ ПОЛЬЗОВАТЕЛЯ ===", username);
             return "edit-user";
@@ -139,17 +110,17 @@ public class AdminPageController {
     }
 
     @PostMapping("/edit/users")
-    public String editUser(@ModelAttribute User user, Model model) {
-        /*if (user.getRole().isEmpty()) {
+    public String editUser(@ModelAttribute User user) {
+        if (user.getRole() == null) {
             user.setRole(null);
-        }*/
+        }
         userService.save(user);
         logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ УСПЕШНО СОХРАНИЛСЯ В БАЗЕ ===", username);
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
     @PostMapping("/delete/users/{id}")
-    public String deleteUser(@PathVariable Long id, Model model) {
+    public String deleteUser(@PathVariable Long id) {
         userService.deleteById(id);
         logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ УСПЕШНО УДАЛИЛСЯ ИЗ БАЗЫ ===", username);
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
@@ -173,14 +144,14 @@ public class AdminPageController {
     }
 
     @PostMapping("/edit/departments")
-    public String editDepartment(@ModelAttribute Department department, Model model) {
+    public String editDepartment(@ModelAttribute Department department) {
         departmentService.save(department);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ФАКУЛЬТЕТА ===", username);
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
     @PostMapping("/delete/departments/{id}")
-    public String deleteDepartment(@PathVariable Long id, Model model) {
+    public String deleteDepartment(@PathVariable Long id) {
         departmentService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ФАКУЛЬТЕТА ===", username);
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
@@ -192,7 +163,8 @@ public class AdminPageController {
     public String editDevice(@PathVariable Long id, Model model) {
         try {
             model.addAttribute("device", isNewRecord(id) ? new Device() : deviceService.findById(id).orElseThrow());
-            model.addAttribute("departments", departmentService.findAll());
+            model.addAttribute("classrooms", classroomService.findAll());
+            model.addAttribute("kafedras", kafedraService.findAll());
             model.addAttribute("currentUserId", currentUserId);
             logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ УСТРОЙСТВА ===", username);
             return "edit-device";
@@ -204,19 +176,81 @@ public class AdminPageController {
     }
 
     @PostMapping("/edit/devices")
-    public String editDevice(@ModelAttribute Device device, Model model) {
+    public String editDevice(@ModelAttribute Device device) {
         deviceService.save(device);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ УСТРОЙСТВА ===", username);
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
     @PostMapping("/delete/devices/{id}")
-    public String deleteDevice(@PathVariable Long id, Model model) {
+    public String deleteDevice(@PathVariable Long id) {
         deviceService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ УСТРОЙСТВА ===", username);
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 // Для сущности device ==========================================================================================
+
+// Для сущности kafedra ==========================================================================================
+    @GetMapping("/edit/kafedras/{id}")
+    public String editKafedra(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("kafedra", isNewRecord(id) ? new Kafedra() : kafedraService.findById(id).orElseThrow());
+            model.addAttribute("departments", departmentService.findAll());
+            model.addAttribute("currentUserId", currentUserId);
+            logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ КАФЕДРЫ ===", username);
+            return "edit-kafedra";
+        }
+        catch (NoSuchElementException ex) {
+            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
+            return ErrorHandler.errorPage("Не найдена кафедра", "Кафедра не найдена в системе", model);
+        }
+    }
+
+    @PostMapping("/edit/kafedras")
+    public String editKafedra(@ModelAttribute Kafedra kafedra) {
+        kafedraService.save(kafedra);
+        logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ КАФЕДРЫ ===", username);
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
+    }
+
+    @PostMapping("/delete/kafedras/{id}")
+    public String deleteKafedra(@PathVariable Long id) {
+        kafedraService.deleteById(id);
+        logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ КАФЕДРЫ ===", username);
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
+    }
+// Для сущности kafedra ==========================================================================================
+
+// Для сущности classroom ==========================================================================================
+    @GetMapping("/edit/classrooms/{id}")
+    public String editClassrooms(@PathVariable Long id, Model model) {
+        try {
+            model.addAttribute("classroom", isNewRecord(id) ? new Classroom() : classroomService.findById(id).orElseThrow());
+            model.addAttribute("kafedras", kafedraService.findAll());
+            model.addAttribute("currentUserId", currentUserId);
+            logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ АУДИТОРИИ ===", username);
+            return "edit-classroom";
+        }
+        catch (NoSuchElementException ex) {
+            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
+            return ErrorHandler.errorPage("Не найдена аудитория", "Аудитория не найдена в системе", model);
+        }
+    }
+
+    @PostMapping("/edit/classrooms")
+    public String editClassroom(@ModelAttribute Classroom classroom) {
+        classroomService.save(classroom);
+        logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ АУДИТОРИИ ===", username);
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
+    }
+
+    @PostMapping("/delete/classrooms/{id}")
+    public String deleteClassroom(@PathVariable Long id) {
+        classroomService.deleteById(id);
+        logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ АУДИТОРИИ ===", username);
+        return Urls.ADMIN_URL.getUrlString() + currentUserId;
+    }
+// Для сущности classroom ==========================================================================================
 
 // Для сущности software ==========================================================================================
     @GetMapping("/edit/software/{id}")
@@ -237,7 +271,7 @@ public class AdminPageController {
     }
 
     @PostMapping("/edit/software")
-    public String editSoftware(@ModelAttribute Software software, Model model) {
+    public String editSoftware(@ModelAttribute Software software) {
         software.setLogoPath(ConstantStrings.LOGO_DIRECTORY_PATH + software.getLogoPath());
         softwareService.save(software);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ПО ===", username);
@@ -269,7 +303,7 @@ public class AdminPageController {
     }
 
     @PostMapping("/edit/developers")
-    public String editDeveloper(@ModelAttribute Developer developer, Model model) {
+    public String editDeveloper(@ModelAttribute Developer developer) {
         developerService.save(developer);
         logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ РАЗРАБОТЧИКА ===", username);
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
@@ -282,105 +316,6 @@ public class AdminPageController {
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 // Для сущности developer ==========================================================================================
-
-// Для сущности license ==========================================================================================
-    @GetMapping("/edit/licenses/{id}")
-    public String editLicense(@PathVariable Long id, Model model) {
-        try {
-            model.addAttribute("license", isNewRecord(id) ? new License() :
-                    licenseService.findById(id).orElseThrow());
-            model.addAttribute("software", softwareService.findAll());
-            model.addAttribute("currentUserId", currentUserId);
-            logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ ЛИЦЕНЗИИ ===", username);
-            return "edit-license";
-        }
-        catch (NoSuchElementException ex) {
-            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найдена лицензия", "Лицензия не найдена в системе", model);
-        }
-    }
-
-    @PostMapping("/edit/licenses")
-    public String editLicense(@ModelAttribute License license, Model model) {
-        licenseService.save(license);
-        logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ЛИЦЕНЗИИ ===", username);
-        return Urls.ADMIN_URL.getUrlString() + currentUserId;
-    }
-
-    @PostMapping("/delete/licenses/{id}")
-    public String deleteLicense(@PathVariable Long id, Model model) {
-        licenseService.deleteById(id);
-        logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ЛИЦЕНЗИИ ===", username);
-        return Urls.ADMIN_URL.getUrlString() + currentUserId;
-    }
-// Для сущности license ==========================================================================================
-
-// Для сущности InstallationRequest ==========================================================================================
-    @GetMapping("/edit/installation_requests/{id}")
-    public String editInstallationRequest(@PathVariable Long id, Model model) {
-        try {
-            model.addAttribute("request", installationRequestService.findById(id).orElseThrow());
-            model.addAttribute("software", softwareService.findAll());
-            model.addAttribute("devices", deviceService.findAll());
-            model.addAttribute("users", userService.findAll());
-            model.addAttribute("currentUserId", currentUserId);
-            logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ ЗАЯВКИ ===", username);
-            return "edit-installation-request";
-        }
-        catch (NoSuchElementException ex) {
-            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найдена заявка на установку ПО", "Заявка не найдена в системе", model);
-        }
-    }
-
-    @PostMapping("/edit/installation_requests")
-    public String editInstallationRequest(@ModelAttribute InstallationRequest installationRequest, Model model) {
-        installationRequestService.save(installationRequest);
-        logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ ЗАЯВКИ ===", username);
-        return Urls.ADMIN_URL.getUrlString() + currentUserId;
-    }
-
-    @PostMapping("/delete/installation_requests/{id}")
-    public String deleteInstallationRequest(@PathVariable Long id, Model model) {
-        installationRequestService.deleteById(id);
-        logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ЗАЯВКИ ===", username);
-        return Urls.ADMIN_URL.getUrlString() + currentUserId;
-    }
-// Для сущности InstallationRequest ==========================================================================================
-
-// Для сущности SoftwareInstallation ==========================================================================================
-    @GetMapping("/edit/software_installations/{id}")
-    public String editSoftwareInstallation(@PathVariable Long id, Model model) {
-        try {
-            model.addAttribute("installation", isNewRecord(id) ? new SoftwareInstallation() :
-                    softwareInstallationService.findById(id).orElseThrow());
-            model.addAttribute("software", softwareService.findAll());
-            model.addAttribute("devices", deviceService.findAll());
-            model.addAttribute("users", userService.findAll());
-            model.addAttribute("currentUserId", currentUserId);
-            logger.info("@{}: === НАЧАЛО РЕДАКТИРОВАНИЯ УСТАНОВКИ ПО ===", username);
-            return "edit-software-installation";
-        }
-        catch (NoSuchElementException ex) {
-            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найдена установка", "Установка не найдена в системе", model);
-        }
-    }
-
-    @PostMapping("/edit/software_installations")
-    public String editSoftwareInstallation(@ModelAttribute SoftwareInstallation softwareInstallation, Model model) {
-        softwareInstallationService.save(softwareInstallation);
-        logger.info("@{}: === УСПЕШНОЕ СОХРАНЕНИЕ ДАННЫХ УСТАНОВКИ ПО ===", username);
-        return Urls.ADMIN_URL.getUrlString() + currentUserId;
-    }
-
-    @PostMapping("/delete/software_installations/{id}")
-    public String deleteSoftwareInstallation(@PathVariable Long id, Model model) {
-        softwareInstallationService.deleteById(id);
-        logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ УСТАНОВКИ ПО ===", username);
-        return Urls.ADMIN_URL.getUrlString() + currentUserId;
-    }
-// Для сущности SoftwareInstallation ==========================================================================================
 
     private boolean isNewRecord(Long id) {
         return id == 0;

@@ -14,7 +14,7 @@
 
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #f8f9fa;
+            background: #f0f2f5;
             min-height: 100vh;
             padding: 2rem;
         }
@@ -23,29 +23,67 @@
             max-width: 600px;
             margin: 0 auto;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             overflow: hidden;
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
             color: white;
             padding: 2rem;
             text-align: center;
+            position: relative;
         }
 
         .header h1 {
-            font-size: 24px;
+            font-size: 28px;
             margin-bottom: 0.5rem;
+            font-weight: 600;
         }
 
         .header p {
             opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .department-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 36px;
+            margin: 0 auto 1.5rem;
+            border: 3px solid rgba(255,255,255,0.5);
         }
 
         .form-container {
-            padding: 2rem;
+            padding: 2.5rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #64748b;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            background: #2563eb;
+            color: white;
+            transform: translateX(-5px);
         }
 
         .form-group {
@@ -56,14 +94,26 @@
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
-            color: #2d3748;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .form-group label i {
+            color: #2563eb;
+            margin-right: 6px;
+        }
+
+        .required::after {
+            content: '*';
+            color: #ef4444;
+            margin-left: 4px;
         }
 
         .form-control {
             width: 100%;
             padding: 12px 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
             font-size: 14px;
             background: white;
             transition: all 0.3s ease;
@@ -71,19 +121,61 @@
 
         .form-control:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
         }
 
         .form-control:disabled {
-            background-color: #f7fafc;
-            color: #a0aec0;
+            background-color: #f1f5f9;
+            color: #64748b;
             cursor: not-allowed;
+            border-color: #e2e8f0;
+        }
+
+        .form-control.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: 0.5rem;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .error-message i {
+            font-size: 14px;
+        }
+
+        .hint {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .hint i {
+            color: #2563eb;
+            font-size: 14px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #e2e8f0;
         }
 
         .btn {
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 12px 28px;
+            border-radius: 12px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -96,121 +188,146 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
             color: white;
         }
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.4);
         }
 
         .btn-secondary {
-            background: #a0aec0;
-            color: white;
+            background: #f1f5f9;
+            color: #475569;
         }
 
         .btn-secondary:hover {
-            background: #718096;
-        }
-
-        .btn-danger {
-            background: #e53e3e;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c53030;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: space-between;
-            margin-top: 2rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .department-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-            font-size: 32px;
-            margin: 0 auto 1.5rem;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: #667eea;
-            text-decoration: none;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-
-        .back-link:hover {
-            color: #764ba2;
-        }
-
-        .info-message {
-            background: #f0fff4;
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 4px solid #38a169;
-            margin-bottom: 1rem;
-        }
-
-        .warning-message {
-            background: #fffaf0;
-            padding: 12px;
-            border-radius: 8px;
-            border-left: 4px solid #dd6b20;
-            margin-bottom: 1rem;
-        }
-
-        .info-message i {
-            color: #38a169;
-        }
-
-        .warning-message i {
-            color: #dd6b20;
+            background: #e2e8f0;
+            transform: translateY(-2px);
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, 1fr);
             gap: 1rem;
-            margin-top: 1rem;
+            margin: 1.5rem 0;
         }
 
         .stat-card {
-            background: #f7fafc;
-            padding: 1rem;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            padding: 1.25rem;
+            border-radius: 16px;
             text-align: center;
-            border: 1px solid #e2e8f0;
+            border: 2px solid #e2e8f0;
         }
 
         .stat-number {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
-            color: #667eea;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             margin-bottom: 0.25rem;
         }
 
         .stat-label {
-            font-size: 12px;
-            color: #718096;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .info-message {
+            background: #eef2ff;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            border-left: 4px solid #2563eb;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #1e293b;
+        }
+
+        .info-message i {
+            color: #2563eb;
+            font-size: 20px;
+        }
+
+        .warning-message {
+            background: #fff3e0;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            border-left: 4px solid #f59e0b;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #1e293b;
+        }
+
+        .warning-message i {
+            color: #f59e0b;
+            font-size: 20px;
+        }
+
+        .department-preview {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .preview-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+        }
+
+        .preview-info {
+            flex: 1;
+        }
+
+        .preview-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+
+        .preview-subtitle {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1rem;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .form-actions .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .department-preview {
+                flex-direction: column;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -220,7 +337,7 @@
     <div style="padding: 1.5rem 2rem 0;">
         <a th:href="@{/admin/dashboard(userId=${currentUserId})}" class="back-link">
             <i class="fas fa-arrow-left"></i>
-            Назад к панели управления
+            <span>Назад к панели управления</span>
         </a>
     </div>
 
@@ -233,34 +350,53 @@
             Редактирование факультета
         </h1>
         <p th:text="${department.depNumber != null} ?
-                   'Измените данные факультета' :
-                   'Добавьте новый факультет в систему'">
+                       'Измените данные факультета' :
+                       'Добавьте новый факультет в систему'">
             Измените данные факультета
         </p>
     </div>
 
     <!-- Форма -->
     <div class="form-container">
+        <!-- Предпросмотр для существующего факультета -->
+        <div th:if="${department.depNumber != null && department.title != null}" class="department-preview">
+            <div class="preview-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="preview-info">
+                <div class="preview-title" th:text="${department.title}">Факультет информатики</div>
+                <div class="preview-subtitle">
+                    <i class="fas fa-hashtag"></i>
+                    Номер факультета: <span th:text="${department.depNumber}">1</span>
+                </div>
+            </div>
+        </div>
+
         <form th:action="@{/admin/edit/departments}" th:object="${department}" method="post" id="departmentForm">
             <!-- Скрытое поле для ID -->
             <input type="hidden" th:field="*{depNumber}">
 
             <div class="form-group">
-                <label for="title">Название факультета *</label>
+                <label for="title">
+                    <i class="fas fa-tag"></i>
+                    <span class="required">Название факультета</span>
+                </label>
                 <input type="text" class="form-control" id="title" th:field="*{title}"
-                       placeholder="Введите название факультета" required maxlength="255">
+                       placeholder="Например: Факультет информационных технологий"
+                       required maxlength="255"
+                       th:attr="data-current-title=${department.title}">
+                <div class="hint">
+                    <i class="fas fa-info-circle"></i>
+                    <span>Полное официальное название факультета</span>
+                </div>
             </div>
 
             <!-- Статистика (только для редактирования существующего факультета) -->
             <div th:if="${department.depNumber != null}">
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-number" th:text="${department.users.size()}">0</div>
-                        <div class="stat-label">Пользователей</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" th:text="${department.devices.size()}">0</div>
-                        <div class="stat-label">Устройств</div>
+                        <div class="stat-number" th:text="${department.kafedraList.size()}">0</div>
+                        <div class="stat-label">Кафедр</div>
                     </div>
                 </div>
             </div>
@@ -268,39 +404,122 @@
             <!-- Информация для нового факультета -->
             <div th:if="${department.depNumber == null}" class="info-message">
                 <i class="fas fa-info-circle"></i>
-                <span>После создания факультета вы сможете назначать ему пользователей и устройства.</span>
+                <span>После создания факультета вы сможете добавлять кафедры и аудитории, привязанные к нему.</span>
+            </div>
+
+            <!-- Предупреждение для существующего факультета с кафедрами -->
+            <div th:if="${department.depNumber != null && department.kafedraList.size() > 0}" class="warning-message">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>
+                    Внимание! У этого факультета есть
+                    <strong th:text="${department.kafedraList.size()}">5</strong>
+                    кафедр. Изменение названия не повлияет на связанные данные.
+                </span>
             </div>
 
             <div class="form-actions">
-                <div style="display: flex; gap: 1rem; margin-left: auto;">
-                    <button type="button" class="btn btn-secondary" onclick="history.back()">
-                        <i class="fas fa-times"></i> Отмена
-                    </button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i>
-                        <span th:text="${department.depNumber != null} ? 'Сохранить изменения' : 'Создать факультет'">
-                            Сохранить изменения
-                        </span>
-                    </button>
-                </div>
+                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                    <i class="fas fa-times"></i> Отмена
+                </button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i>
+                    <span th:text="${department.depNumber != null} ? 'Сохранить изменения' : 'Создать факультет'">
+                        Сохранить изменения
+                    </span>
+                </button>
             </div>
         </form>
     </div>
 </div>
 
 <script>
-    // Обработчик отправки формы
-    document.getElementById('departmentForm').addEventListener('submit', function(e) {
-        const title = document.getElementById('title').value.trim();
+    // Функция валидации названия факультета
+    function validateDepartmentTitle(title) {
+        if (!title || title.trim() === '') {
+            return { valid: false, message: 'Название факультета не может быть пустым' };
+        }
 
-        if (!title) {
-            e.preventDefault();
-            alert('Пожалуйста, введите название факультета');
-            document.getElementById('title').focus();
+        if (title.length < 3) {
+            return { valid: false, message: 'Название факультета должно содержать минимум 3 символа' };
+        }
+
+        if (title.length > 255) {
+            return { valid: false, message: 'Название факультета не может превышать 255 символов' };
+        }
+
+        // Проверка на допустимые символы (буквы, цифры, пробелы, дефисы, точки)
+        const validPattern = /^[а-яА-ЯёЁa-zA-Z0-9\s\-\.]+$/;
+        if (!validPattern.test(title)) {
+            return { valid: false, message: 'Название может содержать только буквы, цифры, пробелы, дефисы и точки' };
+        }
+
+        return { valid: true };
+    }
+
+    // Функция показа ошибки
+    function showError(element, message) {
+        const formGroup = element.closest('.form-group');
+        let errorDiv = formGroup.querySelector('.error-message');
+
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i><span></span>';
+            formGroup.appendChild(errorDiv);
+        }
+
+        errorDiv.querySelector('span').textContent = message;
+        errorDiv.style.display = 'flex';
+        element.classList.add('error');
+    }
+
+    function hideError(element) {
+        const formGroup = element.closest('.form-group');
+        const errorDiv = formGroup.querySelector('.error-message');
+
+        if (errorDiv) {
+            errorDiv.style.display = 'none';
+        }
+        element.classList.remove('error');
+    }
+
+    // Валидация при вводе
+    document.getElementById('title').addEventListener('input', function(e) {
+        const title = e.target.value;
+
+        if (title.trim() === '') {
+            hideError(this);
             return;
         }
 
-        // Можно добавить дополнительную валидацию здесь
+        const validation = validateDepartmentTitle(title);
+        if (!validation.valid) {
+            showError(this, validation.message);
+        } else {
+            hideError(this);
+        }
+    });
+
+    // Обработчик отправки формы
+    document.getElementById('departmentForm').addEventListener('submit', function(e) {
+        const titleInput = document.getElementById('title');
+        const title = titleInput.value.trim();
+
+        const validation = validateDepartmentTitle(title);
+
+        if (!validation.valid) {
+            e.preventDefault();
+            showError(titleInput, validation.message);
+            titleInput.focus();
+            return;
+        }
+
+        // Проверка на дубликат названия (можно добавить, если есть эндпоинт для проверки)
+        const currentTitle = titleInput.getAttribute('data-current-title');
+        if (currentTitle && currentTitle === title) {
+            console.log('Название не изменилось');
+        }
+
         console.log('Форма факультета отправляется');
     });
 
@@ -311,6 +530,15 @@
         // Автофокус на поле названия для новых факультетов
         if ([[${department.depNumber == null}]]) {
             document.getElementById('title').focus();
+        }
+
+        // Валидация существующего названия при загрузке
+        const titleInput = document.getElementById('title');
+        if (titleInput.value) {
+            const validation = validateDepartmentTitle(titleInput.value);
+            if (!validation.valid) {
+                showError(titleInput, validation.message);
+            }
         }
     });
 </script>

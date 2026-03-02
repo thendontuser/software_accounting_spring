@@ -25,9 +25,7 @@ public class Developer {
     @OneToMany(mappedBy = "developer", cascade = CascadeType.ALL, orphanRemoval = true)
     private final List<Software> software = new ArrayList<>();
 
-    public Developer() {
-
-    }
+    public Developer() {}
 
     public Developer(Long id, String title, String companyType, String location) {
         this.id = id;

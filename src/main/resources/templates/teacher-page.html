@@ -402,13 +402,13 @@
             <div class="nav-item" style="cursor: default;">
                 <i class="fas fa-clock"></i>
                 <span>В обработке
-            <span th:text="${#lists.size(user.requests.?[status == T(ru.thendont.software_accounting.util.InstallationRequestsStatus).PENDING])}">2</span>
+            <span th:text="${#lists.size(user.requests.?[status == T(ru.thendont.software_accounting.service.enums.InstallationRequestStatus).PENDING])}">2</span>
         </span>
             </div>
             <div class="nav-item" style="cursor: default;">
                 <i class="fas fa-check-circle"></i>
                 <span>Утвержденные
-            <span th:text="${#lists.size(user.requests.?[status == T(ru.thendont.software_accounting.util.InstallationRequestsStatus).APPROVED])}">5</span>
+            <span th:text="${#lists.size(user.requests.?[status == T(ru.thendont.software_accounting.service.enums.InstallationRequestStatus).APPROVED])}">5</span>
         </span>
             </div>
         </div>
@@ -474,7 +474,7 @@
                     <div class="date" th:text="'Подана: ' + ${#temporals.format(request.date, 'dd.MM.yyyy')}">Дата</div>
                 </div>
                 <div class="status" th:classappend="${request.status}">
-                    <span th:text="${request.status}">Статус</span>
+                    <span th:text="${request.status.getStatusName}">Статус</span>
                 </div>
             </div>
 
@@ -505,7 +505,7 @@
             </div>
             <div style="margin-bottom: 1rem;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Аудитория</label>
-                <select name="deviceId" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px;">
+                <select name="classroomId" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px;">
                     <option th:each="classroom : ${classroomList}"
                             th:value="${classroom.id}"
                             th:text="|Номер - №${classroom.number})|">Устройство</option>

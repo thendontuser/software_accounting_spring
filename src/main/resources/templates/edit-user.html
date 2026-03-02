@@ -220,31 +220,42 @@
             <div class="form-group">
                 <label for="role">Роль</label>
                 <select class="form-control" id="role" th:field="*{role}" onchange="toggleDepartmentField()">
-                    <option value="">Не назначена</option>
-                    <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).ADMIN}">Администратор</option>
-                    <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).MANAGER}">Управляющий факультетом</option>
-                    <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).TEACHER}">Преподаватель</option>
-                    <option th:value="${T(ru.thendont.software_accounting.util.UserRoles).ACCOUNTANT}">Бухгалтер</option>
+                    <option value="">Выберите роль</option>
+                    <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).ADMIN}">
+                        Администратор
+                    </option>
+                    <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).SAM_MANAGER}">
+                        Менеджер по управлению программными активами
+                    </option>
+                    <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).HEAD_OF_LABORATORIES}">
+                        Заведующий лабораториями
+                    </option>
+                    <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).LABORATORY_ASSISTANT}">
+                        Лаборант
+                    </option>
+                    <option th:value="${T(ru.thendont.software_accounting.service.enums.UserRoles).TEACHER}">
+                        Преподаватель
+                    </option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="department">Факультет</label>
-                <select class="form-control" id="department" th:field="*{department.depNumber}" name="departmentNumber">
-                    <option value="">Не назначен</option>
-                    <option th:each="dept : ${departments}"
-                            th:value="${dept.depNumber}"
-                            th:text="${dept.title}"
-                            th:selected="${user.department != null && user.department.depNumber == dept.depNumber}">
-                        Факультет
+                <label for="department">Кафедра</label>
+                <select class="form-control" id="department" th:field="*{kafedra.id}" name="departmentNumber">
+                    <option value="">Не назначена</option>
+                    <option th:each="kaf : ${kafedras}"
+                            th:value="${kaf.id}"
+                            th:text="${kaf.title}"
+                            th:selected="${user.kafedra != null && user.kafedra.id == kaf.id}">
+                        Кафедра
                     </option>
                 </select>
                 <div id="department-info" class="info-message" style="display: none;">
                     <i class="fas fa-info-circle"></i>
-                    <span>Для выбранной роли факультет не требуется</span>
+                    <span>Для выбранной роли кафедра не требуется</span>
                 </div>
                 <small style="color: #718096; font-size: 12px; margin-top: 0.25rem; display: block;">
-                    Для некоторых ролей факультет не требуется
+                    Для некоторых ролей кафедра не требуется
                 </small>
             </div>
 
@@ -268,7 +279,7 @@
         const departmentInfo = document.getElementById('department-info');
 
         // Роли, для которых факультет не требуется
-        const rolesWithoutDepartment = ['ADMIN', 'ACCOUNTANT', ''];
+        const rolesWithoutDepartment = ['ADMIN', 'SAM_MANAGER', ''];
 
         if (rolesWithoutDepartment.includes(roleSelect.value)) {
             // Блокируем выбор факультета
@@ -285,7 +296,7 @@
     // Обработчик отправки формы - устанавливаем department в null для ролей без факультета
     document.getElementById('userForm').addEventListener('submit', function(e) {
         const roleSelect = document.getElementById('role');
-        const rolesWithoutDepartment = ['ADMIN', 'ACCOUNTANT'];
+        const rolesWithoutDepartment = ['ADMIN', 'SAM_MANAGER'];
 
         if (rolesWithoutDepartment.includes(roleSelect.value)) {
             // Создаем скрытое поле для отправки department=null
