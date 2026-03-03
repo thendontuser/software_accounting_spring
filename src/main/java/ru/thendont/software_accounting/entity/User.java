@@ -40,13 +40,13 @@ public class User {
     @JoinColumn(name = "kaf_id")
     private Kafedra kafedra;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     private final List<InstallationRequest> requests = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     private final List<SoftwareInstallation> installations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "requestedBy", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "requestedBy")
     private final List<LicenseRequest> licenseRequests = new ArrayList<>();
 
     public User() {

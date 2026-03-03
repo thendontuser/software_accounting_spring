@@ -29,7 +29,7 @@ public class Device {
     @JoinColumn(name = "classroom_id")
     private Classroom classroom;
 
-    @OneToMany(mappedBy = "device", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "device")
     private final List<SoftwareInstallation> installations = new ArrayList<>();
 
     public Device() {

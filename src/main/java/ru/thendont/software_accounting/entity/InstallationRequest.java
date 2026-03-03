@@ -37,7 +37,7 @@ public class InstallationRequest {
     @Column(name = "comment")
     private String comment;
 
-    @OneToMany(mappedBy = "installationRequest", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "installationRequest")
     private final List<InstallationTask> tasks = new ArrayList<>();
 
     public InstallationRequest() {

@@ -21,7 +21,7 @@ public class Classroom {
     @JoinColumn(name = "kaf_id")
     private Kafedra kafedra;
 
-    @OneToMany(mappedBy = "classroom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "classroom")
     private final List<Device> devices = new ArrayList<>();
 
     public Classroom() {

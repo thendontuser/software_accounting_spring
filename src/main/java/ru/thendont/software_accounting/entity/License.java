@@ -30,7 +30,7 @@ public class License {
     @Column(name = "price")
     private Integer price;
 
-    @OneToMany(mappedBy = "license", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "license")
     private final List<Purchase> purchases = new ArrayList<>();
 
     public License() {

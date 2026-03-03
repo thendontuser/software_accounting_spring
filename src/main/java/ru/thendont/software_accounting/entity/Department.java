@@ -17,7 +17,7 @@ public class Department {
     @Column(name = "title")
     private String title;
 
-    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "department")
     private final List<Kafedra> kafedraList = new ArrayList<>();
 
     public Department() {

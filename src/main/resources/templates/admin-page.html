@@ -400,6 +400,13 @@
             padding: 6px 12px;
             font-size: 12px;
             border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
 
         .btn-pending {
@@ -577,6 +584,235 @@
             color: #1e293b;
         }
 
+        /* Модальные окна */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            animation: slideUp 0.3s ease;
+            position: relative;
+            z-index: 10000;
+            pointer-events: auto;
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            color: white;
+            position: relative;
+            text-align: center;
+            border-radius: 24px 24px 0 0;
+        }
+
+        .modal-header h2 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 28px;
+            border: 3px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-body p {
+            line-height: 1.5;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .modal-footer .btn {
+            pointer-events: auto;
+            cursor: pointer;
+            position: relative;
+            z-index: 10001;
+        }
+
+        /* Список связанных записей */
+        .relations-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 15px 0;
+        }
+
+        .relation-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 15px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .relation-item:hover {
+            border-color: #2563eb;
+            background: #eef2ff;
+            transform: translateX(5px);
+        }
+
+        .relation-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .relation-info {
+            flex: 1;
+        }
+
+        .relation-title {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .relation-count {
+            font-size: 12px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Кнопки */
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        /* Сообщения */
+        .warning-message {
+            background: #fff3e0;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            border-left: 4px solid #f59e0b;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .warning-message i {
+            color: #f59e0b;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .info-message {
+            background: #eef2ff;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            border-left: 4px solid #2563eb;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #1e293b;
+            font-size: 14px;
+        }
+
+        .info-message i {
+            color: #2563eb;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        /* Индикатор загрузки */
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        /* Анимации */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
             .nav-cards {
@@ -614,7 +850,54 @@
             .logout-button {
                 padding: 8px 12px;
             }
+
+            .modal-footer {
+                flex-direction: column;
+            }
+
+            .modal-footer .btn {
+                width: 100%;
+                justify-content: center;
+            }
         }
+
+        .sub-content {
+            display: none;
+        }
+
+        .sub-content.show {
+            display: block;
+        }
+
+        .nav-card.active {
+            border-color: #2563eb;
+            background: #f8fafc;
+            transform: scale(1.02);
+        }
+
+        .no-results td {
+            text-align: center;
+            padding: 40px !important;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .no-results i {
+            font-size: 40px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+            display: block;
+        }
+
+        /* Стили для иконок в зависимости от типа связи */
+        .relation-icon.requests { background: linear-gradient(135deg, #f97316, #ea580c); }
+        .relation-icon.installations { background: linear-gradient(135deg, #6b7280, #4b5563); }
+        .relation-icon.licenseRequests { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+        .relation-icon.usersList { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .relation-icon.classroomsList { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .relation-icon.devices { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .relation-icon.licenses { background: linear-gradient(135deg, #14b8a6, #0d9488); }
+        .relation-icon.softwareList { background: linear-gradient(135deg, #ec4899, #db2777); }
     </style>
 </head>
 <body>
@@ -645,7 +928,7 @@
     </div>
 </header>
 
-<!-- Pending Users Button (Prominent) -->
+<!-- Pending Users Button -->
 <div class="content-area" style="margin-bottom: 0; padding-top: 0;">
     <div style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 16px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; color: white; margin-bottom: 20px;">
         <div style="display: flex; align-items: center; gap: 16px;">
@@ -833,7 +1116,14 @@
                             <a th:href="@{/admin/edit/users/{id}(id=${u.id})}" class="btn btn-edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button class="btn btn-delete" th:onclick="|confirmDelete('users', ${u.id})|">
+                            <button class="btn btn-delete"
+                                    th:attr="data-table='users',
+                                             data-id=${u.id},
+                                             data-name=${u.lastName + ' ' + u.firstName},
+                                             data-requests=${u.requests.size()},
+                                             data-installations=${u.installations.size()},
+                                             data-license-requests=${u.licenseRequests.size()}"
+                                    onclick="confirmDeleteFromData(this)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -890,7 +1180,12 @@
                             <a th:href="@{/admin/edit/departments/{id}(id=${dept.depNumber})}" class="btn btn-edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button class="btn btn-delete" th:onclick="|confirmDelete('departments', ${dept.depNumber})|">
+                            <button class="btn btn-delete"
+                                    th:attr="data-table='departments',
+                                             data-id=${dept.depNumber},
+                                             data-name=${dept.title},
+                                             data-kafedra-list=${dept.kafedraList.size()}"
+                                    onclick="confirmDeleteFromData(this)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -937,7 +1232,13 @@
                             <a th:href="@{/admin/edit/kafedras/{id}(id=${kaf.id})}" class="btn btn-edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button class="btn btn-delete" th:onclick="|confirmDelete('kafedras', ${kaf.id})|">
+                            <button class="btn btn-delete"
+                                    th:attr="data-table='kafedras',
+                                             data-id=${kaf.id},
+                                             data-name=${kaf.title},
+                                             data-users-list=${kaf.users.size()},
+                                             data-classrooms-list=${kaf.classrooms.size()}"
+                                    onclick="confirmDeleteFromData(this)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -984,7 +1285,12 @@
                             <a th:href="@{/admin/edit/classrooms/{id}(id=${room.id})}" class="btn btn-edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button class="btn btn-delete" th:onclick="|confirmDelete('classrooms', ${room.id})|">
+                            <button class="btn btn-delete"
+                                    th:attr="data-table='classrooms',
+                                             data-id=${room.id},
+                                             data-name='Аудитория ' + ${room.number},
+                                             data-devices=${room.devices.size()}"
+                                    onclick="confirmDeleteFromData(this)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1031,13 +1337,18 @@
                     <td th:text="${device.osTitle}">Windows 10</td>
                     <td th:text="${device.ipAddress}">192.168.1.1</td>
                     <td th:text="${device.ramSize + ' ГБ'}">16 ГБ</td>
-                    <td th:text="${device.classroom.number}">ИТ</td>
+                    <td th:text="${device.classroom.number}">401</td>
                     <td>
                         <div class="action-buttons">
                             <a th:href="@{/admin/edit/devices/{id}(id=${device.id})}" class="btn btn-edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button class="btn btn-delete" th:onclick="|confirmDelete('devices', ${device.id})|">
+                            <button class="btn btn-delete"
+                                    th:attr="data-table='devices',
+                                             data-id=${device.id},
+                                             data-name=${device.title},
+                                             data-installations=${device.installations.size()}"
+                                    onclick="confirmDeleteFromData(this)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1100,7 +1411,14 @@
                             <a th:href="@{/admin/edit/software/{id}(id=${soft.id})}" class="btn btn-edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button class="btn btn-delete" th:onclick="|confirmDelete('software', ${soft.id})|">
+                            <button class="btn btn-delete"
+                                    th:attr="data-table='software',
+                                             data-id=${soft.id},
+                                             data-name=${soft.title + ' ' + soft.version},
+                                             data-licenses=${soft.licenses.size()},
+                                             data-requests=${soft.requests.size()},
+                                             data-installations=${soft.installations.size()}"
+                                    onclick="confirmDeleteFromData(this)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1149,7 +1467,12 @@
                             <a th:href="@{/admin/edit/developers/{id}(id=${dev.id})}" class="btn btn-edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <button class="btn btn-delete" th:onclick="|confirmDelete('developers', ${dev.id})|">
+                            <button class="btn btn-delete"
+                                    th:attr="data-table='developers',
+                                             data-id=${dev.id},
+                                             data-name=${dev.title},
+                                             data-software-list=${dev.software.size()}"
+                                    onclick="confirmDeleteFromData(this)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -1201,21 +1524,17 @@
 <script>
     // Управление разделами
     function showSection(section) {
-        // Обновляем активную карточку
         document.querySelectorAll('.nav-card').forEach(card => {
             card.classList.remove('active');
         });
         document.getElementById(`card-${section}`).classList.add('active');
 
-        // Скрываем все таблицы
         document.querySelectorAll('.table-container').forEach(container => {
             container.classList.remove('show');
         });
 
-        // Показываем нужную таблицу
         document.getElementById(`${section}-section`).classList.add('show');
 
-        // Обновляем заголовок
         const titles = {
             'users': { icon: 'fa-users', name: 'Пользователи' },
             'directories': { icon: 'fa-book', name: 'Справочники' },
@@ -1224,11 +1543,8 @@
 
         document.getElementById('section-icon').className = `fas ${titles[section].icon}`;
         document.getElementById('section-name').textContent = titles[section].name;
-
-        // Показываем кнопку "Назад"
         document.getElementById('backButton').classList.add('show');
 
-        // Обновляем счетчики для всех таблиц в этом разделе
         setTimeout(() => {
             if (section === 'users') {
                 updateTableCount('users');
@@ -1246,54 +1562,37 @@
     }
 
     function resetToCards() {
-        // Скрываем все таблицы
         document.querySelectorAll('.table-container').forEach(container => {
             container.classList.remove('show');
         });
 
-        // Убираем активный класс с карточек
         document.querySelectorAll('.nav-card').forEach(card => {
             card.classList.remove('active');
         });
 
-        // Показываем первую таблицу (пользователи) по умолчанию
         document.getElementById('users-section').classList.add('show');
-
-        // Сбрасываем заголовок
         document.getElementById('section-icon').className = 'fas fa-users';
         document.getElementById('section-name').textContent = 'Пользователи';
-
-        // Прячем кнопку "Назад"
         document.getElementById('backButton').classList.remove('show');
-
-        // Обновляем счетчик пользователей
         setTimeout(() => updateTableCount('users'), 100);
     }
 
-    // Управление подвкладками
     function showSubTab(subTab) {
-        // Находим родительскую секцию
         const parentSection = event.target.closest('.table-container');
 
-        // Обновляем активные подвкладки
         parentSection.querySelectorAll('.sub-tab').forEach(tab => {
             tab.classList.remove('active');
         });
         event.target.classList.add('active');
 
-        // Скрываем все подконтенты в этой секции
         parentSection.querySelectorAll('.sub-content').forEach(content => {
             content.classList.remove('show');
         });
 
-        // Показываем нужный подконтент
         parentSection.querySelector(`#sub-${subTab}`).classList.add('show');
-
-        // Обновляем счетчик для этой таблицы
         setTimeout(() => updateTableCount(subTab), 100);
     }
 
-    // Функция фильтрации таблиц
     function filterTable(tableId) {
         const input = document.getElementById(`${tableId}-search`);
         const filter = input.value.toLowerCase();
@@ -1301,12 +1600,10 @@
         const rows = table.getElementsByTagName('tr');
         let visibleCount = 0;
 
-        // Пропускаем заголовок (индекс 0)
         for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
             let textContent = '';
 
-            // Собираем текст из всех ячеек кроме последней (действия)
             const cells = row.getElementsByTagName('td');
             for (let j = 0; j < cells.length - 1; j++) {
                 textContent += cells[j].textContent.toLowerCase() + ' ';
@@ -1320,7 +1617,6 @@
             }
         }
 
-        // Показываем сообщение, если нет результатов
         let noResultsRow = document.getElementById(`${tableId}-no-results`);
         if (visibleCount === 0) {
             if (!noResultsRow) {
@@ -1330,19 +1626,14 @@
                 const cell = noResultsRow.insertCell(0);
                 cell.colSpan = table.rows[0]?.cells.length || 1;
                 cell.innerHTML = '<i class="fas fa-search"></i><br>Ничего не найдено';
-                cell.style.textAlign = 'center';
-                cell.style.padding = '40px';
-                cell.style.color = '#94a3b8';
             }
         } else if (noResultsRow) {
             noResultsRow.remove();
         }
 
-        // Обновляем статистику
         updateTableCount(tableId, visibleCount);
     }
 
-    // Обновление счетчика записей
     function updateTableCount(tableId, visibleCount = null) {
         const table = document.getElementById(`${tableId}-table`);
         if (!table) return;
@@ -1350,14 +1641,12 @@
         const rows = table.getElementsByTagName('tr');
         let total = 0;
 
-        // Считаем общее количество записей (исключая заголовок и сообщение об ошибке)
         for (let i = 1; i < rows.length; i++) {
             if (!rows[i].classList.contains('no-results')) {
                 total++;
             }
         }
 
-        // Если visibleCount не передан, считаем видимые
         if (visibleCount === null) {
             visibleCount = 0;
             for (let i = 1; i < rows.length; i++) {
@@ -1371,16 +1660,9 @@
         const countElement = document.getElementById(`${tableId}-count`);
         if (statsElement && countElement) {
             countElement.textContent = visibleCount;
-            // Обновляем общее количество из атрибута, если есть
-            const totalElement = document.querySelector(`#${tableId}-stats`).innerHTML.match(/из (\d+)/);
-            if (!totalElement) {
-                // Если не нашли, используем посчитанное
-                statsElement.innerHTML = `Показано ${visibleCount} из ${total}`;
-            }
         }
     }
 
-    // Сброс поиска
     function resetSearch(tableId) {
         const input = document.getElementById(`${tableId}-search`);
         if (input) {
@@ -1389,58 +1671,234 @@
         }
     }
 
-    // Функция подтверждения удаления
-    function confirmDelete(tableName, recordId) {
-        if (confirm('Вы уверены, что хотите удалить эту запись?')) {
+    // Функция подтверждения удаления с данными из data-атрибутов
+    function confirmDeleteFromData(button) {
+        const tableName = button.getAttribute('data-table');
+        const recordId = button.getAttribute('data-id');
+        const recordName = button.getAttribute('data-name') || '';
+
+        const relatedData = {};
+        for (let i = 0; i < button.attributes.length; i++) {
+            const attr = button.attributes[i];
+            if (attr.name.startsWith('data-') &&
+                attr.name !== 'data-table' &&
+                attr.name !== 'data-id' &&
+                attr.name !== 'data-name') {
+                const key = attr.name.replace('data-', '');
+                const value = parseInt(attr.value) || 0;
+                if (value > 0) {
+                    relatedData[key] = value;
+                }
+            }
+        }
+
+        const hasRelations = Object.keys(relatedData).length > 0;
+
+        if (hasRelations) {
+            showIntegrityModal(tableName, recordId, recordName, relatedData);
+        } else {
+            showDeleteConfirmationModal(tableName, recordId, recordName);
+        }
+    }
+
+    function showIntegrityModal(tableName, recordId, recordName, relatedData) {
+        closeModal();
+
+        const activeRelations = Object.entries(relatedData);
+
+        const modalHtml = `
+            <div class="modal-overlay" id="integrityModal" onclick="handleModalClick(event)">
+                <div class="modal-container" onclick="event.stopPropagation()">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #ef4444, #dc2626);">
+                        <div class="modal-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h2>Нарушение целостности данных</h2>
+                    </div>
+                    <div class="modal-body">
+                        <div class="warning-message" style="background: #fee2e2; border-left-color: #ef4444; margin-bottom: 20px;">
+                            <i class="fas fa-info-circle" style="color: #ef4444;"></i>
+                            <span>Невозможно удалить запись, так как на нее ссылаются другие данные.</span>
+                        </div>
+
+                        <p style="color: #1e293b; margin-bottom: 15px; font-weight: 500;">
+                            ${recordName ? `"${recordName}"` : `Запись ID: ${recordId}`} используется в:
+                        </p>
+
+                        <div class="relations-list">
+                            ${activeRelations.map(([key, count]) => `
+                                <div class="relation-item">
+                                    <div class="relation-icon ${key}">
+                                        <i class="${getIconForRelation(key)}"></i>
+                                    </div>
+                                    <div class="relation-info">
+                                        <div class="relation-title">${getRelationName(key)}</div>
+                                        <div class="relation-count">${count} ${getDeclension(count, getRelationWord(key))}</div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="info-message" style="margin-top: 20px; background: #eef2ff;">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Для удаления этой записи необходимо сначала удалить или переназначить связанные данные.</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeModal()">
+                            <i class="fas fa-times"></i> Понятно
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    function showDeleteConfirmationModal(tableName, recordId, recordName) {
+        closeModal();
+
+        const modalHtml = `
+            <div class="modal-overlay" id="confirmModal" onclick="handleModalClick(event)">
+                <div class="modal-container" onclick="event.stopPropagation()">
+                    <div class="modal-header" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                        <div class="modal-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <h2>Подтверждение удаления</h2>
+                    </div>
+                    <div class="modal-body">
+                        <p style="color: #1e293b; margin-bottom: 10px; font-size: 16px;">
+                            Вы уверены, что хотите удалить запись?
+                        </p>
+                        <p style="color: #64748b; font-size: 14px; padding: 10px; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                            <i class="fas fa-info-circle" style="color: #2563eb; margin-right: 8px;"></i>
+                            ${recordName ? `"${recordName}"` : `Запись ID: ${recordId}`}
+                        </p>
+                        <div class="warning-message" style="margin-top: 20px; background: #fff3e0; padding: 15px; border-radius: 8px;">
+                            <i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 18px; margin-right: 8px;"></i>
+                            <span style="color: #1e293b;">Это действие нельзя отменить.</span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closeModal()">
+                            <i class="fas fa-times"></i> Отмена
+                        </button>
+                        <button class="btn btn-danger" onclick="executeDelete('${tableName}', ${recordId})">
+                            <i class="fas fa-trash"></i> Удалить
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    function showLoadingModal() {
+        const modalHtml = `
+            <div class="modal-overlay" id="loadingModal" onclick="handleModalClick(event)">
+                <div class="modal-container" onclick="event.stopPropagation()" style="text-align: center; padding: 40px;">
+                    <div class="loading-spinner"></div>
+                    <p style="color: #2563eb; margin-top: 20px; font-weight: 500;">
+                        Удаление...
+                    </p>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+
+    function handleModalClick(event) {
+        if (event.target.classList.contains('modal-overlay')) {
+            closeModal();
+        }
+    }
+
+    function closeModal() {
+        const modals = document.querySelectorAll('.modal-overlay');
+        modals.forEach(modal => modal.remove());
+    }
+
+    function executeDelete(tableName, recordId) {
+        closeModal();
+        showLoadingModal();
+
+        setTimeout(() => {
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '/admin/delete/' + tableName + '/' + recordId;
             document.body.appendChild(form);
             form.submit();
+        }, 100);
+    }
+
+    function getIconForRelation(relationKey) {
+        const icons = {
+            'requests': 'fas fa-clipboard-list',
+            'installations': 'fas fa-download',
+            'license-requests': 'fas fa-file-signature',
+            'users-list': 'fas fa-users',
+            'classrooms-list': 'fas fa-door-open',
+            'devices': 'fas fa-desktop',
+            'licenses': 'fas fa-certificate',
+            'software-list': 'fas fa-cube',
+            'kafedra-list': 'fas fa-chalkboard-teacher'
+        };
+        return icons[relationKey] || 'fas fa-link';
+    }
+
+    function getRelationName(key) {
+        const names = {
+            'requests': 'Заявки на установку',
+            'installations': 'Установки ПО',
+            'license-requests': 'Запросы лицензий',
+            'users-list': 'Пользователи',
+            'classrooms-list': 'Аудитории',
+            'devices': 'Устройства',
+            'licenses': 'Лицензии',
+            'software-list': 'Программное обеспечение',
+            'kafedra-list': 'Кафедры'
+        };
+        return names[key] || key;
+    }
+
+    function getRelationWord(key) {
+        const words = {
+            'requests': 'запис',
+            'installations': 'запис',
+            'license-requests': 'запис',
+            'users-list': 'запис',
+            'classrooms-list': 'запис',
+            'devices': 'запис',
+            'licenses': 'запис',
+            'software-list': 'запис',
+            'kafedra-list': 'запис'
+        };
+        return words[key] || 'запис';
+    }
+
+    function getDeclension(count, word) {
+        if (count % 10 === 1 && count % 100 !== 11) {
+            return word + 'ь';
+        } else if ([2, 3, 4].includes(count % 10) && ![12, 13, 14].includes(count % 100)) {
+            return word + 'и';
+        } else {
+            return word + 'ей';
         }
     }
 
     // Инициализация при загрузке страницы
     document.addEventListener('DOMContentLoaded', function() {
-        // Показываем секцию пользователей по умолчанию
         resetToCards();
 
-        // Инициализация счетчиков для всех таблиц
         const tables = ['users', 'department', 'kafedra', 'classroom', 'device', 'software', 'developer', 'installation'];
         tables.forEach(tableId => {
             setTimeout(() => updateTableCount(tableId), 200);
         });
     });
 </script>
-
-<style>
-    .sub-content {
-        display: none;
-    }
-
-    .sub-content.show {
-        display: block;
-    }
-
-    .nav-card.active {
-        border-color: #2563eb;
-        background: #f8fafc;
-        transform: scale(1.02);
-    }
-
-    .no-results td {
-        text-align: center;
-        padding: 40px !important;
-        color: #94a3b8;
-        font-size: 14px;
-    }
-
-    .no-results i {
-        font-size: 40px;
-        margin-bottom: 16px;
-        opacity: 0.5;
-        display: block;
-    }
-</style>
 </body>
 </html>

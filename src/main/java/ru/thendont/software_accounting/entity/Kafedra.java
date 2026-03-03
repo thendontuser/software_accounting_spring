@@ -21,10 +21,10 @@ public class Kafedra {
     @JoinColumn(name = "dep_number")
     private Department department;
 
-    @OneToMany(mappedBy = "kafedra", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "kafedra")
     private final List<User> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "kafedra", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "kafedra")
     private final List<Classroom> classrooms = new ArrayList<>();
 
     public Kafedra() {

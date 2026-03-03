@@ -26,16 +26,16 @@ public class Software {
     @Column(name = "logo_path")
     private String logoPath;
 
-    @OneToMany(mappedBy = "software", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "software")
     private final List<License> licenses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "software", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "software")
     private final List<InstallationRequest> requests = new ArrayList<>();
 
-    @OneToMany(mappedBy = "software", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "software")
     private final List<SoftwareInstallation> installations = new ArrayList<>();
 
-    @OneToMany(mappedBy = "software", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "software")
     private final List<LicenseRequest> licenseRequests = new ArrayList<>();
 
     public Software() {
