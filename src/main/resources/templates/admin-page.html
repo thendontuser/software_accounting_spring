@@ -1080,7 +1080,7 @@
             </div>
             <div class="search-stats" id="users-stats">Показано <span id="users-count">0</span> из <span th:text="${userCount}">0</span></div>
         </div>
-        <div class="table-container" style="box-shadow: none; border-radius: 0;">
+        <div class="table-wrapper" style="box-shadow: none; border-radius: 0;">
             <table class="data-table" id="users-table">
                 <thead>
                 <tr>
@@ -1098,14 +1098,14 @@
                     <td th:text="${u.email}">ivan@mail.com</td>
                     <td th:text="${u.username}">ivanov</td>
                     <td>
-                        <th:block th:switch="${u.role?.name()}">
+                        <span th:if="${u.role != null}" th:switch="${u.role.name()}" class="role-badge">
                             <span th:case="'ADMIN'" class="role-badge admin">Администратор</span>
                             <span th:case="'TEACHER'" class="role-badge teacher">Преподаватель</span>
                             <span th:case="'HEAD_OF_LABORATORIES'" class="role-badge head-lab">Зав. лабораторией</span>
                             <span th:case="'LABORATORY_ASSISTANT'" class="role-badge lab-assistant">Лаборант</span>
                             <span th:case="'SAM_MANAGER'" class="role-badge manager">SAM-менеджер</span>
-                            <span th:case="*" class="role-badge pending">Не активирован</span>
-                        </th:block>
+                        </span>
+                        <span th:if="${u.role == null}" class="role-badge pending">Не назначена</span>
                     </td>
                     <td>
                         <span th:if="${u.kafedra != null}" th:text="${u.kafedra.title}">Кафедра информатики</span>
