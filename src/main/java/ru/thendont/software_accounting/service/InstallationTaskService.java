@@ -3,8 +3,11 @@ package ru.thendont.software_accounting.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.InstallationTask;
+import ru.thendont.software_accounting.entity.Kafedra;
+import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.repository.InstallationTaskRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,5 +31,15 @@ public class InstallationTaskService {
 
     public void deleteById(Long id) {
         installationTaskRepository.deleteById(id);
+    }
+
+    public List<InstallationTask> findByAssignedBy(User assignedBy) {
+        return (List<InstallationTask>) installationTaskRepository.findByAssignedBy(assignedBy);
+    }
+
+    public List<InstallationTask> findByKafedraAndDateBetween(Kafedra kafedra, LocalDate dateFrom, LocalDate dateTo) {
+        return (List<InstallationTask>) installationTaskRepository.findByKafedraAndDateBetween(
+                kafedra.getId(), dateFrom, dateTo
+        );
     }
 }

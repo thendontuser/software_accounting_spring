@@ -3,6 +3,7 @@ package ru.thendont.software_accounting.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.InstallationReport;
+import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.repository.InstallationReportRepository;
 
 import java.util.List;
@@ -28,5 +29,9 @@ public class InstallationReportService {
 
     public void deleteById(Long id) {
         installationReportRepository.deleteById(id);
+    }
+
+    public List<InstallationReport> findByTaskAssignedBy(User assignedBy) {
+        return (List<InstallationReport>) installationReportRepository.findByTaskAssignedBy(assignedBy.getId());
     }
 }

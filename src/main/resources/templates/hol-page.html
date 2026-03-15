@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель заведующего лабораториями - Учет ПО</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* ========== СТИЛИ ========== */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: #f8f9fa;
+        min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logo-icon i {
+        color: white;
+        font-size: 20px;
+    }
+
+    .logo-text h1 {
+        font-size: 20px;
+        color: #2d3748;
+        font-weight: 600;
+    }
+
+    .logo-text p {
+        font-size: 12px;
+        color: #718096;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .user-avatar {
+        width: 45px;
+        height: 45px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    /* Main Layout */
+    .container {
+        display: flex;
+        min-height: calc(100vh - 80px);
+    }
+
+    /* Sidebar */
+    .sidebar {
+        width: 280px;
+        background: white;
+        padding: 2rem 1.5rem;
+        border-right: 1px solid #e2e8f0;
+    }
+
+    .nav-section {
+        margin-bottom: 2rem;
+    }
+
+    .nav-title {
+        font-size: 12px;
+        color: #718096;
+        text-transform: uppercase;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        letter-spacing: 0.5px;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 15px;
+        border-radius: 10px;
+        color: #4a5568;
+        text-decoration: none;
+        margin-bottom: 5px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+        font-size: 14px;
+    }
+
+    .nav-item:hover, .nav-item.active {
+        background: #667eea;
+        color: white;
+    }
+
+    .nav-item i {
+        width: 20px;
+        text-align: center;
+    }
+
+    .badge {
+        background: #e2e8f0;
+        color: #4a5568;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        margin-left: auto;
+        font-weight: 500;
+    }
+
+    .nav-item:hover .badge {
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+
+    /* Main Content */
+    .main-content {
+        flex: 1;
+        padding: 2rem;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .page-title {
+        font-size: 28px;
+        color: #2d3748;
+        font-weight: 700;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #48bb78, #38a169);
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+    }
+
+    .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+
+    .stat-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .stat-icon.blue { background: #ebf8ff; color: #3182ce; }
+    .stat-icon.green { background: #f0fff4; color: #38a169; }
+    .stat-icon.yellow { background: #fefcbf; color: #d69e2e; }
+    .stat-icon.purple { background: #faf5ff; color: #9f7aea; }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2d3748;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #718096;
+    }
+
+    /* Tables */
+    .table-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .table-title {
+        font-size: 18px;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .table-title i {
+        color: #667eea;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th {
+        text-align: left;
+        padding: 12px 16px;
+        background: #f7fafc;
+        color: #4a5568;
+        font-weight: 600;
+        font-size: 14px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    td {
+        padding: 16px;
+        border-bottom: 1px solid #e2e8f0;
+        color: #2d3748;
+        font-size: 14px;
+    }
+
+    tr:hover td {
+        background: #f7fafc;
+    }
+
+    /* Status badges */
+    .status {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .status.PENDING { background: #fefcbf; color: #975a16; }
+    .status.APPROVED { background: #c6f6d5; color: #276749; }
+    .status.REJECTED { background: #fed7d7; color: #9b2c2c; }
+    .status.COMPLETED { background: #bee3f8; color: #2c5282; }
+    .status.IN_PROGRESS { background: #e9d8fd; color: #6b46c1; }
+
+    /* Action buttons */
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    .btn-icon {
+        background: none;
+        border: none;
+        padding: 8px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        color: #718096;
+        font-size: 14px;
+    }
+
+    .btn-icon:hover {
+        background: #e2e8f0;
+    }
+
+    .btn-icon.approve:hover { background: #c6f6d5; color: #38a169; }
+    .btn-icon.reject:hover { background: #fed7d7; color: #e53e3e; }
+    .btn-icon.task:hover { background: #c3dafe; color: #5a67d8; }
+    .btn-icon.view:hover { background: #bee3f8; color: #3182ce; }
+
+    /* Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+    }
+
+    .modal-content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-header h2 {
+        color: #2d3748;
+        font-size: 20px;
+    }
+
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        color: #718096;
+    }
+
+    .modal-body {
+        margin-bottom: 1.5rem;
+    }
+
+    .modal-body label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #4a5568;
+    }
+
+    .modal-body input,
+    .modal-body select,
+    .modal-body textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-family: inherit;
+        font-size: 14px;
+    }
+
+    .modal-body textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+
+    .info-block {
+        background: #f7fafc;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .info-block p {
+        margin: 5px 0;
+        color: #4a5568;
+    }
+
+    .deadline-passed {
+        color: #e53e3e;
+        font-weight: 600;
+    }
+
+    .deadline-passed:after {
+        content: " (просрочено)";
+        font-size: 12px;
+        font-weight: normal;
+    }
+
+    /* Анимация подсветки */
+    @keyframes highlight {
+        0% { background-color: #fff3cd; }
+        50% { background-color: #ffe69c; }
+        100% { background-color: #fff3cd; }
+    }
+
+    .highlight-row {
+        animation: highlight 2s ease-in-out;
+        border-left: 4px solid #ffc107 !important;
+    }
+
+    /* Для плавного перехода */
+    .table tbody tr {
+        transition: background-color 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon">
+      <i class="fas fa-flask"></i>
+    </div>
+    <div class="logo-text">
+      <h1>Учет ПО</h1>
+      <p>Заведующий лабораториями</p>
+    </div>
+  </div>
+  <div class="user-info">
+    <div class="user-avatar">
+      <span th:text="${#strings.substring(user.lastName, 0, 1) + #strings.substring(user.firstName, 0, 1)}">ИИ</span>
+    </div>
+    <div>
+      <div style="font-weight: 600; color: #2d3748;"
+           th:text="${user.lastName + ' ' + user.firstName + ' ' + user.patronymic}">
+        Иванов Иван Иванович
+      </div>
+      <div style="font-size: 12px; color: #718096;" th:text="'Кафедра: ' + ${kafedra.title}">
+        Кафедра информатики
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="nav-section">
+      <div class="nav-title">Навигация</div>
+      <button class="nav-item active" onclick="showSection('dashboard')">
+        <i class="fas fa-tachometer-alt"></i>
+        <span>Обзор</span>
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-title">Заявки</div>
+      <button class="nav-item" onclick="showSection('pending-requests')">
+        <i class="fas fa-clock"></i>
+        <span>На модерации</span>
+        <span class="badge"
+              th:text="${#lists.size(installationRequests.?[status.name() == 'PENDING'])}">0</span>
+      </button>
+      <button class="nav-item" onclick="showSection('all-requests')">
+        <i class="fas fa-list-ul"></i>
+        <span>Все заявки</span>
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-title">Поручения</div>
+      <button class="nav-item" onclick="showSection('active-tasks')">
+        <i class="fas fa-tasks"></i>
+        <span>Активные</span>
+        <span class="badge"
+              th:text="${#lists.size(installationTasks.?[status.name() != 'COMPLETED'])}">0</span>
+      </button>
+      <button class="nav-item" onclick="showSection('all-tasks')">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Все поручения</span>
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-title">Отчеты</div>
+      <button class="nav-item" onclick="showSection('reports')">
+        <i class="fas fa-file-alt"></i>
+        <span>Отчеты лаборантов</span>
+        <span class="badge" th:text="${#lists.size(installationReports)}">0</span>
+      </button>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-title">Аккаунт</div>
+      <a th:href="@{/auth/logout}" class="nav-item">
+        <i class="fas fa-sign-out-alt"></i>
+        <span>Выйти</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Секция "Обзор" (показывается по умолчанию) -->
+    <div id="dashboard-section" style="display: block;">
+      <div class="page-header">
+        <h1 class="page-title">Обзор</h1>
+        <button class="btn-success" onclick="openReportModal()">
+          <i class="fas fa-chart-bar"></i> Сформировать отчет
+        </button>
+      </div>
+
+      <!-- Статистика -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon yellow">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div>
+              <div class="stat-value"
+                   th:text="${#lists.size(installationRequests.?[status.name() == 'PENDING'])}">3</div>
+              <div class="stat-label">Заявок на модерации</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon green">
+              <i class="fas fa-check-circle"></i>
+            </div>
+            <div>
+              <div class="stat-value"
+                   th:text="${#lists.size(installationRequests.?[status.name() == 'APPROVED'])}">5</div>
+              <div class="stat-label">Утвержденных заявок</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon blue">
+              <i class="fas fa-tasks"></i>
+            </div>
+            <div>
+              <div class="stat-value"
+                   th:text="${#lists.size(installationTasks.?[status.name() != 'COMPLETED'])}">2</div>
+              <div class="stat-label">Активных поручений</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-header">
+            <div class="stat-icon purple">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <div>
+              <div class="stat-value" th:text="${#lists.size(installationReports)}">4</div>
+              <div class="stat-label">Отчетов лаборантов</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Последние заявки -->
+      <div class="table-container">
+        <div class="table-title">
+          <i class="fas fa-inbox"></i>
+          Последние заявки
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Преподаватель</th>
+              <th>ПО</th>
+              <th>Аудитория</th>
+              <th>Статус</th>
+              <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="req : ${installationRequests}" th:if="${reqStat.index < 5}">
+              <td th:text="${#temporals.format(req.date, 'dd.MM.yyyy')}">01.01.2024</td>
+              <td th:text="${req.user.lastName + ' ' + #strings.substring(req.user.firstName, 0, 1) + '.' + #strings.substring(req.user.patronymic, 0, 1) + '.'}">
+                Иванов И.И.
+              </td>
+              <td th:text="${req.software.title}">Microsoft Office</td>
+              <td th:text="'№' + ${req.classroom.number}">101</td>
+              <td>
+                                        <span class="status" th:classappend="${req.status.name()}"
+                                              th:text="${req.status.getStatusName()}">В ожидании</span>
+              </td>
+              <td>
+                <div class="action-buttons"
+                     th:if="${req.status.name() == 'PENDING'}">
+                  <button class="btn-icon approve"
+                          th:attr="data-request-id=${req.id},
+                                                             data-software=${req.software.title},
+                                                             data-teacher=${req.user.lastName + ' ' + req.user.firstName},
+                                                             data-classroom=${req.classroom.number}"
+                          onclick="openTaskModal(this)">
+                    <i class="fas fa-clipboard-check"></i>
+                  </button>
+                  <button class="btn-icon reject"
+                          th:attr="data-request-id=${req.id}"
+                          onclick="openRejectModal(this)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr th:if="${#lists.size(installationRequests) == 0}">
+              <td colspan="6" style="text-align: center; color: #718096; padding: 2rem;">
+                Нет заявок
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Активные поручения -->
+      <div class="table-container">
+        <div class="table-title">
+          <i class="fas fa-play-circle"></i>
+          Активные поручения
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+            <tr>
+              <th>Срок</th>
+              <th>Лаборант</th>
+              <th>ПО</th>
+              <th>Аудитория</th>
+              <th>Статус</th>
+              <th>Отчет</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="task : ${installationTasks}"
+                th:if="${task.status.name() != 'COMPLETED'}">
+                <td th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}"
+                    th:classappend="${task.deadline.isBefore(T(java.time.LocalDate).now()) ? 'deadline-passed' : ''}">
+                  10.02.2024
+                </td>
+                <td th:text="${task.assignedTo.lastName + ' ' + #strings.substring(task.assignedTo.firstName, 0, 1) + '.'}">
+                  Петров П.
+                </td>
+                <td th:text="${task.installationRequest.software.title}">Photoshop</td>
+                <td th:text="'№' + ${task.installationRequest.classroom.number}">205</td>
+                <td>
+                  <span class="status" th:classappend="${task.status.name()}"
+                        th:text="${task.status.getStatusName()}">В работе</span>
+                </td>
+                <td>
+                  <!-- Исправлено: проверяем, есть ли отчет для этого поручения -->
+                  <span th:if="${installationReports.![installationTask.id].contains(task.id)}">
+                    <button class="btn-icon view"
+                            th:attr="data-task-id=${task.id}"
+                            onclick="viewReportFromTask(this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                  </span>
+                  <span th:unless="${installationReports.![installationTask.id].contains(task.id)}">—</span>
+                </td>
+            </tr>
+            <tr th:if="${#lists.size(installationTasks.?[status.name() != 'COMPLETED']) == 0}">
+              <td colspan="6" style="text-align: center; color: #718096; padding: 2rem;">
+                Нет активных поручений
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Секция "Заявки на модерации" -->
+    <div id="pending-requests-section" style="display: none;">
+      <div class="page-header">
+        <h1 class="page-title">Заявки на модерации</h1>
+      </div>
+      <div class="table-container">
+        <div class="table-responsive">
+          <table>
+            <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Преподаватель</th>
+              <th>ПО</th>
+              <th>Аудитория</th>
+              <th>Комментарий</th>
+              <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="req : ${installationRequests}"
+                th:if="${req.status.name() == 'PENDING'}">
+              <td th:text="${#temporals.format(req.date, 'dd.MM.yyyy')}">01.01.2024</td>
+              <td th:text="${req.user.lastName + ' ' + #strings.substring(req.user.firstName, 0, 1) + '.' + #strings.substring(req.user.patronymic, 0, 1) + '.'}">
+                Иванов И.И.
+              </td>
+              <td th:text="${req.software.title}">Microsoft Office</td>
+              <td th:text="'№' + ${req.classroom.number}">101</td>
+              <td th:text="${req.comment ?: '-'}">Комментарий</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-icon approve"
+                          th:attr="data-request-id=${req.id},
+                                                             data-software=${req.software.title},
+                                                             data-teacher=${req.user.lastName + ' ' + req.user.firstName},
+                                                             data-classroom=${req.classroom.number}"
+                          onclick="openTaskModal(this)">
+                    <i class="fas fa-clipboard-check"></i>
+                  </button>
+                  <button class="btn-icon reject"
+                          th:attr="data-request-id=${req.id}"
+                          onclick="openRejectModal(this)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr th:if="${#lists.size(installationRequests.?[status.name() == 'PENDING']) == 0}">
+              <td colspan="6" style="text-align: center; color: #718096; padding: 2rem;">
+                Нет заявок на модерации
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Секция "Все заявки" -->
+    <div id="all-requests-section" style="display: none;">
+      <div class="page-header">
+        <h1 class="page-title">Все заявки кафедры</h1>
+      </div>
+      <div class="table-container">
+        <div class="table-responsive">
+          <table>
+            <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Преподаватель</th>
+              <th>ПО</th>
+              <th>Аудитория</th>
+              <th>Статус</th>
+              <th>Комментарий</th>
+              <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="req : ${installationRequests}">
+              <td th:text="${#temporals.format(req.date, 'dd.MM.yyyy')}">01.01.2024</td>
+              <td th:text="${req.user.lastName + ' ' + #strings.substring(req.user.firstName, 0, 1) + '.' + #strings.substring(req.user.patronymic, 0, 1) + '.'}">
+                Иванов И.И.
+              </td>
+              <td th:text="${req.software.title}">Microsoft Office</td>
+              <td th:text="'№' + ${req.classroom.number}">101</td>
+              <td>
+                                        <span class="status" th:classappend="${req.status.name()}"
+                                              th:text="${req.status.getStatusName()}">В ожидании</span>
+              </td>
+              <td th:text="${req.comment ?: '-'}">Комментарий</td>
+              <td>
+                <div class="action-buttons" th:if="${req.status.name() == 'PENDING'}">
+                  <button class="btn-icon approve"
+                          th:attr="data-request-id=${req.id},
+                                                             data-software=${req.software.title},
+                                                             data-teacher=${req.user.lastName + ' ' + req.user.firstName},
+                                                             data-classroom=${req.classroom.number}"
+                          onclick="openTaskModal(this)">
+                    <i class="fas fa-clipboard-check"></i>
+                  </button>
+                  <button class="btn-icon reject"
+                          th:attr="data-request-id=${req.id}"
+                          onclick="openRejectModal(this)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Секция "Активные поручения" -->
+    <div id="active-tasks-section" style="display: none;">
+      <div class="page-header">
+        <h1 class="page-title">Активные поручения</h1>
+      </div>
+      <div class="table-container">
+        <div class="table-responsive">
+          <table>
+            <thead>
+            <tr>
+              <th>Создано</th>
+              <th>Срок</th>
+              <th>Лаборант</th>
+              <th>ПО</th>
+              <th>Аудитория</th>
+              <th>Статус</th>
+              <th>Отчет</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="task : ${installationTasks}"
+                th:if="${task.status.name() != 'DONE'}">
+              <td th:text="${#temporals.format(task.createdAt, 'dd.MM.yyyy')}">01.02.2024</td>
+              <td th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}"
+                  th:classappend="${task.deadline.isBefore(T(java.time.LocalDate).now()) ? 'deadline-passed' : ''}">
+                10.02.2024
+              </td>
+              <td th:text="${task.assignedTo.lastName + ' ' + #strings.substring(task.assignedTo.firstName, 0, 1) + '.'}">
+                Петров П.
+              </td>
+              <td th:text="${task.installationRequest.software.title}">Photoshop</td>
+              <td th:text="'№' + ${task.installationRequest.classroom.number}">205</td>
+              <td>
+                <span class="status" th:classappend="${task.status.name()}"
+                      th:text="${task.status.getStatusName()}">В работе</span>
+              </td>
+              <td>
+                <span th:if="${installationReports.![installationTask.id].contains(task.id)}">
+                    <button class="btn-icon view"
+                            th:attr="data-task-id=${task.id}"
+                            onclick="viewReportFromTask(this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </span>
+                <span th:unless="${installationReports.![installationTask.id].contains(task.id)}">—</span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Секция "Все поручения" -->
+    <div id="all-tasks-section" style="display: none;">
+      <div class="page-header">
+        <h1 class="page-title">Все поручения</h1>
+      </div>
+      <div class="table-container">
+        <div class="table-responsive">
+          <table>
+            <thead>
+            <tr>
+              <th>Создано</th>
+              <th>Срок</th>
+              <th>Лаборант</th>
+              <th>ПО</th>
+              <th>Аудитория</th>
+              <th>Статус</th>
+              <th>Отчет</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="task : ${installationTasks}">
+              <td th:text="${#temporals.format(task.createdAt, 'dd.MM.yyyy')}">01.02.2024</td>
+              <td th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}">10.02.2024</td>
+              <td th:text="${task.assignedTo.lastName + ' ' + #strings.substring(task.assignedTo.firstName, 0, 1) + '.'}">
+                Петров П.
+              </td>
+              <td th:text="${task.installationRequest.software.title}">Photoshop</td>
+              <td th:text="'№' + ${task.installationRequest.classroom.number}">205</td>
+              <td>
+                <span class="status" th:classappend="${task.status.name()}"
+                      th:text="${task.status.getStatusName()}">В работе</span>
+              </td>
+              <td>
+                <span th:if="${installationReports.![installationTask.id].contains(task.id)}">
+                    <button class="btn-icon view"
+                            th:attr="data-task-id=${task.id}"
+                            onclick="viewReportFromTask(this)">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </span>
+                <span th:unless="${installationReports.![installationTask.id].contains(task.id)}">—</span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Секция "Отчеты" -->
+    <div id="reports-section" style="display: none;">
+      <div class="page-header">
+        <h1 class="page-title">Отчеты лаборантов</h1>
+      </div>
+      <div class="table-container">
+        <div class="table-responsive">
+          <table>
+            <thead>
+            <tr>
+              <th>Дата</th>
+              <th>Лаборант</th>
+              <th>ПО</th>
+              <th>Аудитория</th>
+              <th>Нужна лицензия</th>
+              <th>Примечания</th>
+              <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="report : ${installationReports}"
+                th:attr="data-report-id=${report.id},
+                                 data-task-id=${report.installationTask.id},
+                                 data-task-created=${#temporals.format(report.installationTask.createdAt, 'dd.MM.yyyy')},
+                                 data-task-deadline=${#temporals.format(report.installationTask.deadline, 'dd.MM.yyyy')},
+                                 data-task-status=${report.installationTask.status.getStatusName()}">
+              <td th:text="${#temporals.format(report.createdAt, 'dd.MM.yyyy')}">01.03.2024</td>
+              <td th:text="${report.installationTask.assignedTo.lastName + ' ' +
+                                      #strings.substring(report.installationTask.assignedTo.firstName, 0, 1) + '.'}">
+                Сидоров С.
+              </td>
+              <td th:text="${report.installationTask.installationRequest.software.title}">
+                Visual Studio
+              </td>
+              <td th:text="'№' + ${report.installationTask.installationRequest.classroom.number}">
+                310
+              </td>
+              <td>
+                <span th:if="${report.licenseRequired}" style="color: #e53e3e; font-weight: 600;">Да</span>
+                <span th:unless="${report.licenseRequired}" style="color: #38a169; font-weight: 600;">Нет</span>
+              </td>
+              <td>
+                  <!-- Проверяем длину через #strings.length() -->
+                  <span th:if="${report.notes != null and #strings.length(report.notes) > 30}"
+                        th:text="${#strings.substring(report.notes, 0, 30) + '...'}"
+                        th:title="${report.notes}">Длинный текст...
+                  </span>
+
+                  <!-- Если примечание короткое или null -->
+                  <span th:unless="${report.notes != null and #strings.length(report.notes) > 30}"
+                        th:text="${report.notes != null ? report.notes : '-'}">Короткий текст или прочерк
+                  </span>
+              </td>
+              <td>
+                <button class="btn-icon view"
+                        th:attr="data-report-id=${report.id}"
+                        onclick="viewReportDetails(this)">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn-icon"
+                        th:if="${report.licenseRequired}"
+                        th:attr="data-software-id=${report.installationTask.installationRequest.software.id}"
+                        onclick="openLicenseModal(this.getAttribute('data-software-id'))"
+                        title="Запросить лицензию">
+                  <i class="fas fa-shopping-cart"></i>
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Модальное окно для отклонения заявки -->
+<div id="rejectModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Отклонение заявки</h2>
+      <button class="close-modal" onclick="closeModal('rejectModal')">&times;</button>
+    </div>
+    <form th:action="@{|/hol/reject-request|}" method="post">
+      <input type="hidden" name="requestId" id="rejectRequestId">
+      <input type="hidden" name="userId" th:value="${user.id}">
+      <div class="modal-body">
+        <label for="rejectComment">Причина отклонения:</label>
+        <textarea name="comment" id="rejectComment" required
+                  placeholder="Укажите причину отклонения заявки"></textarea>
+      </div>
+      <button type="submit" class="btn-primary" style="width: 100%; background: #e53e3e;">
+        <i class="fas fa-times-circle"></i> Отклонить заявку
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Модальное окно для создания поручения -->
+<div id="taskModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Создать поручение</h2>
+      <button class="close-modal" onclick="closeModal('taskModal')">&times;</button>
+    </div>
+    <form th:action="@{|/hol/create-task|}" method="post">
+      <input type="hidden" name="requestId" id="taskRequestId">
+      <input type="hidden" name="assignedBy" th:value="${user.id}">
+      <div class="modal-body">
+        <div class="info-block" id="taskInfo">
+          <!-- Информация заполняется через JS -->
+        </div>
+
+        <label for="assignedTo">Лаборант:</label>
+        <select name="assignedTo" id="assignedTo" required>
+          <option value="">Выберите лаборанта</option>
+          <option th:each="labAssistant : ${labAssistants}"
+                  th:value="${labAssistant.id}"
+                  th:text="${labAssistant.lastName + ' ' + labAssistant.firstName + ' ' + labAssistant.patronymic}">
+            Иванов Иван Иванович
+          </option>
+        </select>
+
+        <label for="deadline">Срок выполнения:</label>
+        <input type="date" name="deadline" id="deadline" required
+               th:value="${T(java.time.LocalDate).now().plusDays(7)}">
+      </div>
+      <button type="submit" class="btn-primary" style="width: 100%;">
+        <i class="fas fa-paper-plane"></i> Создать поручение
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Модальное окно для запроса лицензии -->
+<div id="licenseModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Запрос на закупку лицензий</h2>
+      <button class="close-modal" onclick="closeModal('licenseModal')">&times;</button>
+    </div>
+    <form th:action="@{|/hol/request-license|}" method="post">
+      <input type="hidden" name="userId" th:value="${user.id}">
+      <input type="hidden" name="softwareId" id="licenseSoftwareId">
+      <div class="modal-body">
+        <label for="quantity">Количество:</label>
+        <input type="number" name="quantity" id="quantity" min="1" value="1" required>
+
+        <label for="reason">Обоснование:</label>
+        <textarea name="reason" id="reason" required
+                  placeholder="Почему необходима закупка?"></textarea>
+      </div>
+      <button type="submit" class="btn-primary" style="width: 100%;">
+        <i class="fas fa-shopping-cart"></i> Отправить запрос
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Модальное окно для формирования отчета -->
+<div id="reportModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Оперативный отчет</h2>
+      <button class="close-modal" onclick="closeModal('reportModal')">&times;</button>
+    </div>
+    <form th:action="@{|/hol/generate-report|}" method="get" target="_blank">
+      <input type="hidden" name="userId" th:value="${user.id}">
+      <div class="modal-body">
+        <label for="reportType">Тип отчета:</label>
+        <select name="type" id="reportType">
+          <option value="requests">По заявкам</option>
+          <option value="tasks">По поручениям</option>
+          <option value="software">По установленному ПО</option>
+        </select>
+
+        <label for="dateFrom">Период с:</label>
+        <input type="date" name="dateFrom" id="dateFrom">
+
+        <label for="dateTo">по:</label>
+        <input type="date" name="dateTo" id="dateTo">
+      </div>
+      <button type="submit" class="btn-success" style="width: 100%;">
+        <i class="fas fa-file-pdf"></i> Сформировать PDF
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Модальное окно для просмотра отчета -->
+<div id="viewReportModal" class="modal">
+  <div class="modal-content" style="max-width: 600px;">
+    <div class="modal-header">
+      <h2><i class="fas fa-file-alt" style="margin-right: 10px;"></i> Детали отчета</h2>
+      <button class="close-modal" onclick="closeModal('viewReportModal')">&times;</button>
+    </div>
+    <div class="modal-body" id="reportContent" style="max-height: 60vh; overflow-y: auto;">
+      <!-- Содержимое будет заполнено через JavaScript -->
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: flex-end; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+      <button class="btn-primary" onclick="closeModal('viewReportModal')" style="background: #718096;">
+        Закрыть
+      </button>
+      <button class="btn-primary" id="printReportBtn" onclick="window.print()" style="background: #48bb78;">
+        <i class="fas fa-print"></i> Печать
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Навигация по секциям
+  function showSection(sectionId) {
+      // Скрываем все секции
+      document.getElementById('dashboard-section').style.display = 'none';
+      document.getElementById('pending-requests-section').style.display = 'none';
+      document.getElementById('all-requests-section').style.display = 'none';
+      document.getElementById('active-tasks-section').style.display = 'none';
+      document.getElementById('all-tasks-section').style.display = 'none';
+      document.getElementById('reports-section').style.display = 'none';
+
+      // Показываем нужную секцию
+      document.getElementById(sectionId + '-section').style.display = 'block';
+
+      // Обновляем активный пункт меню
+      document.querySelectorAll('.nav-item').forEach(item => {
+          item.classList.remove('active');
+      });
+      event.currentTarget.classList.add('active');
+  }
+
+  // Работа с модальными окнами
+  function openModal(modalId) {
+      document.getElementById(modalId).style.display = 'block';
+  }
+
+  function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+  }
+
+  // Открыть модалку отклонения
+  function openRejectModal(button) {
+      const requestId = button.getAttribute('data-request-id');
+      document.getElementById('rejectRequestId').value = requestId;
+      openModal('rejectModal');
+  }
+
+  // Открыть модалку создания поручения
+  function openTaskModal(button) {
+      const requestId = button.getAttribute('data-request-id');
+      const software = button.getAttribute('data-software');
+      const teacher = button.getAttribute('data-teacher');
+      const classroom = button.getAttribute('data-classroom');
+
+      document.getElementById('taskRequestId').value = requestId;
+      document.getElementById('taskInfo').innerHTML = `
+          <p><strong>Заявка #${requestId}</strong></p>
+          <p>ПО: ${software}</p>
+          <p>Преподаватель: ${teacher}</p>
+          <p>Аудитория: №${classroom}</p>
+      `;
+
+      // Устанавливаем дату по умолчанию (сегодня + 7 дней)
+      const today = new Date();
+      const nextWeek = new Date(today);
+      nextWeek.setDate(today.getDate() + 7);
+      document.getElementById('deadline').value = nextWeek.toISOString().split('T')[0];
+
+      openModal('taskModal');
+  }
+
+  // Открыть модалку запроса лицензии
+  function openLicenseModal(softwareId) {
+      document.getElementById('licenseSoftwareId').value = softwareId;
+      openModal('licenseModal');
+  }
+
+  // Открыть модалку отчета
+  function openReportModal() {
+      // Устанавливаем даты по умолчанию (первый день месяца и сегодня)
+      const today = new Date();
+      const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+
+      document.getElementById('dateFrom').value = firstDay.toISOString().split('T')[0];
+      document.getElementById('dateTo').value = today.toISOString().split('T')[0];
+
+      openModal('reportModal');
+  }
+
+  // Просмотр отчета из таблицы поручений (переход к отчету)
+  function viewReportFromTask(button) {
+      const taskId = button.getAttribute('data-task-id');
+
+      // Переключаемся на секцию отчетов
+      showSection('reports');
+
+      // Немного ждем, пока секция отобразится, затем подсвечиваем строку
+      setTimeout(function() {
+          highlightReportRowByTaskId(taskId);
+      }, 100);
+  }
+
+  // Просмотр деталей отчета из секции отчетов (открытие модалки)
+  function viewReportDetails(button) {
+      const row = button.closest('tr');
+
+      // Собираем данные из строки таблицы
+      const cells = row.getElementsByTagName('td');
+      const reportDate = cells[0].innerText;
+      const labAssistant = cells[1].innerText;
+      const software = cells[2].innerText;
+      const classroom = cells[3].innerText;
+      const licenseRequired = cells[4].innerText;
+      const notes = cells[5].innerText;
+
+      // Получаем дополнительные данные из атрибутов
+      const taskId = row.getAttribute('data-task-id');
+      const taskCreatedAt = row.getAttribute('data-task-created');
+      const taskDeadline = row.getAttribute('data-task-deadline');
+      const taskStatus = row.getAttribute('data-task-status');
+
+      // Заполняем модальное окно
+      const reportContent = document.getElementById('reportContent');
+      reportContent.innerHTML = `
+          <div style="display: flex; flex-direction: column; gap: 15px;">
+              <div style="background: #f7fafc; padding: 15px; border-radius: 10px;">
+                  <h3 style="margin-bottom: 10px; color: #2d3748;">Информация об отчете</h3>
+                  <p><strong>Дата отчета:</strong> ${reportDate}</p>
+                  <p><strong>Лаборант:</strong> ${labAssistant}</p>
+                  <p><strong>Требуется лицензия:</strong> ${licenseRequired}</p>
+              </div>
+
+              <div style="background: #f7fafc; padding: 15px; border-radius: 10px;">
+                  <h3 style="margin-bottom: 10px; color: #2d3748;">Детали установки</h3>
+                  <p><strong>Программное обеспечение:</strong> ${software}</p>
+                  <p><strong>Аудитория:</strong> ${classroom}</p>
+                  ${taskCreatedAt ? `<p><strong>Дата создания поручения:</strong> ${taskCreatedAt}</p>` : ''}
+                  ${taskDeadline ? `<p><strong>Срок выполнения:</strong> ${taskDeadline}</p>` : ''}
+                  ${taskStatus ? `<p><strong>Статус поручения:</strong> ${taskStatus}</p>` : ''}
+              </div>
+
+              <div style="background: #f7fafc; padding: 15px; border-radius: 10px;">
+                  <h3 style="margin-bottom: 10px; color: #2d3748;">Примечания</h3>
+                  <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; max-height: 200px; overflow-y: auto;">
+                      ${notes || 'Нет примечаний'}
+                  </div>
+              </div>
+          </div>
+      `;
+
+      // Открываем модальное окно
+      openModal('viewReportModal');
+  }
+
+  // Подсветка строки отчета по taskId (для навигации из поручений)
+  function highlightReportRowByTaskId(taskId) {
+      // Находим все строки в таблице отчетов
+      const reportRows = document.querySelectorAll('#reports-section tbody tr');
+
+      // Снимаем подсветку со всех строк
+      reportRows.forEach(row => {
+          row.style.backgroundColor = '';
+          row.style.borderLeft = '';
+      });
+
+      // Ищем строку, где data-task-id совпадает
+      let found = false;
+      for (let row of reportRows) {
+          const rowTaskId = row.getAttribute('data-task-id');
+          if (rowTaskId && rowTaskId === taskId) {
+              // Подсвечиваем найденную строку
+              row.style.backgroundColor = '#fff3cd';
+              row.style.borderLeft = '4px solid #ffc107';
+              row.style.transition = 'background-color 0.5s';
+
+              // Прокручиваем к этой строке
+              row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+              // Мигание для привлечения внимания
+              let blinkCount = 0;
+              const blinkInterval = setInterval(() => {
+                  row.style.backgroundColor = blinkCount % 2 === 0 ? '#ffe69c' : '#fff3cd';
+                  blinkCount++;
+                  if (blinkCount >= 6) {
+                      clearInterval(blinkInterval);
+                      row.style.backgroundColor = '#fff3cd';
+                  }
+              }, 300);
+
+              found = true;
+              break;
+          }
+      }
+
+      if (!found) {
+          alert('Отчет для этого поручения не найден');
+      }
+  }
+
+  // Закрытие модалок по клику вне области
+  window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+          event.target.style.display = 'none';
+      }
+  }
+</script>
+</body>
+</html>

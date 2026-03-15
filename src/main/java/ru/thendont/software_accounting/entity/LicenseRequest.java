@@ -14,13 +14,12 @@ public class LicenseRequest {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "installation_report_id")
-    private InstallationReport installationReport;
-
     @ManyToOne
     @JoinColumn(name = "software_id")
     private Software software;
+
+    @Column(name = "amount")
+    private Integer amount;
 
     @ManyToOne
     @JoinColumn(name = "requested_by")
@@ -41,15 +40,15 @@ public class LicenseRequest {
     }
 
     public LicenseRequest(Long id,
-                          InstallationReport installationReport,
                           Software software,
+                          Integer amount,
                           User requestedBy,
                           LocalDate createdAt,
                           LicenseRequestStatus status,
                           String comment) {
         this.id = id;
-        this.installationReport = installationReport;
         this.software = software;
+        this.amount = amount;
         this.requestedBy = requestedBy;
         this.createdAt = createdAt;
         this.status = status;
@@ -60,12 +59,12 @@ public class LicenseRequest {
         this.id = id;
     }
 
-    public void setInstallationReport(InstallationReport installationReport) {
-        this.installationReport = installationReport;
-    }
-
     public void setSoftware(Software software) {
         this.software = software;
+    }
+
+    public void setAmount(Integer amount) {
+        this.amount = amount;
     }
 
     public void setRequestedBy(User requestedBy) {
@@ -88,12 +87,12 @@ public class LicenseRequest {
         return id;
     }
 
-    public InstallationReport getInstallationReport() {
-        return installationReport;
-    }
-
     public Software getSoftware() {
         return software;
+    }
+
+    public Integer getAmount() {
+        return amount;
     }
 
     public User getRequestedBy() {

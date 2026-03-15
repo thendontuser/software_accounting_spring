@@ -114,6 +114,9 @@ public class AdminPageController {
         if (user.getRole() == null) {
             user.setRole(null);
         }
+        if (user.getKafedra() != null && user.getKafedra().getId() == null) {
+            user.setKafedra(null);
+        }
         userService.save(user);
         logger.info("@{}: === ПОЛЬЗОВАТЕЛЬ УСПЕШНО СОХРАНИЛСЯ В БАЗЕ ===", username);
         return Urls.ADMIN_URL.getUrlString() + currentUserId;

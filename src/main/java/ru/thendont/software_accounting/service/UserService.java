@@ -6,8 +6,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.thendont.software_accounting.entity.Kafedra;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.repository.UserRepository;
+import ru.thendont.software_accounting.service.enums.UserRoles;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +43,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
+    public List<User> findByRole(UserRoles role) {
+        return (List<User>) userRepository.findByRole(role);
+    }
+
     public List<User> findPendingUsers() {
         return (List<User>) userRepository.findPendingUsers();
     }
@@ -48,6 +54,10 @@ public class UserService implements UserDetailsService {
     public void hashPassword(User user) {
         String passwordEncoded = passwordEncoder.encode(user.getPassword());
         user.setPassword(passwordEncoded);
+    }
+
+    public List<User> findByRoleAndKafedra(UserRoles role, Kafedra kafedra) {
+        return (List<User>) userRepository.findByRoleAndKafedra(role, kafedra);
     }
 
     @Override
