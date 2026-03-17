@@ -17,6 +17,7 @@ import ru.thendont.software_accounting.entity.*;
 import ru.thendont.software_accounting.service.InstallationRequestService;
 import ru.thendont.software_accounting.service.InstallationTaskService;
 import ru.thendont.software_accounting.service.SoftwareInstallationService;
+import ru.thendont.software_accounting.util.Util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -84,7 +85,7 @@ public class ReportService {
             }
 
             document.add(new Paragraph("\n\nОтчет сгенерирован: " +
-                    LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+                    Util.getCurrentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
                     .setFontSize(8)
                     .setTextAlignment(TextAlignment.RIGHT)
                     .setFont(font));

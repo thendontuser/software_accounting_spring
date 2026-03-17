@@ -1,10 +1,10 @@
 package ru.thendont.software_accounting.controllers;
 
 import org.apache.logging.log4j.Logger;
+import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
@@ -17,11 +17,12 @@ import ru.thendont.software_accounting.service.*;
 import ru.thendont.software_accounting.service.email.EmailService;
 import ru.thendont.software_accounting.service.enums.*;
 import ru.thendont.software_accounting.service.report.ReportService;
+import ru.thendont.software_accounting.util.ConstantStrings;
+import ru.thendont.software_accounting.util.Util;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Controller
@@ -81,7 +82,7 @@ public class HeadOfLabsController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден пользователь", "Пользователь не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.USER_NOT_FOUND_TITLE, ConstantStrings.USER_NOT_FOUND_MESSAGE, model);
         }
     }
 
@@ -95,7 +96,7 @@ public class HeadOfLabsController {
             User user = userService.findById(userId).orElseThrow();
             byte[] pdfContent = reportService.generateReport(user, type, dateFrom, dateTo);
             String filename = String.format("report_%s_%s.pdf", type,
-                    LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
+                    Util.getCurrentDate().format(DateTimeFormatter.ofPattern("yyyyMMdd")));
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
@@ -124,38 +125,36 @@ public class HeadOfLabsController {
             installationRequestService.save(installationRequest);
 
             InstallationTask installationTask = new InstallationTask(
-                    null, installationRequest, by, to, LocalDate.now(), InstallationTaskStatus.IN_EXECUTION, deadline
+                    null, installationRequest, by, to, Util.getCurrentDate(), InstallationTaskStatus.IN_EXECUTION, deadline
             );
             installationTaskService.save(installationTask);
 
             String emailMessage;
 
             // Отправляем сообщение преподавателю
-            emailMessage = "Заведующий лабораториями " + by.getLastName() + " " + by.getFirstName().charAt(0) + "." +
-                    by.getPatronymic().charAt(0) + "." + " одобрил Вашу заявку и отправил ее на поручение";
+            emailMessage = ConstantStrings.HEAD_OF_LABS + " " + Util.getUserInitials(by) +
+                    " одобрил Вашу заявку и отправил ее на поручение";
 
-            emailService.sendMessage(installationRequest.getUser().getEmail(), "Заявка на установку " +
-                    installationRequest.getSoftware().getTitle() + " в аудиторию №" +
-                    installationRequest.getClassroom().getNumber(), emailMessage);
+            emailService.sendMessage(installationRequest.getUser().getEmail(),
+                    Util.getInstallationRequestEmailSubject(installationRequest),
+                    emailMessage);
 
             // Отправлеям сообщение лаборанту
-            emailMessage = "Заведующий лабораториями " + by.getLastName() + " " + by.getFirstName().charAt(0) + "." +
-                    by.getPatronymic().charAt(0) + "." + " дал Вам поручение на установку " +
+            emailMessage = ConstantStrings.HEAD_OF_LABS + " " + Util.getUserInitials(by) + " дал Вам поручение на установку " +
                     installationRequest.getSoftware().getTitle() + " в аудиторию №" +
-                    installationRequest.getClassroom().getNumber() + ". Загляните в личный кабинет";
+                    installationRequest.getClassroom().getNumber() + ". " + ConstantStrings.GO_PERSONAL_ACCOUNT;
 
-            emailService.sendMessage(to.getEmail(), "Поручение по установке ПО в аудиторию", emailMessage);
+            emailService.sendMessage(to.getEmail(), ConstantStrings.INSTALLATION_TASK, emailMessage);
 
             return Urls.HEAD_OF_LABORATORIES_URL.getUrlString() + assignedBy;
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден объект", "Объект не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.OBJECT_NOT_FOUND_TITLE, ConstantStrings.OBJECT_NOT_FOUND_MESSAGE, model);
         }
         catch (MailException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Ошибка при отправке сообщения на почту",
-                    "Сообщение не отправлено на указанный адрес, проверьте соединение с интернетом", model);
+            return ErrorHandler.errorPage(ConstantStrings.EMAIL_ERROR_TITLE, ConstantStrings.EMAIL_ERROR_MESSAGE, model);
         }
     }
 
@@ -171,24 +170,21 @@ public class HeadOfLabsController {
             installationTask.setStatus(status);
             installationTaskService.save(installationTask);
 
-            String emailMessage = "Заведующий лабораториями " + user.getLastName() + " " + user.getFirstName().charAt(0) + "." +
-                    user.getPatronymic().charAt(0) + "." + " сменил статус Вашего поручения на \"" + status.getStatusName() +
-                    "\" по поручению №" + installationTask.getId() + ". Загляните в личный кабинет";
+            String emailMessage = ConstantStrings.HEAD_OF_LABS + " " + Util.getUserInitials(user) +
+                    " сменил статус Вашего поручения на \"" + status.getStatusName() + "\" по поручению №" +
+                    installationTask.getId() + ". " + ConstantStrings.GO_PERSONAL_ACCOUNT;
 
-            emailService.sendMessage(installationTask.getAssignedTo().getEmail(),
-                    "Поручение по установке ПО в аудиторию",
-                    emailMessage);
+            emailService.sendMessage(installationTask.getAssignedTo().getEmail(), ConstantStrings.INSTALLATION_TASK, emailMessage);
 
             return Urls.HEAD_OF_LABORATORIES_URL.getUrlString() + userId;
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден объект", "Объект не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.OBJECT_NOT_FOUND_TITLE, ConstantStrings.OBJECT_NOT_FOUND_MESSAGE, model);
         }
         catch (Exception ex) {
             logger.error("Ошибка при обновлении статуса", ex);
-            return ErrorHandler.errorPage("Ошибка при отправке сообщения на почту",
-                    "Сообщение не отправлено на указанный адрес, проверьте соединение с интернетом", model);
+            return ErrorHandler.errorPage(ConstantStrings.EMAIL_ERROR_TITLE, ConstantStrings.EMAIL_ERROR_MESSAGE, model);
         }
     }
 
@@ -201,27 +197,25 @@ public class HeadOfLabsController {
             User user = userService.findById(userId).orElseThrow();
             InstallationRequest installationRequest = installationRequestService.findById(requestId).orElseThrow();
 
-            installationRequest.setComment(comment);
             installationRequest.setStatus(InstallationRequestStatus.REJECTED);
             installationRequestService.save(installationRequest);
 
-            String emailMessage = "Заведующий лабораториями " + user.getLastName() + " " + user.getFirstName().charAt(0) +
-                    "." + user.getPatronymic().charAt(0) + "." + " отклонил заявку. Причина: " + comment;
+            String emailMessage = ConstantStrings.HEAD_OF_LABS + " " + Util.getUserInitials(user) +
+                    " отклонил заявку. Причина: " + comment;
 
             emailService.sendMessage(installationRequest.getUser().getEmail(),
-                    "Заявка на установку " + installationRequest.getSoftware().getTitle() + " в аудиторию №" +
-                    installationRequest.getClassroom().getNumber(), emailMessage);
+                    Util.getInstallationRequestEmailSubject(installationRequest),
+                    emailMessage);
 
             return Urls.HEAD_OF_LABORATORIES_URL.getUrlString() + userId;
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден объект", "Объект не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.OBJECT_NOT_FOUND_TITLE, ConstantStrings.OBJECT_NOT_FOUND_MESSAGE, model);
         }
         catch (MailException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Ошибка при отправке сообщения на почту",
-                    "Сообщение не отправлено на указанный адрес, проверьте соединение с интернетом", model);
+            return ErrorHandler.errorPage(ConstantStrings.EMAIL_ERROR_TITLE, ConstantStrings.EMAIL_ERROR_MESSAGE, model);
         }
     }
 
@@ -237,14 +231,14 @@ public class HeadOfLabsController {
             List<User> sam_managers = userService.findByRole(UserRoles.SAM_MANAGER);
 
             LicenseRequest licenseRequest = new LicenseRequest(
-                    null, software, quantity, user, LocalDate.now(), LicenseRequestStatus.PENDING, reason
+                    null, software, quantity, user, Util.getCurrentDate(), LicenseRequestStatus.PENDING, reason
             );
             licenseRequestService.save(licenseRequest);
 
-            String emailMessage = "Заведующий лабораториями " + user.getLastName() + " " + user.getFirstName().charAt(0) + "."
-                    + user.getPatronymic().charAt(0) + "." + " сформировал запрос на закупку лицензии." +
+            String emailMessage = ConstantStrings.HEAD_OF_LABS + " " + Util.getUserInitials(user) +
+                    " сформировал запрос на закупку лицензии." +
                     "\nПрограммное обеспечение: " + software.getTitle() + " " + software.getVersion() +
-                    "\nКоличество лицензий(шт.): " + quantity + "\nЗагляните в личный кабинет";
+                    "\nКоличество лицензий(шт.): " + quantity + "\n" + ConstantStrings.GO_PERSONAL_ACCOUNT;
 
             for (User u : sam_managers) {
                 emailService.sendMessage(u.getEmail(), "Запрос на закупку лицензии", emailMessage);
@@ -254,12 +248,11 @@ public class HeadOfLabsController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден объект", "Объект не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.OBJECT_NOT_FOUND_TITLE, ConstantStrings.OBJECT_NOT_FOUND_MESSAGE, model);
         }
         catch (MailException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Ошибка при отправке сообщения на почту",
-                    "Сообщение не отправлено на указанный адрес, проверьте соединение с интернетом", model);
+            return ErrorHandler.errorPage(ConstantStrings.EMAIL_ERROR_TITLE, ConstantStrings.EMAIL_ERROR_MESSAGE, model);
         }
     }
 }

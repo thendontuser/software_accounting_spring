@@ -89,7 +89,7 @@ public class AdminPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден пользователь", "Пользователь не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.USER_NOT_FOUND_TITLE, ConstantStrings.USER_NOT_FOUND_MESSAGE, model);
         }
     }
 
@@ -105,7 +105,7 @@ public class AdminPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден пользователь", "Пользователь не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.USER_NOT_FOUND_TITLE, ConstantStrings.USER_NOT_FOUND_MESSAGE, model);
         }
     }
 

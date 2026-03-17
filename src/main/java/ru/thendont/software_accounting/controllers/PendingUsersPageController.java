@@ -14,6 +14,7 @@ import ru.thendont.software_accounting.service.UserService;
 import ru.thendont.software_accounting.service.email.EmailService;
 import ru.thendont.software_accounting.service.enums.Urls;
 import ru.thendont.software_accounting.service.enums.UserRoles;
+import ru.thendont.software_accounting.util.ConstantStrings;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -56,7 +57,7 @@ public class PendingUsersPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден пользователь", "Пользователь не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.USER_NOT_FOUND_TITLE, ConstantStrings.USER_NOT_FOUND_MESSAGE, model);
         }
     }
 
@@ -71,18 +72,17 @@ public class PendingUsersPageController {
             user.setKafedra(kafId != null ? kafedraService.findById(kafId).orElseThrow() : null);
             userService.save(user);
 
-            emailService.sendMessage(user.getEmail(), "Регистрация в системе",
+            emailService.sendMessage(user.getEmail(), ConstantStrings.REGISTER_IN_SYSTEM,
                     "Администратор подтвердил вашу заявку на регистрацию в системе");
             return Urls.PENDING_USERS_URL.getUrlString() + currentUserId;
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден пользователь или факультет",
-                    "Пользователь или факультет не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.OBJECT_NOT_FOUND_TITLE, ConstantStrings.OBJECT_NOT_FOUND_MESSAGE, model);
         }
         catch (MailException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Ошибка отправки сообщения на почту", "Плохое подключение к сети", model);
+            return ErrorHandler.errorPage(ConstantStrings.EMAIL_ERROR_TITLE, ConstantStrings.EMAIL_ERROR_MESSAGE, model);
         }
     }
 
@@ -90,18 +90,18 @@ public class PendingUsersPageController {
     public String rejectUser(@PathVariable Long userId, Model model) {
         try {
             User user = userService.findById(userId).orElseThrow();
-            emailService.sendMessage(user.getEmail(), "Регистрация в системе",
+            emailService.sendMessage(user.getEmail(), ConstantStrings.REGISTER_IN_SYSTEM,
                     "Администратор отклонил вашу заявку на регистрацию в системе");
             userService.deleteById(userId);
             return Urls.PENDING_USERS_URL.getUrlString() + currentUserId;
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден пользователь", "Пользователь не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.USER_NOT_FOUND_TITLE, ConstantStrings.USER_NOT_FOUND_MESSAGE, model);
         }
         catch (MailException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Ошибка отправки сообщения на почту", "Плохое подключение к сети", model);
+            return ErrorHandler.errorPage(ConstantStrings.EMAIL_ERROR_TITLE, ConstantStrings.EMAIL_ERROR_MESSAGE, model);
         }
     }
 }

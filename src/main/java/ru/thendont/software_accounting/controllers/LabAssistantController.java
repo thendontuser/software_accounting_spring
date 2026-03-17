@@ -18,6 +18,8 @@ import ru.thendont.software_accounting.service.InstallationTaskService;
 import ru.thendont.software_accounting.service.UserService;
 import ru.thendont.software_accounting.service.email.EmailService;
 import ru.thendont.software_accounting.service.enums.Urls;
+import ru.thendont.software_accounting.util.ConstantStrings;
+import ru.thendont.software_accounting.util.Util;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -61,7 +63,7 @@ public class LabAssistantController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден пользователь", "Пользователь не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.USER_NOT_FOUND_TITLE, ConstantStrings.USER_NOT_FOUND_MESSAGE, model);
         }
     }
 
@@ -76,15 +78,15 @@ public class LabAssistantController {
             InstallationTask installationTask = installationTaskService.findById(taskId).orElseThrow();
 
             InstallationReport installationReport = new InstallationReport(
-                    null, installationTask, LocalDate.now(), licenseRequired != null ? licenseRequired : false, notes
+                    null, installationTask, Util.getCurrentDate(), licenseRequired != null ? licenseRequired : false, notes
             );
             installationReportService.save(installationReport);
 
-            String emailMessage = "Лаборант " + user.getLastName() + " " + user.getFirstName().charAt(0) + "." +
-                    user.getPatronymic().charAt(0) + "." + " сформировал отчет по установке " +
+            String emailMessage = "Лаборант " + Util.getUserInitials(user) + " сформировал отчет по установке " +
                     installationTask.getInstallationRequest().getSoftware().getTitle() + " " +
                     installationTask.getInstallationRequest().getSoftware().getVersion() + " в аудиторию №" +
-                    installationTask.getInstallationRequest().getClassroom().getNumber() + ". Загляните в личный кабинет";
+                    installationTask.getInstallationRequest().getClassroom().getNumber() + ". " +
+                    ConstantStrings.GO_PERSONAL_ACCOUNT;
 
             emailService.sendMessage(installationTask.getAssignedBy().getEmail(), "Отчет по установке ПО", emailMessage);
 
@@ -92,12 +94,11 @@ public class LabAssistantController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден объект", "Объект не найден в системе", model);
+            return ErrorHandler.errorPage(ConstantStrings.OBJECT_NOT_FOUND_TITLE, ConstantStrings.OBJECT_NOT_FOUND_MESSAGE, model);
         }
         catch (MailException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Ошибка при отправке сообщения на почту",
-                    "Сообщение не отправлено на указанный адрес, проверьте соединение с интернетом", model);
+            return ErrorHandler.errorPage(ConstantStrings.EMAIL_ERROR_TITLE, ConstantStrings.EMAIL_ERROR_MESSAGE, model);
         }
     }
 }

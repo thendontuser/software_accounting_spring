@@ -17,6 +17,8 @@ import ru.thendont.software_accounting.service.SoftwareService;
 import ru.thendont.software_accounting.service.UserService;
 import ru.thendont.software_accounting.service.enums.InstallationRequestStatus;
 import ru.thendont.software_accounting.service.enums.Urls;
+import ru.thendont.software_accounting.util.ConstantStrings;
+import ru.thendont.software_accounting.util.Util;
 
 import java.time.LocalDate;
 import java.util.NoSuchElementException;
@@ -54,7 +56,7 @@ public class TeacherPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Пользователь не найден", "Система не нашла данного пользователя", model);
+            return ErrorHandler.errorPage(ConstantStrings.USER_NOT_FOUND_TITLE, ConstantStrings.USER_NOT_FOUND_MESSAGE, model);
         }
     }
 
@@ -65,7 +67,7 @@ public class TeacherPageController {
             User user = userService.findById(userId).orElseThrow();
             Software software = softwareService.findById(softwareId).orElseThrow();
             Classroom classroom = classroomService.findById(classroomId).orElseThrow();
-            InstallationRequest request = new InstallationRequest(null, software, classroom, user, LocalDate.now(),
+            InstallationRequest request = new InstallationRequest(null, software, classroom, user, Util.getCurrentDate(),
                     InstallationRequestStatus.PENDING, comment);
 
             installationRequestService.save(request);
@@ -74,7 +76,7 @@ public class TeacherPageController {
         }
         catch (NoSuchElementException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
-            return ErrorHandler.errorPage("Не найден требуемый объект", ex.getMessage(), model);
+            return ErrorHandler.errorPage(ConstantStrings.OBJECT_NOT_FOUND_TITLE, ConstantStrings.OBJECT_NOT_FOUND_MESSAGE, model);
         }
     }
 }
