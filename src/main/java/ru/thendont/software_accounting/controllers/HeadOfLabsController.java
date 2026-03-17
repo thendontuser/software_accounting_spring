@@ -4,15 +4,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import ru.thendont.software_accounting.entity.*;
 import ru.thendont.software_accounting.error.ErrorHandler;
 import ru.thendont.software_accounting.service.*;
@@ -23,6 +21,7 @@ import ru.thendont.software_accounting.service.report.ReportService;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Controller
@@ -155,6 +154,39 @@ public class HeadOfLabsController {
         }
         catch (MailException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
+            return ErrorHandler.errorPage("Ошибка при отправке сообщения на почту",
+                    "Сообщение не отправлено на указанный адрес, проверьте соединение с интернетом", model);
+        }
+    }
+
+    @PostMapping("/update-task-status")
+    public String updateTaskStatus(@RequestParam Long taskId,
+                                   @RequestParam Long userId,
+                                   @RequestParam InstallationTaskStatus status,
+                                   Model model) {
+        try {
+            User user = userService.findById(userId).orElseThrow();
+            InstallationTask installationTask = installationTaskService.findById(taskId).orElseThrow();
+
+            installationTask.setStatus(status);
+            installationTaskService.save(installationTask);
+
+            String emailMessage = "Заведующий лабораториями " + user.getLastName() + " " + user.getFirstName().charAt(0) + "." +
+                    user.getPatronymic().charAt(0) + "." + " сменил статус Вашего поручения на \"" + status.getStatusName() +
+                    "\" по поручению №" + installationTask.getId() + ". Загляните в личный кабинет";
+
+            emailService.sendMessage(installationTask.getAssignedTo().getEmail(),
+                    "Поручение по установке ПО в аудиторию",
+                    emailMessage);
+
+            return Urls.HEAD_OF_LABORATORIES_URL.getUrlString() + userId;
+        }
+        catch (NoSuchElementException ex) {
+            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
+            return ErrorHandler.errorPage("Не найден объект", "Объект не найден в системе", model);
+        }
+        catch (Exception ex) {
+            logger.error("Ошибка при обновлении статуса", ex);
             return ErrorHandler.errorPage("Ошибка при отправке сообщения на почту",
                     "Сообщение не отправлено на указанный адрес, проверьте соединение с интернетом", model);
         }

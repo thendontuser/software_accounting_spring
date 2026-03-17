@@ -34,4 +34,8 @@ public class InstallationReportService {
     public List<InstallationReport> findByTaskAssignedBy(User assignedBy) {
         return (List<InstallationReport>) installationReportRepository.findByTaskAssignedBy(assignedBy.getId());
     }
+
+    public List<InstallationReport> findByTaskAssignedTo(User assignedTo) {
+        return (List<InstallationReport>) installationReportRepository.findByTaskAssignedTo(assignedTo.getId());
+    }
 }

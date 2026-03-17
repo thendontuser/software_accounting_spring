@@ -13,6 +13,8 @@ public interface InstallationTaskRepository extends CrudRepository<InstallationT
 
     Iterable<InstallationTask> findByAssignedBy(User assignedBy);
 
+    Iterable<InstallationTask> findByAssignedTo(User assignedTo);
+
     @Query(value = "SELECT * FROM installation_task WHERE assigned_by in (SELECT id FROM users WHERE kaf_id = :kafId)" +
             "AND created_at BETWEEN :dateFrom AND :dateTo",
             nativeQuery = true)

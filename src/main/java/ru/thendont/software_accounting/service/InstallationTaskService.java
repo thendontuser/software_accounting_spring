@@ -37,6 +37,10 @@ public class InstallationTaskService {
         return (List<InstallationTask>) installationTaskRepository.findByAssignedBy(assignedBy);
     }
 
+    public List<InstallationTask> findByAssignedTo(User assignedTo) {
+        return (List<InstallationTask>) installationTaskRepository.findByAssignedTo(assignedTo);
+    }
+
     public List<InstallationTask> findByKafedraAndDateBetween(Kafedra kafedra, LocalDate dateFrom, LocalDate dateTo) {
         return (List<InstallationTask>) installationTaskRepository.findByKafedraAndDateBetween(
                 kafedra.getId(), dateFrom, dateTo

@@ -259,6 +259,31 @@
         color: #718096;
     }
 
+    /* Search */
+    .search-container {
+        margin-bottom: 1rem;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 12px 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-input::placeholder {
+        color: #a0aec0;
+    }
+
     /* Tables */
     .table-container {
         background: white;
@@ -325,7 +350,9 @@
     .status.APPROVED { background: #c6f6d5; color: #276749; }
     .status.REJECTED { background: #fed7d7; color: #9b2c2c; }
     .status.COMPLETED { background: #bee3f8; color: #2c5282; }
-    .status.IN_PROGRESS { background: #e9d8fd; color: #6b46c1; }
+    .status.IN_EXECUTION { background: #e9d8fd; color: #6b46c1; }
+    .status.DONE { background: #c6f6d5; color: #276749; }
+    .status.NOT_COMPLETED { background: #fed7d7; color: #9b2c2c; }
 
     /* Action buttons */
     .action-buttons {
@@ -353,6 +380,50 @@
     .btn-icon.task:hover { background: #c3dafe; color: #5a67d8; }
     .btn-icon.view:hover { background: #bee3f8; color: #3182ce; }
 
+    /* Добавьте к существующим стилям */
+    .btn-icon.edit:hover {
+        background: #c3dafe;
+        color: #5a67d8;
+    }
+
+    /* Стили для комментария в модальном окне */
+    #statusComment {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 14px;
+        resize: vertical;
+        margin-top: 5px;
+    }
+
+    #statusComment:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Улучшенные стили для info-block */
+    .info-block {
+        background: #f7fafc;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border-left: 4px solid #667eea;
+    }
+
+    .info-block p {
+        margin: 8px 0;
+        color: #4a5568;
+    }
+
+    .info-block strong {
+        color: #2d3748;
+        min-width: 100px;
+        display: inline-block;
+    }
+
     /* Modal */
     .modal {
         display: none;
@@ -374,7 +445,7 @@
         padding: 2rem;
         border-radius: 15px;
         width: 90%;
-        max-width: 500px;
+        max-width: 600px;
         max-height: 90vh;
         overflow-y: auto;
     }
@@ -450,7 +521,7 @@
         font-weight: normal;
     }
 
-    /* Анимация подсветки */
+    /* Highlight animation */
     @keyframes highlight {
         0% { background-color: #fff3cd; }
         50% { background-color: #ffe69c; }
@@ -462,7 +533,6 @@
         border-left: 4px solid #ffc107 !important;
     }
 
-    /* Для плавного перехода */
     .table tbody tr {
         transition: background-color 0.3s ease;
     }
@@ -527,7 +597,7 @@
         <i class="fas fa-tasks"></i>
         <span>Активные</span>
         <span class="badge"
-              th:text="${#lists.size(installationTasks.?[status.name() != 'COMPLETED'])}">0</span>
+              th:text="${#lists.size(installationTasks.?[status.name() != 'DONE'])}">0</span>
       </button>
       <button class="nav-item" onclick="showSection('all-tasks')">
         <i class="fas fa-clipboard-list"></i>
@@ -555,7 +625,7 @@
 
   <!-- Main Content -->
   <main class="main-content">
-    <!-- Секция "Обзор" (показывается по умолчанию) -->
+    <!-- Секция "Обзор" -->
     <div id="dashboard-section" style="display: block;">
       <div class="page-header">
         <h1 class="page-title">Обзор</h1>
@@ -599,7 +669,7 @@
             </div>
             <div>
               <div class="stat-value"
-                   th:text="${#lists.size(installationTasks.?[status.name() != 'COMPLETED'])}">2</div>
+                   th:text="${#lists.size(installationTasks.?[status.name() != 'DONE'])}">2</div>
               <div class="stat-label">Активных поручений</div>
             </div>
           </div>
@@ -625,7 +695,7 @@
           Последние заявки
         </div>
         <div class="table-responsive">
-          <table>
+          <table id="latest-requests-table">
             <thead>
             <tr>
               <th>Дата</th>
@@ -645,17 +715,16 @@
               <td th:text="${req.software.title}">Microsoft Office</td>
               <td th:text="'№' + ${req.classroom.number}">101</td>
               <td>
-                                        <span class="status" th:classappend="${req.status.name()}"
-                                              th:text="${req.status.getStatusName()}">В ожидании</span>
+                                <span class="status" th:classappend="${req.status.name()}"
+                                      th:text="${req.status.getStatusName()}">В ожидании</span>
               </td>
               <td>
-                <div class="action-buttons"
-                     th:if="${req.status.name() == 'PENDING'}">
+                <div class="action-buttons" th:if="${req.status.name() == 'PENDING'}">
                   <button class="btn-icon approve"
                           th:attr="data-request-id=${req.id},
-                                                             data-software=${req.software.title},
-                                                             data-teacher=${req.user.lastName + ' ' + req.user.firstName},
-                                                             data-classroom=${req.classroom.number}"
+                                                     data-software=${req.software.title},
+                                                     data-teacher=${req.user.lastName + ' ' + req.user.firstName},
+                                                     data-classroom=${req.classroom.number}"
                           onclick="openTaskModal(this)">
                     <i class="fas fa-clipboard-check"></i>
                   </button>
@@ -684,7 +753,7 @@
           Активные поручения
         </div>
         <div class="table-responsive">
-          <table>
+          <table id="latest-tasks-table">
             <thead>
             <tr>
               <th>Срок</th>
@@ -697,33 +766,33 @@
             </thead>
             <tbody>
             <tr th:each="task : ${installationTasks}"
-                th:if="${task.status.name() != 'COMPLETED'}">
-                <td th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}"
-                    th:classappend="${task.deadline.isBefore(T(java.time.LocalDate).now()) ? 'deadline-passed' : ''}">
-                  10.02.2024
-                </td>
-                <td th:text="${task.assignedTo.lastName + ' ' + #strings.substring(task.assignedTo.firstName, 0, 1) + '.'}">
-                  Петров П.
-                </td>
-                <td th:text="${task.installationRequest.software.title}">Photoshop</td>
-                <td th:text="'№' + ${task.installationRequest.classroom.number}">205</td>
-                <td>
-                  <span class="status" th:classappend="${task.status.name()}"
-                        th:text="${task.status.getStatusName()}">В работе</span>
-                </td>
-                <td>
-                  <!-- Исправлено: проверяем, есть ли отчет для этого поручения -->
-                  <span th:if="${installationReports.![installationTask.id].contains(task.id)}">
-                    <button class="btn-icon view"
-                            th:attr="data-task-id=${task.id}"
-                            onclick="viewReportFromTask(this)">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                  </span>
-                  <span th:unless="${installationReports.![installationTask.id].contains(task.id)}">—</span>
-                </td>
+                th:if="${task.status.name() != 'DONE'}"
+                th:attr="data-task-id=${task.id}">
+              <td th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}"
+                  th:classappend="${task.deadline.isBefore(T(java.time.LocalDate).now()) ? 'deadline-passed' : ''}">
+                10.02.2024
+              </td>
+              <td th:text="${task.assignedTo.lastName + ' ' + #strings.substring(task.assignedTo.firstName, 0, 1) + '.'}">
+                Петров П.
+              </td>
+              <td th:text="${task.installationRequest.software.title}">Photoshop</td>
+              <td th:text="'№' + ${task.installationRequest.classroom.number}">205</td>
+              <td>
+                                <span class="status" th:classappend="${task.status.name()}"
+                                      th:text="${task.status.getStatusName()}">В работе</span>
+              </td>
+              <td>
+                                <span th:if="${installationReports.![installationTask.id].contains(task.id)}">
+                                    <button class="btn-icon view"
+                                            th:attr="data-task-id=${task.id}"
+                                            onclick="viewReportFromTask(this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </span>
+                <span th:unless="${installationReports.![installationTask.id].contains(task.id)}">—</span>
+              </td>
             </tr>
-            <tr th:if="${#lists.size(installationTasks.?[status.name() != 'COMPLETED']) == 0}">
+            <tr th:if="${#lists.size(installationTasks.?[status.name() != 'DONE']) == 0}">
               <td colspan="6" style="text-align: center; color: #718096; padding: 2rem;">
                 Нет активных поручений
               </td>
@@ -739,9 +808,19 @@
       <div class="page-header">
         <h1 class="page-title">Заявки на модерации</h1>
       </div>
+
+      <!-- Поиск -->
+      <div class="search-container">
+        <input type="text"
+               id="searchPendingRequests"
+               class="search-input"
+               placeholder="Поиск по дате, преподавателю, ПО, аудитории..."
+               onkeyup="filterTable('pending-requests-table', this.value)">
+      </div>
+
       <div class="table-container">
         <div class="table-responsive">
-          <table>
+          <table id="pending-requests-table">
             <thead>
             <tr>
               <th>Дата</th>
@@ -766,9 +845,9 @@
                 <div class="action-buttons">
                   <button class="btn-icon approve"
                           th:attr="data-request-id=${req.id},
-                                                             data-software=${req.software.title},
-                                                             data-teacher=${req.user.lastName + ' ' + req.user.firstName},
-                                                             data-classroom=${req.classroom.number}"
+                                                     data-software=${req.software.title},
+                                                     data-teacher=${req.user.lastName + ' ' + req.user.firstName},
+                                                     data-classroom=${req.classroom.number}"
                           onclick="openTaskModal(this)">
                     <i class="fas fa-clipboard-check"></i>
                   </button>
@@ -796,9 +875,19 @@
       <div class="page-header">
         <h1 class="page-title">Все заявки кафедры</h1>
       </div>
+
+      <!-- Поиск -->
+      <div class="search-container">
+        <input type="text"
+               id="searchAllRequests"
+               class="search-input"
+               placeholder="Поиск по дате, преподавателю, ПО, аудитории, статусу..."
+               onkeyup="filterTable('all-requests-table', this.value)">
+      </div>
+
       <div class="table-container">
         <div class="table-responsive">
-          <table>
+          <table id="all-requests-table">
             <thead>
             <tr>
               <th>Дата</th>
@@ -819,17 +908,17 @@
               <td th:text="${req.software.title}">Microsoft Office</td>
               <td th:text="'№' + ${req.classroom.number}">101</td>
               <td>
-                                        <span class="status" th:classappend="${req.status.name()}"
-                                              th:text="${req.status.getStatusName()}">В ожидании</span>
+                                <span class="status" th:classappend="${req.status.name()}"
+                                      th:text="${req.status.getStatusName()}">В ожидании</span>
               </td>
               <td th:text="${req.comment ?: '-'}">Комментарий</td>
               <td>
                 <div class="action-buttons" th:if="${req.status.name() == 'PENDING'}">
                   <button class="btn-icon approve"
                           th:attr="data-request-id=${req.id},
-                                                             data-software=${req.software.title},
-                                                             data-teacher=${req.user.lastName + ' ' + req.user.firstName},
-                                                             data-classroom=${req.classroom.number}"
+                                                     data-software=${req.software.title},
+                                                     data-teacher=${req.user.lastName + ' ' + req.user.firstName},
+                                                     data-classroom=${req.classroom.number}"
                           onclick="openTaskModal(this)">
                     <i class="fas fa-clipboard-check"></i>
                   </button>
@@ -852,9 +941,19 @@
       <div class="page-header">
         <h1 class="page-title">Активные поручения</h1>
       </div>
+
+      <!-- Поиск -->
+      <div class="search-container">
+        <input type="text"
+               id="searchActiveTasks"
+               class="search-input"
+               placeholder="Поиск по дате, лаборанту, ПО, аудитории, статусу..."
+               onkeyup="filterTable('active-tasks-table', this.value)">
+      </div>
+
       <div class="table-container">
         <div class="table-responsive">
-          <table>
+          <table id="active-tasks-table">
             <thead>
             <tr>
               <th>Создано</th>
@@ -868,7 +967,8 @@
             </thead>
             <tbody>
             <tr th:each="task : ${installationTasks}"
-                th:if="${task.status.name() != 'DONE'}">
+                th:if="${task.status.name() != 'DONE'}"
+                th:attr="data-task-id=${task.id}">
               <td th:text="${#temporals.format(task.createdAt, 'dd.MM.yyyy')}">01.02.2024</td>
               <td th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}"
                   th:classappend="${task.deadline.isBefore(T(java.time.LocalDate).now()) ? 'deadline-passed' : ''}">
@@ -880,17 +980,17 @@
               <td th:text="${task.installationRequest.software.title}">Photoshop</td>
               <td th:text="'№' + ${task.installationRequest.classroom.number}">205</td>
               <td>
-                <span class="status" th:classappend="${task.status.name()}"
-                      th:text="${task.status.getStatusName()}">В работе</span>
+                                <span class="status" th:classappend="${task.status.name()}"
+                                      th:text="${task.status.getStatusName()}">В работе</span>
               </td>
               <td>
-                <span th:if="${installationReports.![installationTask.id].contains(task.id)}">
-                    <button class="btn-icon view"
-                            th:attr="data-task-id=${task.id}"
-                            onclick="viewReportFromTask(this)">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </span>
+                                <span th:if="${installationReports.![installationTask.id].contains(task.id)}">
+                                    <button class="btn-icon view"
+                                            th:attr="data-task-id=${task.id}"
+                                            onclick="viewReportFromTask(this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </span>
                 <span th:unless="${installationReports.![installationTask.id].contains(task.id)}">—</span>
               </td>
             </tr>
@@ -905,9 +1005,19 @@
       <div class="page-header">
         <h1 class="page-title">Все поручения</h1>
       </div>
+
+      <!-- Поиск -->
+      <div class="search-container">
+        <input type="text"
+               id="searchAllTasks"
+               class="search-input"
+               placeholder="Поиск по дате, лаборанту, ПО, аудитории, статусу..."
+               onkeyup="filterTable('all-tasks-table', this.value)">
+      </div>
+
       <div class="table-container">
         <div class="table-responsive">
-          <table>
+          <table id="all-tasks-table">
             <thead>
             <tr>
               <th>Создано</th>
@@ -920,7 +1030,8 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="task : ${installationTasks}">
+            <tr th:each="task : ${installationTasks}"
+                th:attr="data-task-id=${task.id}">
               <td th:text="${#temporals.format(task.createdAt, 'dd.MM.yyyy')}">01.02.2024</td>
               <td th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}">10.02.2024</td>
               <td th:text="${task.assignedTo.lastName + ' ' + #strings.substring(task.assignedTo.firstName, 0, 1) + '.'}">
@@ -929,17 +1040,17 @@
               <td th:text="${task.installationRequest.software.title}">Photoshop</td>
               <td th:text="'№' + ${task.installationRequest.classroom.number}">205</td>
               <td>
-                <span class="status" th:classappend="${task.status.name()}"
-                      th:text="${task.status.getStatusName()}">В работе</span>
+                                <span class="status" th:classappend="${task.status.name()}"
+                                      th:text="${task.status.getStatusName()}">В работе</span>
               </td>
               <td>
-                <span th:if="${installationReports.![installationTask.id].contains(task.id)}">
-                    <button class="btn-icon view"
-                            th:attr="data-task-id=${task.id}"
-                            onclick="viewReportFromTask(this)">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </span>
+                                <span th:if="${installationReports.![installationTask.id].contains(task.id)}">
+                                    <button class="btn-icon view"
+                                            th:attr="data-task-id=${task.id}"
+                                            onclick="viewReportFromTask(this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </span>
                 <span th:unless="${installationReports.![installationTask.id].contains(task.id)}">—</span>
               </td>
             </tr>
@@ -954,9 +1065,19 @@
       <div class="page-header">
         <h1 class="page-title">Отчеты лаборантов</h1>
       </div>
+
+      <!-- Поиск -->
+      <div class="search-container">
+        <input type="text"
+               id="searchReports"
+               class="search-input"
+               placeholder="Поиск по дате, лаборанту, ПО, аудитории..."
+               onkeyup="filterTable('reports-table', this.value)">
+      </div>
+
       <div class="table-container">
         <div class="table-responsive">
-          <table>
+          <table id="reports-table">
             <thead>
             <tr>
               <th>Дата</th>
@@ -965,19 +1086,20 @@
               <th>Аудитория</th>
               <th>Нужна лицензия</th>
               <th>Примечания</th>
-              <th>Действия</th>
+              <th>Просмотр</th>
+              <th>Статус поручения</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="report : ${installationReports}"
                 th:attr="data-report-id=${report.id},
-                                 data-task-id=${report.installationTask.id},
-                                 data-task-created=${#temporals.format(report.installationTask.createdAt, 'dd.MM.yyyy')},
-                                 data-task-deadline=${#temporals.format(report.installationTask.deadline, 'dd.MM.yyyy')},
-                                 data-task-status=${report.installationTask.status.getStatusName()}">
+                                     data-task-id=${report.installationTask.id},
+                                     data-task-created=${#temporals.format(report.installationTask.createdAt, 'dd.MM.yyyy')},
+                                     data-task-deadline=${#temporals.format(report.installationTask.deadline, 'dd.MM.yyyy')},
+                                     data-task-status=${report.installationTask.status.name()}">
               <td th:text="${#temporals.format(report.createdAt, 'dd.MM.yyyy')}">01.03.2024</td>
               <td th:text="${report.installationTask.assignedTo.lastName + ' ' +
-                                      #strings.substring(report.installationTask.assignedTo.firstName, 0, 1) + '.'}">
+                                          #strings.substring(report.installationTask.assignedTo.firstName, 0, 1) + '.'}">
                 Сидоров С.
               </td>
               <td th:text="${report.installationTask.installationRequest.software.title}">
@@ -991,16 +1113,13 @@
                 <span th:unless="${report.licenseRequired}" style="color: #38a169; font-weight: 600;">Нет</span>
               </td>
               <td>
-                  <!-- Проверяем длину через #strings.length() -->
-                  <span th:if="${report.notes != null and #strings.length(report.notes) > 30}"
-                        th:text="${#strings.substring(report.notes, 0, 30) + '...'}"
-                        th:title="${report.notes}">Длинный текст...
-                  </span>
-
-                  <!-- Если примечание короткое или null -->
-                  <span th:unless="${report.notes != null and #strings.length(report.notes) > 30}"
-                        th:text="${report.notes != null ? report.notes : '-'}">Короткий текст или прочерк
-                  </span>
+                                <span th:if="${report.notes != null and #strings.length(report.notes) > 30}"
+                                      th:text="${#strings.substring(report.notes, 0, 30) + '...'}"
+                                      th:title="${report.notes}">Длинный текст...
+                                </span>
+                <span th:unless="${report.notes != null and #strings.length(report.notes) > 30}"
+                      th:text="${report.notes != null ? report.notes : '-'}">Короткий текст
+                                </span>
               </td>
               <td>
                 <button class="btn-icon view"
@@ -1014,6 +1133,20 @@
                         onclick="openLicenseModal(this.getAttribute('data-software-id'))"
                         title="Запросить лицензию">
                   <i class="fas fa-shopping-cart"></i>
+                </button>
+              </td>
+              <td>
+                <span class="status" th:classappend="${report.installationTask.status.name()}"
+                      th:text="${report.installationTask.status.getStatusName()}"
+                      th:attr="data-task-id=${report.installationTask.id}">
+                    В выполнении
+                </span>
+                <button class="btn-icon task"
+                        th:attr="data-task-id=${report.installationTask.id},
+                        data-current-status=${report.installationTask.status.name()}"
+                        onclick="openChangeStatusModal(this)"
+                        title="Изменить статус">
+                  <i class="fas fa-edit"></i>
                 </button>
               </td>
             </tr>
@@ -1058,9 +1191,7 @@
       <input type="hidden" name="requestId" id="taskRequestId">
       <input type="hidden" name="assignedBy" th:value="${user.id}">
       <div class="modal-body">
-        <div class="info-block" id="taskInfo">
-          <!-- Информация заполняется через JS -->
-        </div>
+        <div class="info-block" id="taskInfo"></div>
 
         <label for="assignedTo">Лаборант:</label>
         <select name="assignedTo" id="assignedTo" required>
@@ -1145,9 +1276,7 @@
       <h2><i class="fas fa-file-alt" style="margin-right: 10px;"></i> Детали отчета</h2>
       <button class="close-modal" onclick="closeModal('viewReportModal')">&times;</button>
     </div>
-    <div class="modal-body" id="reportContent" style="max-height: 60vh; overflow-y: auto;">
-      <!-- Содержимое будет заполнено через JavaScript -->
-    </div>
+    <div class="modal-body" id="reportContent" style="max-height: 60vh; overflow-y: auto; word-wrap: break-word; word-break: break-word; padding: 20px;"></div>
     <div style="display: flex; gap: 10px; justify-content: flex-end; padding-top: 20px; border-top: 1px solid #e2e8f0;">
       <button class="btn-primary" onclick="closeModal('viewReportModal')" style="background: #718096;">
         Закрыть
@@ -1159,28 +1288,96 @@
   </div>
 </div>
 
+<!-- Модальное окно для смены статуса поручения -->
+<div id="changeStatusModal" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2><i class="fas fa-sync-alt" style="margin-right: 10px;"></i> Изменение статуса поручения</h2>
+      <button class="close-modal" onclick="closeModal('changeStatusModal')">&times;</button>
+    </div>
+    <form th:action="@{|/hol/update-task-status|}" method="post">
+      <input type="hidden" name="taskId" id="changeStatusTaskId">
+      <input type="hidden" name="userId" th:value="${user.id}">
+      <div class="modal-body">
+        <div class="info-block" id="taskStatusInfo">
+          <!-- Информация заполняется через JS -->
+        </div>
+
+        <label for="newStatus">Новый статус:</label>
+        <select name="status" id="newStatus" class="status-select" required>
+          <option value="IN_EXECUTION">В выполнении</option>
+          <option value="DONE">Выполнено</option>
+          <option value="NOT_COMPLETED">Не выполнено</option>
+        </select>
+      </div>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button type="button" class="btn-primary" onclick="closeModal('changeStatusModal')" style="background: #718096;">
+          Отмена
+        </button>
+        <button type="submit" class="btn-primary" style="background: #48bb78;">
+          <i class="fas fa-save"></i> Сохранить
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
   // Навигация по секциям
   function showSection(sectionId) {
-      // Скрываем все секции
-      document.getElementById('dashboard-section').style.display = 'none';
-      document.getElementById('pending-requests-section').style.display = 'none';
-      document.getElementById('all-requests-section').style.display = 'none';
-      document.getElementById('active-tasks-section').style.display = 'none';
-      document.getElementById('all-tasks-section').style.display = 'none';
-      document.getElementById('reports-section').style.display = 'none';
+      const sections = [
+          'dashboard-section',
+          'pending-requests-section',
+          'all-requests-section',
+          'active-tasks-section',
+          'all-tasks-section',
+          'reports-section'
+      ];
 
-      // Показываем нужную секцию
-      document.getElementById(sectionId + '-section').style.display = 'block';
+      sections.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = 'none';
+      });
 
-      // Обновляем активный пункт меню
+      const targetSection = document.getElementById(sectionId + '-section');
+      if (targetSection) targetSection.style.display = 'block';
+
       document.querySelectorAll('.nav-item').forEach(item => {
           item.classList.remove('active');
       });
       event.currentTarget.classList.add('active');
   }
 
-  // Работа с модальными окнами
+  // Поиск по таблице
+  function filterTable(tableId, searchText) {
+      const table = document.getElementById(tableId);
+      if (!table) return;
+
+      const tbody = table.getElementsByTagName('tbody')[0];
+      if (!tbody) return;
+
+      const rows = tbody.getElementsByTagName('tr');
+      searchText = searchText.toLowerCase().trim();
+
+      for (let row of rows) {
+          if (row.cells.length === 1 && row.cells[0].colSpan > 1) {
+              row.style.display = '';
+              continue;
+          }
+
+          let found = false;
+          for (let cell of row.cells) {
+              const cellText = cell.textContent || cell.innerText;
+              if (cellText.toLowerCase().includes(searchText)) {
+                  found = true;
+                  break;
+              }
+          }
+          row.style.display = found ? '' : 'none';
+      }
+  }
+
+  // Модальные окна
   function openModal(modalId) {
       document.getElementById(modalId).style.display = 'block';
   }
@@ -1211,7 +1408,6 @@
           <p>Аудитория: №${classroom}</p>
       `;
 
-      // Устанавливаем дату по умолчанию (сегодня + 7 дней)
       const today = new Date();
       const nextWeek = new Date(today);
       nextWeek.setDate(today.getDate() + 7);
@@ -1228,7 +1424,6 @@
 
   // Открыть модалку отчета
   function openReportModal() {
-      // Устанавливаем даты по умолчанию (первый день месяца и сегодня)
       const today = new Date();
       const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
 
@@ -1238,39 +1433,48 @@
       openModal('reportModal');
   }
 
-  // Просмотр отчета из таблицы поручений (переход к отчету)
+  // Просмотр отчета из таблицы поручений
   function viewReportFromTask(button) {
       const taskId = button.getAttribute('data-task-id');
-
-      // Переключаемся на секцию отчетов
       showSection('reports');
 
-      // Немного ждем, пока секция отобразится, затем подсвечиваем строку
-      setTimeout(function() {
+      setTimeout(() => {
           highlightReportRowByTaskId(taskId);
       }, 100);
   }
 
-  // Просмотр деталей отчета из секции отчетов (открытие модалки)
+  // Просмотр деталей отчета
   function viewReportDetails(button) {
       const row = button.closest('tr');
-
-      // Собираем данные из строки таблицы
       const cells = row.getElementsByTagName('td');
+
       const reportDate = cells[0].innerText;
       const labAssistant = cells[1].innerText;
       const software = cells[2].innerText;
       const classroom = cells[3].innerText;
       const licenseRequired = cells[4].innerText;
-      const notes = cells[5].innerText;
 
-      // Получаем дополнительные данные из атрибутов
+      let notes = '';
+      const notesCell = cells[5];
+      const notesSpan = notesCell.querySelector('span');
+
+      if (notesSpan) {
+          if (notesSpan.getAttribute('title')) {
+              notes = notesSpan.getAttribute('title');
+          } else {
+              notes = notesSpan.innerText;
+          }
+      } else {
+          notes = notesCell.innerText;
+      }
+
+      notes = notes.replace(/\n/g, '<br>');
+
       const taskId = row.getAttribute('data-task-id');
       const taskCreatedAt = row.getAttribute('data-task-created');
       const taskDeadline = row.getAttribute('data-task-deadline');
       const taskStatus = row.getAttribute('data-task-status');
 
-      // Заполняем модальное окно
       const reportContent = document.getElementById('reportContent');
       reportContent.innerHTML = `
           <div style="display: flex; flex-direction: column; gap: 15px;">
@@ -1287,47 +1491,42 @@
                   <p><strong>Аудитория:</strong> ${classroom}</p>
                   ${taskCreatedAt ? `<p><strong>Дата создания поручения:</strong> ${taskCreatedAt}</p>` : ''}
                   ${taskDeadline ? `<p><strong>Срок выполнения:</strong> ${taskDeadline}</p>` : ''}
-                  ${taskStatus ? `<p><strong>Статус поручения:</strong> ${taskStatus}</p>` : ''}
+                  ${taskStatus ? `<p><strong>Статус поручения:</strong> ${getStatusName(taskStatus)}</p>` : ''}
               </div>
 
               <div style="background: #f7fafc; padding: 15px; border-radius: 10px;">
                   <h3 style="margin-bottom: 10px; color: #2d3748;">Примечания</h3>
-                  <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; max-height: 200px; overflow-y: auto;">
+                  <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;
+                              max-height: 300px; overflow-y: auto; font-family: inherit; line-height: 1.6;
+                              white-space: pre-wrap; word-wrap: break-word;">
                       ${notes || 'Нет примечаний'}
                   </div>
               </div>
           </div>
       `;
 
-      // Открываем модальное окно
       openModal('viewReportModal');
   }
 
-  // Подсветка строки отчета по taskId (для навигации из поручений)
+  // Подсветка строки отчета
   function highlightReportRowByTaskId(taskId) {
-      // Находим все строки в таблице отчетов
       const reportRows = document.querySelectorAll('#reports-section tbody tr');
 
-      // Снимаем подсветку со всех строк
       reportRows.forEach(row => {
           row.style.backgroundColor = '';
           row.style.borderLeft = '';
       });
 
-      // Ищем строку, где data-task-id совпадает
       let found = false;
       for (let row of reportRows) {
           const rowTaskId = row.getAttribute('data-task-id');
           if (rowTaskId && rowTaskId === taskId) {
-              // Подсвечиваем найденную строку
               row.style.backgroundColor = '#fff3cd';
               row.style.borderLeft = '4px solid #ffc107';
               row.style.transition = 'background-color 0.5s';
 
-              // Прокручиваем к этой строке
               row.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-              // Мигание для привлечения внимания
               let blinkCount = 0;
               const blinkInterval = setInterval(() => {
                   row.style.backgroundColor = blinkCount % 2 === 0 ? '#ffe69c' : '#fff3cd';
@@ -1346,6 +1545,57 @@
       if (!found) {
           alert('Отчет для этого поручения не найден');
       }
+  }
+
+  // Открыть модальное окно для смены статуса
+  function openChangeStatusModal(button) {
+      const taskId = button.getAttribute('data-task-id');
+      const currentStatus = button.getAttribute('data-current-status');
+
+      // Устанавливаем ID задачи
+      document.getElementById('changeStatusTaskId').value = taskId;
+
+      // Устанавливаем текущий статус в селекте
+      const statusSelect = document.getElementById('newStatus');
+      statusSelect.value = currentStatus;
+
+      // Заполняем информацию о поручении
+      const taskInfo = document.getElementById('taskStatusInfo');
+
+      // Находим строку с поручением в любой таблице
+      const taskRow = document.querySelector(`tr[data-task-id="${taskId}"]`);
+      if (taskRow) {
+          const cells = taskRow.getElementsByTagName('td');
+          const software = cells[2]?.innerText || 'Неизвестно';
+          const labAssistant = cells[1]?.innerText || 'Неизвестно';
+          const deadline = cells[0]?.innerText || 'Неизвестно';
+
+          taskInfo.innerHTML = `
+              <p><strong>Поручение #${taskId}</strong></p>
+              <p><strong>ПО:</strong> ${software}</p>
+              <p><strong>Лаборант:</strong> ${labAssistant}</p>
+              <p><strong>Текущий статус:</strong> <span class="status ${currentStatus}">${getStatusName(currentStatus)}</span></p>
+              <p><strong>Срок:</strong> ${deadline}</p>
+          `;
+      } else {
+          taskInfo.innerHTML = `<p><strong>Поручение #${taskId}</strong></p>`;
+      }
+
+      openModal('changeStatusModal');
+  }
+
+  // Получение названия статуса
+  function getStatusName(statusCode) {
+      const statuses = {
+          'DONE': 'Выполнено',
+          'NOT_COMPLETED': 'Не выполнено',
+          'IN_EXECUTION': 'В выполнении',
+          'PENDING': 'В ожидании',
+          'APPROVED': 'Утверждено',
+          'REJECTED': 'Отклонено',
+          'COMPLETED': 'Завершено'
+      };
+      return statuses[statusCode] || statusCode;
   }
 
   // Закрытие модалок по клику вне области

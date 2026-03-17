@@ -12,4 +12,9 @@ public interface InstallationReportRepository extends CrudRepository<Installatio
             "(SELECT id FROM installation_task WHERE assigned_by = :assignedBy)",
             nativeQuery = true)
     Iterable<InstallationReport> findByTaskAssignedBy(Long assignedBy);
+
+    @Query(value = "SELECT * FROM installation_report WHERE installation_task_id IN " +
+            "(SELECT id FROM installation_task WHERE assigned_to = :assignedTo)",
+            nativeQuery = true)
+    Iterable<InstallationReport> findByTaskAssignedTo(Long assignedTo);
 }

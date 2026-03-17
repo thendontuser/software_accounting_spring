@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель лаборанта - Учет ПО</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* ========== СТИЛИ (аналогичные странице зав лаба) ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon i {
+            color: white;
+            font-size: 20px;
+        }
+
+        .logo-text h1 {
+            font-size: 20px;
+            color: #2d3748;
+            font-weight: 600;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            padding: 2rem 1.5rem;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-title {
+            font-size: 12px;
+            color: #718096;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            color: #4a5568;
+            text-decoration: none;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .badge {
+            background: #e2e8f0;
+            color: #4a5568;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-left: auto;
+            font-weight: 500;
+        }
+
+        .nav-item:hover .badge {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            color: #2d3748;
+            font-weight: 700;
+        }
+
+        /* Search Bar */
+        .search-container {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-icon {
+            color: #718096;
+            font-size: 18px;
+        }
+
+        .search-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            padding: 8px 0;
+        }
+
+        .search-input::placeholder {
+            color: #a0aec0;
+        }
+
+        .search-clear {
+            color: #718096;
+            cursor: pointer;
+            font-size: 14px;
+            display: none;
+        }
+
+        .search-clear:hover {
+            color: #e53e3e;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .stat-icon.blue { background: #ebf8ff; color: #3182ce; }
+        .stat-icon.green { background: #f0fff4; color: #38a169; }
+        .stat-icon.yellow { background: #fefcbf; color: #d69e2e; }
+        .stat-icon.purple { background: #faf5ff; color: #9f7aea; }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #718096;
+        }
+
+        /* Tables */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .table-title {
+            font-size: 18px;
+            color: #2d3748;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-title i {
+            color: #667eea;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px 16px;
+            background: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+            font-size: 14px;
+            border-bottom: 2px solid #e2e8f0;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+        }
+
+        th:hover {
+            background: #edf2f7;
+        }
+
+        th i {
+            margin-left: 5px;
+            font-size: 12px;
+            color: #718096;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #2d3748;
+            font-size: 14px;
+        }
+
+        tr:hover td {
+            background: #f7fafc;
+        }
+
+        /* Скрытые строки при поиске */
+        tr.search-hidden {
+            display: none;
+        }
+
+        /* Status badges */
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status.PENDING { background: #fefcbf; color: #975a16; }
+        .status.APPROVED { background: #c6f6d5; color: #276749; }
+        .status.REJECTED { background: #fed7d7; color: #9b2c2c; }
+        .status.COMPLETED { background: #bee3f8; color: #2c5282; }
+        .status.IN_PROGRESS { background: #e9d8fd; color: #6b46c1; }
+        .status.DONE { background: #bee3f8; color: #2c5282; }
+        .status.IN_EXECUTION { background: #e9d8fd; color: #6b46c1; }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #718096;
+            font-size: 14px;
+        }
+
+        .btn-icon:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-icon.report:hover { background: #c3dafe; color: #5a67d8; }
+        .btn-icon.view:hover { background: #bee3f8; color: #3182ce; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: #2d3748;
+            font-size: 20px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #718096;
+        }
+
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-body label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .modal-body input,
+        .modal-body select,
+        .modal-body textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .modal-body textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .info-block {
+            background: #f7fafc;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .info-block p {
+            margin: 5px 0;
+            color: #4a5568;
+        }
+
+        .deadline-passed {
+            color: #e53e3e;
+            font-weight: 600;
+        }
+
+        .deadline-passed:after {
+            content: " (просрочено)";
+            font-size: 12px;
+            font-weight: normal;
+        }
+
+        /* Checkbox стилизация */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .checkbox-container label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        /* Анимация подсветки */
+        @keyframes highlight {
+            0% { background-color: #fff3cd; }
+            50% { background-color: #ffe69c; }
+            100% { background-color: #fff3cd; }
+        }
+
+        .highlight-row {
+            animation: highlight 2s ease-in-out;
+            border-left: 4px solid #ffc107 !important;
+        }
+
+        /* Сортировка */
+        .sort-asc:after {
+            content: " ↑";
+        }
+
+        .sort-desc:after {
+            content: " ↓";
+        }
+    </style>
+</head>
+<body>
+<!-- Header -->
+<header class="header">
+    <div class="logo">
+        <div class="logo-icon">
+            <i class="fas fa-flask"></i>
+        </div>
+        <div class="logo-text">
+            <h1>Учет ПО</h1>
+            <p>Лаборант</p>
+        </div>
+    </div>
+    <div class="user-info">
+        <div class="user-avatar">
+            <span th:text="${#strings.substring(user.lastName, 0, 1) + #strings.substring(user.firstName, 0, 1)}">ИИ</span>
+        </div>
+        <div>
+            <div style="font-weight: 600; color: #2d3748;"
+                 th:text="${user.lastName + ' ' + user.firstName + ' ' + user.patronymic}">
+                Иванов Иван Иванович
+            </div>
+            <div style="font-size: 12px; color: #718096;" th:text="'Кафедра: ' + ${user.kafedra.title}">
+                Кафедра информатики
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <!-- Sidebar (упрощенный для лаборанта) -->
+    <nav class="sidebar">
+        <div class="nav-section">
+            <div class="nav-title">Навигация</div>
+            <button class="nav-item active" onclick="showSection('tasks')">
+                <i class="fas fa-tasks"></i>
+                <span>Мои поручения</span>
+                <span class="badge" th:text="${#lists.size(installationTasks)}">0</span>
+            </button>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Отчеты</div>
+            <button class="nav-item" onclick="showSection('my-reports')">
+                <i class="fas fa-file-alt"></i>
+                <span>Мои отчеты</span>
+                <span class="badge" th:text="${#lists.size(myReports)}">0</span>
+            </button>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-title">Аккаунт</div>
+            <a th:href="@{/auth/logout}" class="nav-item">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Выйти</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Секция "Мои поручения" (отображается по умолчанию) -->
+        <div id="tasks-section" style="display: block;">
+            <div class="page-header">
+                <h1 class="page-title">Мои поручения</h1>
+            </div>
+
+            <!-- Статистика по поручениям -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value"
+                                 th:text="${#lists.size(installationTasks.?[status.name() == 'IN_EXECUTION'])}">2</div>
+                            <div class="stat-label">В работе</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value"
+                                 th:text="${#lists.size(installationTasks.?[status.name() == 'DONE'])}">3</div>
+                            <div class="stat-label">Завершено</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value"
+                                 th:text="${#lists.size(installationTasks.?[deadline.isBefore(T(java.time.LocalDate).now()) && status.name() != 'DONE'])}">0</div>
+                            <div class="stat-label">Просрочено</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Поисковая строка для поручений -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="taskSearch"
+                       placeholder="Поиск по номеру, ПО, аудитории, зав. лабораторией..."
+                       onkeyup="searchTable('tasks-table', 'taskSearch', 'taskNoResults')">
+                <span class="search-clear" id="taskSearchClear" onclick="clearSearch('taskSearch', 'tasks-table', 'taskNoResults')">✕</span>
+            </div>
+            <div id="taskNoResults" style="display: none; text-align: center; padding: 1rem; color: #718096;">
+                <i class="fas fa-search"></i> По вашему запросу ничего не найдено
+            </div>
+
+            <!-- Таблица поручений -->
+            <div class="table-container">
+                <div class="table-title">
+                    <i class="fas fa-clipboard-list"></i>
+                    Текущие поручения
+                </div>
+                <div class="table-responsive">
+                    <table id="tasks-table">
+                        <thead>
+                        <tr>
+                            <th onclick="sortTable('tasks-table', 0, 'number')">№ <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('tasks-table', 1, 'date')">Дата создания <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('tasks-table', 2, 'date')">Срок <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('tasks-table', 3)">ПО <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('tasks-table', 4)">Аудитория <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('tasks-table', 5)">Зав. лабораторией <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('tasks-table', 6)">Статус <i class="fas fa-sort"></i></th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <!-- Сортировка по ID (номеру) на стороне сервера или через Thymeleaf -->
+                        <tr th:each="task : ${installationTasks}" th:attr="data-task-id=${task.id}">
+                            <td th:text="${task.id}">1</td>
+                            <td th:text="${#temporals.format(task.createdAt, 'dd.MM.yyyy')}">01.03.2024</td>
+                            <td th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}"
+                                th:classappend="${task.deadline.isBefore(T(java.time.LocalDate).now()) and task.status.name() != 'DONE' ? 'deadline-passed' : ''}">
+                                10.03.2024
+                            </td>
+                            <td th:text="${task.installationRequest.software.title}">Microsoft Office</td>
+                            <td th:text="'№' + ${task.installationRequest.classroom.number}">101</td>
+                            <td th:text="${task.assignedBy.lastName + ' ' +
+                                          #strings.substring(task.assignedBy.firstName, 0, 1) + '.' +
+                                          #strings.substring(task.assignedBy.patronymic, 0, 1) + '.'}">
+                                Петров П.П.
+                            </td>
+                            <td>
+                                <span class="status" th:classappend="${task.status.name()}"
+                                      th:text="${task.status.getStatusName()}">В работе</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <!-- Кнопка отчета только для незавершенных задач -->
+                                    <button class="btn-icon report"
+                                            th:if="${task.status.name() != 'DONE'}"
+                                            th:attr="data-task-id=${task.id},
+                                                     data-software=${task.installationRequest.software.title},
+                                                     data-classroom=${task.installationRequest.classroom.number},
+                                                     data-assigned-by=${task.assignedBy.lastName + ' ' +
+                                                                       #strings.substring(task.assignedBy.firstName, 0, 1) + '.' +
+                                                                       #strings.substring(task.assignedBy.patronymic, 0, 1) + '.'}"
+                                            onclick="openReportModal(this)">
+                                        <i class="fas fa-file-alt"></i>
+                                    </button>
+                                    <!-- Кнопка просмотра отчета для завершенных задач -->
+                                    <button class="btn-icon view"
+                                            th:if="${task.status.name() == 'DONE'}"
+                                            th:attr="data-task-id=${task.id}"
+                                            onclick="viewTaskReport(this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.size(installationTasks) == 0}">
+                            <td colspan="8" style="text-align: center; color: #718096; padding: 2rem;">
+                                Нет назначенных поручений
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Секция "Мои отчеты" -->
+        <div id="my-reports-section" style="display: none;">
+            <div class="page-header">
+                <h1 class="page-title">Мои отчеты</h1>
+            </div>
+
+            <!-- Поисковая строка для отчетов -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="reportSearch"
+                       placeholder="Поиск по ПО, аудитории, комментарию..."
+                       onkeyup="searchTable('reports-table', 'reportSearch', 'reportNoResults')">
+                <span class="search-clear" id="reportSearchClear" onclick="clearSearch('reportSearch', 'reports-table', 'reportNoResults')">✕</span>
+            </div>
+            <div id="reportNoResults" style="display: none; text-align: center; padding: 1rem; color: #718096;">
+                <i class="fas fa-search"></i> По вашему запросу ничего не найдено
+            </div>
+
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table id="reports-table">
+                        <thead>
+                        <tr>
+                            <th onclick="sortTable('reports-table', 0, 'date')">Дата <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('reports-table', 1)">ПО <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('reports-table', 2)">Аудитория <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('reports-table', 3)">Нужна лицензия <i class="fas fa-sort"></i></th>
+                            <th>Комментарий</th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="report : ${myReports}"
+                            th:attr="data-report-id=${report.id}, data-task-id=${report.installationTask.id}">
+                            <td th:text="${#temporals.format(report.createdAt, 'dd.MM.yyyy')}">15.03.2024</td>
+                            <td th:text="${report.installationTask.installationRequest.software.title}">Microsoft Office</td>
+                            <td th:text="'№' + ${report.installationTask.installationRequest.classroom.number}">101</td>
+                            <td>
+                                <span th:if="${report.licenseRequired}" style="color: #e53e3e; font-weight: 600;">Да</span>
+                                <span th:unless="${report.licenseRequired}" style="color: #38a169; font-weight: 600;">Нет</span>
+                            </td>
+                            <td>
+                                <span th:if="${report.notes != null and #strings.length(report.notes) > 30}"
+                                      th:text="${#strings.substring(report.notes, 0, 30) + '...'}"
+                                      th:title="${report.notes}">Комментарий...
+                                </span>
+                                <span th:unless="${report.notes != null and #strings.length(report.notes) > 30}"
+                                      th:text="${report.notes != null ? report.notes : '-'}">-</span>
+                            </td>
+                            <td>
+                                <button class="btn-icon view"
+                                        th:attr="data-report-id=${report.id}"
+                                        onclick="viewReportDetails(this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.size(myReports) == 0}">
+                            <td colspan="6" style="text-align: center; color: #718096; padding: 2rem;">
+                                Вы еще не создавали отчеты
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Модальное окно для создания отчета по поручению -->
+<div id="reportModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Отчет о выполнении</h2>
+            <button class="close-modal" onclick="closeModal('reportModal')">&times;</button>
+        </div>
+        <form th:action="@{|/assistant/submit-report|}" method="post">
+            <input type="hidden" name="taskId" id="reportTaskId">
+            <input type="hidden" name="userId" th:value="${user.id}">
+            <div class="modal-body">
+                <!-- Детали поручения -->
+                <div class="info-block" id="taskDetails">
+                    <!-- Заполняется через JS -->
+                </div>
+
+                <!-- Чекбокс для отметки о необходимости лицензии -->
+                <div class="checkbox-container">
+                    <input type="checkbox" name="licenseRequired" id="licenseRequired">
+                    <label for="licenseRequired">
+                        <i class="fas fa-exclamation-triangle" style="color: #e53e3e; margin-right: 5px;"></i>
+                        Требуется приобретение лицензии
+                    </label>
+                </div>
+
+                <!-- Поле для комментария -->
+                <label for="notes">Комментарий о выполненной работе:</label>
+                <textarea name="notes" id="notes" placeholder="Опишите процесс установки, возникшие проблемы и результаты..."></textarea>
+
+                <!-- Подтверждение успешной установки (неявно подразумевается при отправке отчета) -->
+                <p style="font-size: 12px; color: #718096; margin-top: 10px;">
+                    <i class="fas fa-info-circle"></i>
+                    Отправка отчета подтверждает успешную установку ПО на указанные устройства
+                </p>
+            </div>
+            <button type="submit" class="btn-success" style="width: 100%;">
+                <i class="fas fa-paper-plane"></i> Отправить отчет зав. лабораторией
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно для просмотра отчета -->
+<div id="viewReportModal" class="modal">
+    <div class="modal-content" style="max-width: 600px; width: 90%;">
+        <div class="modal-header">
+            <h2><i class="fas fa-file-alt" style="margin-right: 10px;"></i> Детали отчета</h2>
+            <button class="close-modal" onclick="closeModal('viewReportModal')">&times;</button>
+        </div>
+        <div class="modal-body" id="reportContent" style="max-height: 60vh; overflow-y: auto; padding: 20px; word-wrap: break-word; word-break: break-word;">
+            <!-- Содержимое будет заполнено через JavaScript -->
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: flex-end; padding: 20px; border-top: 1px solid #e2e8f0;">
+            <button class="btn-primary" onclick="closeModal('viewReportModal')" style="background: #718096;">
+                Закрыть
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Текущие настройки сортировки
+    let currentSort = {
+        table: null,
+        column: null,
+        direction: 'asc'
+    };
+
+    // Навигация по секциям
+    function showSection(sectionId) {
+        // Скрываем все секции
+        document.getElementById('tasks-section').style.display = 'none';
+        document.getElementById('my-reports-section').style.display = 'none';
+
+        // Показываем нужную секцию
+        document.getElementById(sectionId + '-section').style.display = 'block';
+
+        // Обновляем активный пункт меню
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        event.currentTarget.classList.add('active');
+    }
+
+    // Работа с модальными окнами
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'block';
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+    }
+
+    // Открыть модальное окно для создания отчета
+    function openReportModal(button) {
+        const taskId = button.getAttribute('data-task-id');
+        const software = button.getAttribute('data-software');
+        const classroom = button.getAttribute('data-classroom');
+        const assignedBy = button.getAttribute('data-assigned-by');
+
+        document.getElementById('reportTaskId').value = taskId;
+        document.getElementById('taskDetails').innerHTML = `
+            <p><strong>Поручение #${taskId}</strong></p>
+            <p><i class="fas fa-cube" style="margin-right: 5px;"></i> ПО: ${software}</p>
+            <p><i class="fas fa-door-open" style="margin-right: 5px;"></i> Аудитория: №${classroom}</p>
+            <p><i class="fas fa-user-tie" style="margin-right: 5px;"></i> Зав. лабораторией: ${assignedBy}</p>
+        `;
+
+        // Очищаем поля формы
+        document.getElementById('licenseRequired').checked = false;
+        document.getElementById('notes').value = '';
+
+        openModal('reportModal');
+    }
+
+    // Просмотр отчета по задаче (для завершенных задач) с подсветкой
+    function viewTaskReport(button) {
+        const taskId = button.getAttribute('data-task-id');
+
+        // Переключаемся на секцию отчетов
+        showSection('my-reports');
+
+        // Подсвечиваем соответствующий отчет
+        setTimeout(function() {
+            highlightReportRowByTaskId(taskId);
+        }, 100);
+    }
+
+    // Подсветка строки отчета по taskId (как на странице зав лаба)
+    function highlightReportRowByTaskId(taskId) {
+        // Находим все строки в таблице отчетов
+        const reportRows = document.querySelectorAll('#reports-table tbody tr');
+
+        // Снимаем подсветку со всех строк
+        reportRows.forEach(row => {
+            row.style.backgroundColor = '';
+            row.style.borderLeft = '';
+        });
+
+        // Ищем строку, где data-task-id совпадает
+        let found = false;
+        for (let row of reportRows) {
+            const rowTaskId = row.getAttribute('data-task-id');
+            if (rowTaskId && rowTaskId === taskId) {
+                // Подсвечиваем найденную строку
+                row.style.backgroundColor = '#fff3cd';
+                row.style.borderLeft = '4px solid #ffc107';
+                row.style.transition = 'background-color 0.5s';
+
+                // Прокручиваем к этой строке
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                // Мигание для привлечения внимания
+                let blinkCount = 0;
+                const blinkInterval = setInterval(() => {
+                    row.style.backgroundColor = blinkCount % 2 === 0 ? '#ffe69c' : '#fff3cd';
+                    blinkCount++;
+                    if (blinkCount >= 6) {
+                        clearInterval(blinkInterval);
+                        row.style.backgroundColor = '#fff3cd';
+                    }
+                }, 300);
+
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            alert('Отчет для этого поручения не найден');
+        }
+    }
+
+    // Просмотр деталей отчета
+    function viewReportDetails(button) {
+        const row = button.closest('tr');
+        const cells = row.getElementsByTagName('td');
+
+        const reportDate = cells[0].innerText;
+        const software = cells[1].innerText;
+        const classroom = cells[2].innerText;
+        const licenseRequired = cells[3].innerText;
+
+        // Получаем полный текст комментария из атрибута title или из ячейки
+        let notes = '';
+        const notesCell = cells[4];
+        const notesSpan = notesCell.querySelector('span');
+
+        if (notesSpan && notesSpan.getAttribute('title')) {
+            notes = notesSpan.getAttribute('title');
+        } else if (notesSpan && notesSpan.innerText) {
+            notes = notesSpan.innerText;
+        } else {
+            notes = notesCell.innerText;
+        }
+
+        // Заменяем переносы строк на HTML теги для правильного отображения
+        notes = notes.replace(/\n/g, '<br>');
+
+        const reportContent = document.getElementById('reportContent');
+        reportContent.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div style="background: #f7fafc; padding: 15px; border-radius: 10px;">
+                    <h3 style="margin-bottom: 10px; color: #2d3748;">Информация об отчете</h3>
+                    <p><strong>Дата отчета:</strong> ${reportDate}</p>
+                    <p><strong>Требуется лицензия:</strong> ${licenseRequired}</p>
+                </div>
+
+                <div style="background: #f7fafc; padding: 15px; border-radius: 10px;">
+                    <h3 style="margin-bottom: 10px; color: #2d3748;">Детали установки</h3>
+                    <p><strong>Программное обеспечение:</strong> ${software}</p>
+                    <p><strong>Аудитория:</strong> ${classroom}</p>
+                </div>
+
+                <div style="background: #f7fafc; padding: 15px; border-radius: 10px;">
+                    <h3 style="margin-bottom: 10px; color: #2d3748;">Комментарий</h3>
+                    <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;
+                                max-height: 300px; overflow-y: auto; font-family: inherit; line-height: 1.5;
+                                white-space: pre-wrap; word-wrap: break-word; word-break: break-word;">
+                        ${notes || 'Нет комментария'}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        openModal('viewReportModal');
+    }
+
+    // Функция поиска по таблице
+    function searchTable(tableId, inputId, noResultsId) {
+        const input = document.getElementById(inputId);
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById(tableId);
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        const clearBtn = document.getElementById(inputId + 'Clear');
+        const noResults = document.getElementById(noResultsId);
+
+        let visibleCount = 0;
+
+        // Показываем кнопку очистки если есть текст
+        if (filter.length > 0) {
+            clearBtn.style.display = 'inline';
+        } else {
+            clearBtn.style.display = 'none';
+        }
+
+        // Проходим по всем строкам таблицы (кроме последней, если это строка "Нет данных")
+        for (let i = 0; i < rows.length; i++) {
+            // Пропускаем строку с сообщением об отсутствии данных
+            if (rows[i].cells.length === 1 && rows[i].cells[0].colSpan > 1) {
+                continue;
+            }
+
+            let found = false;
+            // Ищем по всем ячейкам строки (кроме последней с действиями)
+            for (let j = 0; j < rows[i].cells.length - 1; j++) {
+                const cell = rows[i].cells[j];
+                if (cell) {
+                    const textValue = cell.textContent || cell.innerText;
+                    if (textValue.toLowerCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+
+            if (found) {
+                rows[i].classList.remove('search-hidden');
+                visibleCount++;
+            } else {
+                rows[i].classList.add('search-hidden');
+            }
+        }
+
+        // Показываем сообщение, если ничего не найдено
+        if (visibleCount === 0) {
+            noResults.style.display = 'block';
+        } else {
+            noResults.style.display = 'none';
+        }
+    }
+
+    // Очистка поиска
+    function clearSearch(inputId, tableId, noResultsId) {
+        document.getElementById(inputId).value = '';
+        document.getElementById(inputId + 'Clear').style.display = 'none';
+        document.getElementById(noResultsId).style.display = 'none';
+
+        const table = document.getElementById(tableId);
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            rows[i].classList.remove('search-hidden');
+        }
+    }
+
+    // Сортировка таблицы
+    function sortTable(tableId, column, type = 'string') {
+        const table = document.getElementById(tableId);
+        const tbody = table.getElementsByTagName('tbody')[0];
+        const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+        // Фильтруем строки, исключая строку "Нет данных"
+        const dataRows = rows.filter(row => !(row.cells.length === 1 && row.cells[0].colSpan > 1));
+
+        // Определяем направление сортировки
+        let direction = 'asc';
+        if (currentSort.table === tableId && currentSort.column === column) {
+            direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        }
+
+        // Сортируем строки
+        dataRows.sort((a, b) => {
+            let aVal = a.cells[column].textContent.trim();
+            let bVal = b.cells[column].textContent.trim();
+
+            // Специальная обработка для разных типов
+            if (type === 'number') {
+                // Извлекаем число (для номера поручения)
+                aVal = parseInt(aVal) || 0;
+                bVal = parseInt(bVal) || 0;
+            } else if (type === 'date') {
+                // Конвертируем дату ДД.ММ.ГГГГ в сравнимый формат
+                aVal = convertDateToComparable(aVal);
+                bVal = convertDateToComparable(bVal);
+            } else {
+                // Для строк - сравниваем в нижнем регистре
+                aVal = aVal.toLowerCase();
+                bVal = bVal.toLowerCase();
+            }
+
+            if (direction === 'asc') {
+                if (aVal < bVal) return -1;
+                if (aVal > bVal) return 1;
+                return 0;
+            } else {
+                if (aVal > bVal) return -1;
+                if (aVal < bVal) return 1;
+                return 0;
+            }
+        });
+
+        // Перестраиваем tbody
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+        }
+
+        dataRows.forEach(row => tbody.appendChild(row));
+
+        // Добавляем обратно строку "Нет данных", если она была
+        const noDataRow = rows.find(row => row.cells.length === 1 && row.cells[0].colSpan > 1);
+        if (noDataRow) {
+            tbody.appendChild(noDataRow);
+        }
+
+        // Обновляем иконки сортировки
+        updateSortIcons(tableId, column, direction);
+
+        // Сохраняем текущую сортировку
+        currentSort = {
+            table: tableId,
+            column: column,
+            direction: direction
+        };
+    }
+
+    // Конвертация даты из формата ДД.ММ.ГГГГ в сравнимый формат (ГГГГММДД)
+    function convertDateToComparable(dateStr) {
+        const parts = dateStr.split('.');
+        if (parts.length === 3) {
+            return parts[2] + parts[1] + parts[0];
+        }
+        return dateStr;
+    }
+
+    // Обновление иконок сортировки
+    function updateSortIcons(tableId, activeColumn, direction) {
+        const headers = document.querySelectorAll(`#${tableId} th`);
+        headers.forEach((header, index) => {
+            const icon = header.querySelector('i');
+            if (icon) {
+                if (index === activeColumn) {
+                    icon.className = direction === 'asc' ? 'fas fa-sort-up' : 'fas fa-sort-down';
+                } else {
+                    icon.className = 'fas fa-sort';
+                }
+            }
+        });
+    }
+
+    // Закрытие модалок по клику вне области
+    window.onclick = function(event) {
+        if (event.target.classList.contains('modal')) {
+            event.target.style.display = 'none';
+        }
+    }
+
+    // Инициализация сортировки по номеру при загрузке страницы
+    window.onload = function() {
+        // Сортируем таблицу поручений по номеру (по умолчанию)
+        setTimeout(() => {
+            sortTable('tasks-table', 0, 'number');
+        }, 100);
+    }
+</script>
+</body>
+</html>
