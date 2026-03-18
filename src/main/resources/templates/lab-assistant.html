@@ -691,38 +691,45 @@
                         </thead>
                         <tbody>
                         <!-- Сортировка по ID (номеру) на стороне сервера или через Thymeleaf -->
-                        <tr th:each="task : ${installationTasks}" th:attr="data-task-id=${task.id}">
+                        <tr th:each="task : ${installationTasks}"
+                            th:attr="data-task-id=${task.id}">
                             <td th:text="${task.id}">1</td>
                             <td th:text="${#temporals.format(task.createdAt, 'dd.MM.yyyy')}">01.03.2024</td>
-                            <td th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}"
-                                th:classappend="${task.deadline.isBefore(T(java.time.LocalDate).now()) and task.status.name() != 'DONE' ? 'deadline-passed' : ''}">
-                                10.03.2024
-                            </td>
+                            <td th:text="${#temporals.format(task.deadline, 'dd.MM.yyyy')}">10.03.2024</td>
                             <td th:text="${task.installationRequest.software.title}">Microsoft Office</td>
                             <td th:text="'№' + ${task.installationRequest.classroom.number}">101</td>
                             <td th:text="${task.assignedBy.lastName + ' ' +
-                                          #strings.substring(task.assignedBy.firstName, 0, 1) + '.' +
-                                          #strings.substring(task.assignedBy.patronymic, 0, 1) + '.'}">
-                                Петров П.П.
-                            </td>
+                                  #strings.substring(task.assignedBy.firstName, 0, 1) + '.' +
+                                  #strings.substring(task.assignedBy.patronymic, 0, 1) + '.'}">Петров П.П.</td>
                             <td>
                                 <span class="status" th:classappend="${task.status.name()}"
-                                      th:text="${task.status.getStatusName()}">В работе</span>
-                            </td>
+                                      th:text="${task.status.getStatusName()}">В работе</span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <!-- Кнопка отчета только для незавершенных задач -->
+                                    <!-- Кнопка отчета для незавершенных задач -->
                                     <button class="btn-icon report"
                                             th:if="${task.status.name() != 'DONE'}"
                                             th:attr="data-task-id=${task.id},
-                                                     data-software=${task.installationRequest.software.title},
-                                                     data-classroom=${task.installationRequest.classroom.number},
-                                                     data-assigned-by=${task.assignedBy.lastName + ' ' +
-                                                                       #strings.substring(task.assignedBy.firstName, 0, 1) + '.' +
-                                                                       #strings.substring(task.assignedBy.patronymic, 0, 1) + '.'}"
+                             data-software=${task.installationRequest.software.title},
+                             data-classroom=${task.installationRequest.classroom.number},
+                             data-assigned-by=${task.assignedBy.lastName + ' ' +
+                                               #strings.substring(task.assignedBy.firstName, 0, 1) + '.' +
+                                               #strings.substring(task.assignedBy.patronymic, 0, 1) + '.'}"
                                             onclick="openReportModal(this)">
                                         <i class="fas fa-file-alt"></i>
                                     </button>
+
+                                    <!-- Кнопка для отметки устройств -->
+                                    <button class="btn-icon"
+                                            th:if="${task.status.name() != 'DONE'}"
+                                            style="color: #48bb78;"
+                                            th:attr="data-task-id=${task.id},
+                                            data-software=${task.installationRequest.software.title},
+                                            data-classroom=${task.installationRequest.classroom.number}"
+                                            onclick="openDevicesModalFromContainer(this)">
+                                        <i class="fas fa-laptop"></i>
+                                    </button>
+
                                     <!-- Кнопка просмотра отчета для завершенных задач -->
                                     <button class="btn-icon view"
                                             th:if="${task.status.name() == 'DONE'}"
@@ -740,6 +747,22 @@
                         </tr>
                         </tbody>
                     </table>
+
+                    <!-- Скрытый контейнер с данными об устройствах - С ПРОВЕРКОЙ -->
+                    <div style="display: none;" id="devices-data-container">
+                        <th:block th:each="task : ${installationTasks}">
+                            <div th:attr="data-task-id=${task.id}">
+                                <!-- Используем ?: для подстраховки от null -->
+                                <th:block th:each="device : ${taskDevices[task.id] ?: {}}">
+                                    <span th:text="${device.id} + ':' + ${device.title}"
+                                          th:attr="data-device-id=${device.id}, data-device-title=${device.title}"
+                                          class="device-item">
+                                    </span>
+                                </th:block>
+                            </div>
+                        </th:block>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -871,6 +894,49 @@
                 Закрыть
             </button>
         </div>
+    </div>
+</div>
+
+<!-- Модальное окно для отметки устройств -->
+<div id="devicesModal" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-laptop" style="margin-right: 10px; color: #48bb78;"></i> Установка на устройства</h2>
+            <button class="close-modal" onclick="closeModal('devicesModal')">&times;</button>
+        </div>
+        <form th:action="@{|/assistant/confirm-devices|}" method="post">
+            <input type="hidden" name="taskId" id="modalTaskId"> <!-- Изменено с deviceTaskId на modalTaskId -->
+            <input type="hidden" name="userId" th:value="${user.id}">
+            <div class="modal-body">
+                <!-- Информация о поручении -->
+                <div class="info-block" id="modalTaskInfo"> <!-- Изменено с deviceTaskInfo на modalTaskInfo -->
+                    <!-- Заполняется через JS -->
+                </div>
+
+                <!-- Контейнер для списка устройств -->
+                <div id="devicesListContainer">
+                    <div style="text-align: center; padding: 2rem;">
+                        <i class="fas fa-spinner fa-spin"></i> Загрузка устройств...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопки управления -->
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn-primary" onclick="selectAllDevices()"
+                        style="flex: 1; background: #4a5568;">
+                    <i class="fas fa-check-double"></i> Выбрать все
+                </button>
+                <button type="button" class="btn-primary" onclick="deselectAllDevices()"
+                        style="flex: 1; background: #718096;">
+                    <i class="fas fa-times"></i> Очистить
+                </button>
+            </div>
+
+            <button type="submit" class="btn-success" style="width: 100%; margin-top: 15px;" id="submitDevicesBtn">
+                <i class="fas fa-check-circle"></i> Подтвердить установку
+            </button>
+        </form>
     </div>
 </div>
 
@@ -1202,6 +1268,171 @@
                 }
             }
         });
+    }
+
+    // Обновление счетчика выбранных устройств
+    function updateSelectedCount() {
+        const checkboxes = document.querySelectorAll('#devicesListContainer input[name="deviceIds"]');
+        const selected = document.querySelectorAll('#devicesListContainer input[name="deviceIds"]:checked');
+        const countSpan = document.getElementById('selectedCount');
+
+        if (countSpan) {
+            countSpan.innerHTML = `Выбрано: ${selected.length} из ${checkboxes.length}`;
+        }
+    }
+
+    // Выбрать все устройства
+    function selectAllDevices() {
+        const checkboxes = document.querySelectorAll('#devicesListContainer input[name="deviceIds"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = true;
+        });
+        updateSelectedCount();
+    }
+
+    // Очистить выбор устройств
+    function deselectAllDevices() {
+        const checkboxes = document.querySelectorAll('#devicesListContainer input[name="deviceIds"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        updateSelectedCount();
+    }
+
+    function renderDevicesList(container, devices) {
+        if (!devices || devices.length === 0) {
+            showNoDevicesMessage(container);
+            return;
+        }
+
+        let devicesHtml = `
+            <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #4a5568;">
+                Выберите устройства, на которые успешно установлено ПО:
+            </label>
+            <div style="max-height: 300px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 1rem;">
+        `;
+
+        devices.forEach(device => {
+            devicesHtml += `
+                <div style="padding: 8px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox"
+                           name="deviceIds"
+                           value="${device.id}"
+                           id="device_${device.id}"
+                           style="width: 18px; height: 18px; cursor: pointer;">
+                    <label for="device_${device.id}"
+                           style="cursor: pointer; display: flex; align-items: center; gap: 8px; flex: 1;">
+                        <i class="fas fa-desktop" style="color: #667eea;"></i>
+                        <span style="color: #2d3748; font-size: 14px;">${device.title || 'Компьютер'}</span>
+                    </label>
+                </div>
+            `;
+        });
+
+        devicesHtml += '</div>';
+
+        devicesHtml += `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: #718096;">
+                <span><i class="fas fa-info-circle"></i> Отметьте устройства, на которые выполнена установка</span>
+                <span id="selectedCount">Выбрано: 0</span>
+            </div>
+        `;
+
+        container.innerHTML = devicesHtml;
+
+        // Добавляем обработчики для подсчета выбранных
+        document.querySelectorAll('#devicesListContainer input[name="deviceIds"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updateSelectedCount);
+        });
+
+        // Обновляем счетчик
+        updateSelectedCount();
+
+        const submitBtn = document.getElementById('submitDevicesBtn');
+        if (submitBtn) submitBtn.disabled = false;
+    }
+
+    function showNoDevicesMessage(container) {
+        container.innerHTML = `
+            <div style="text-align: center; color: #718096; padding: 2rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                <p>В этой аудитории нет устройств</p>
+            </div>
+        `;
+        const submitBtn = document.getElementById('submitDevicesBtn');
+        if (submitBtn) submitBtn.disabled = true;
+    }
+
+    // Новая функция для открытия модального окна с устройствами из контейнера
+    function openDevicesModalFromContainer(button) {
+        console.log('Opening devices modal from container');
+
+        const taskId = button.getAttribute('data-task-id');
+        const software = button.getAttribute('data-software');
+        const classroom = button.getAttribute('data-classroom');
+
+        console.log('Task ID:', taskId);
+
+        const modalTaskId = document.getElementById('modalTaskId');
+        const modalTaskInfo = document.getElementById('modalTaskInfo');
+
+        if (!modalTaskId || !modalTaskInfo) {
+            console.error('Modal elements not found!');
+            return;
+        }
+
+        modalTaskId.value = taskId;
+
+        modalTaskInfo.innerHTML = `
+            <p><strong>Поручение #${taskId}</strong></p>
+            <p><i class="fas fa-cube" style="margin-right: 5px;"></i> ПО: ${software}</p>
+            <p><i class="fas fa-door-open" style="margin-right: 5px;"></i> Аудитория: №${classroom}</p>
+        `;
+
+        // Находим контейнер с устройствами для этой задачи
+        const deviceContainer = document.querySelector(`#devices-data-container div[data-task-id="${taskId}"]`);
+        const container = document.getElementById('devicesListContainer');
+
+        if (!deviceContainer) {
+            console.log('No devices container found for task:', taskId);
+            container.innerHTML = `
+                <div style="text-align: center; color: #718096; padding: 2rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                    <p>В этой аудитории нет устройств</p>
+                </div>
+            `;
+            const submitBtn = document.getElementById('submitDevicesBtn');
+            if (submitBtn) submitBtn.disabled = true;
+            openModal('devicesModal');
+            return;
+        }
+
+        const deviceSpans = deviceContainer.querySelectorAll('.device-item');
+        const devices = [];
+
+        deviceSpans.forEach(span => {
+            devices.push({
+                id: span.getAttribute('data-device-id'),
+                title: span.getAttribute('data-device-title') || 'Компьютер'
+            });
+        });
+
+        console.log('Found devices:', devices);
+
+        if (devices.length > 0) {
+            renderDevicesList(container, devices);
+        } else {
+            container.innerHTML = `
+                <div style="text-align: center; color: #718096; padding: 2rem; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
+                    <p>В этой аудитории нет устройств</p>
+                </div>
+            `;
+            const submitBtn = document.getElementById('submitDevicesBtn');
+            if (submitBtn) submitBtn.disabled = true;
+        }
+
+        openModal('devicesModal');
     }
 
     // Закрытие модалок по клику вне области

@@ -9,21 +9,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import ru.thendont.software_accounting.entity.InstallationReport;
-import ru.thendont.software_accounting.entity.InstallationTask;
-import ru.thendont.software_accounting.entity.User;
+import ru.thendont.software_accounting.entity.*;
 import ru.thendont.software_accounting.error.ErrorHandler;
-import ru.thendont.software_accounting.service.InstallationReportService;
-import ru.thendont.software_accounting.service.InstallationTaskService;
-import ru.thendont.software_accounting.service.UserService;
+import ru.thendont.software_accounting.service.*;
 import ru.thendont.software_accounting.service.email.EmailService;
 import ru.thendont.software_accounting.service.enums.Urls;
 import ru.thendont.software_accounting.util.ConstantStrings;
 import ru.thendont.software_accounting.util.Util;
 
-import java.time.LocalDate;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Controller
 @RequestMapping("/assistant")
@@ -44,6 +38,12 @@ public class LabAssistantController {
     private InstallationReportService installationReportService;
 
     @Autowired
+    private SoftwareInstallationService softwareInstallationService;
+
+    @Autowired
+    private DeviceService deviceService;
+
+    @Autowired
     private EmailService emailService;
 
     @GetMapping("/dashboard")
@@ -55,9 +55,16 @@ public class LabAssistantController {
             List<InstallationTask> installationTasks = installationTaskService.findByAssignedTo(user);
             List<InstallationReport> myReports = installationReportService.findByTaskAssignedTo(user);
 
+            Map<Long, List<Device>> taskDevices = new HashMap<>();
+            for (InstallationTask task : installationTasks) {
+                List<Device> devices = task.getInstallationRequest().getClassroom().getDevices();
+                taskDevices.put(task.getId(), devices);
+            }
+
             model.addAttribute("user", user);
             model.addAttribute("installationTasks", installationTasks);
             model.addAttribute("myReports", myReports);
+            model.addAttribute("taskDevices", taskDevices);
 
             return "lab-assistant";
         }
@@ -99,6 +106,33 @@ public class LabAssistantController {
         catch (MailException ex) {
             logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
             return ErrorHandler.errorPage(ConstantStrings.EMAIL_ERROR_TITLE, ConstantStrings.EMAIL_ERROR_MESSAGE, model);
+        }
+    }
+
+    @PostMapping("/confirm-devices")
+    public String confirmDevices(@RequestParam Long taskId,
+                                 @RequestParam Long userId,
+                                 @RequestParam(value = "deviceIds", required = false) List<Long> deviceIds,
+                                 Model model) {
+        try {
+            if (deviceIds != null) {
+                InstallationTask installationTask = installationTaskService.findById(taskId).orElseThrow();
+                User user = userService.findById(userId).orElseThrow();
+                Software software = installationTask.getInstallationRequest().getSoftware();
+
+                for (Long deviceId : deviceIds) {
+                    Device device = deviceService.findById(deviceId).orElseThrow();
+                    SoftwareInstallation softwareInstallation = new SoftwareInstallation(
+                            null, software, device, user, Util.getCurrentDate()
+                    );
+                    softwareInstallationService.save(softwareInstallation);
+                }
+            }
+            return Urls.LABORATORY_ASSISTANT.getUrlString() + userId;
+        }
+        catch (NoSuchElementException ex) {
+            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
+            return ErrorHandler.errorPage(ConstantStrings.OBJECT_NOT_FOUND_TITLE, ConstantStrings.OBJECT_NOT_FOUND_MESSAGE, model);
         }
     }
 }
