@@ -260,9 +260,6 @@ public class ReportService {
         table.addHeaderCell(new Cell().add(new Paragraph("ПО"))
                 .setBold()
                 .setFont(font));
-        table.addHeaderCell(new Cell().add(new Paragraph("Версия"))
-                .setBold()
-                .setFont(font));
         table.addHeaderCell(new Cell().add(new Paragraph("Устройство"))
                 .setBold()
                 .setFont(font));
@@ -278,8 +275,6 @@ public class ReportService {
             table.addCell(new Cell().add(new Paragraph(String.valueOf(i++))
                     .setFont(font)));
             table.addCell(new Cell().add(new Paragraph(inst.getSoftware().getTitle())
-                    .setFont(font)));
-            table.addCell(new Cell().add(new Paragraph(inst.getSoftware().getVersion())
                     .setFont(font)));
             table.addCell(new Cell().add(new Paragraph(inst.getDevice().getTitle())
                     .setFont(font)));
