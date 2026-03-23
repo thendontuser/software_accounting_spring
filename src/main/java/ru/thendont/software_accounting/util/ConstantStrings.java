@@ -27,4 +27,6 @@ public final class ConstantStrings {
     public static final String INSTALLATION_TASK = "Поручение по установке ПО в аудиторию";
 
     public static final String REGISTER_IN_SYSTEM = "Регистрация в системе";
+
+    public static final String PDF_CREATE_ERROR = "Ошибка при создании PDF";
 }

@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.LicenseRequest;
 import ru.thendont.software_accounting.repository.LicenseRequestRepository;
+import ru.thendont.software_accounting.service.enums.LicenseRequestStatus;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,5 +29,9 @@ public class LicenseRequestService {
 
     public void deleteById(Long id) {
         licenseRequestRepository.deleteById(id);
+    }
+
+    public List<LicenseRequest> findByStatus(LicenseRequestStatus status) {
+        return (List<LicenseRequest>) licenseRequestRepository.findByStatus(status);
     }
 }

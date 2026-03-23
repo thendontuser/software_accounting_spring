@@ -6,6 +6,7 @@ import ru.thendont.software_accounting.entity.License;
 import ru.thendont.software_accounting.repository.LicenseRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,5 +34,13 @@ public class LicenseService {
 
     public BigDecimal getTotalCost() {
         return licenseRepository.getTotalCost();
+    }
+
+    public List<License> findExpiringLicenses() {
+        return (List<License>) licenseRepository.findExpiringLicenses();
+    }
+
+    public LocalDate extendEnd(License license, int months) {
+        return licenseRepository.extendEnd(license.getId(), months);
     }
 }

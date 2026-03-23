@@ -2,6 +2,7 @@ package ru.thendont.software_accounting.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.thendont.software_accounting.entity.License;
 import ru.thendont.software_accounting.entity.Purchase;
 import ru.thendont.software_accounting.repository.PurchaseRepository;
 
@@ -28,5 +29,9 @@ public class PurchaseService {
 
     public void deleteById(Long id) {
         purchaseRepository.deleteById(id);
+    }
+
+    public Optional<Purchase> findByLicense(License license) {
+        return purchaseRepository.findByLicense(license);
     }
 }

@@ -16,7 +16,9 @@ import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.*;
 import ru.thendont.software_accounting.service.InstallationRequestService;
 import ru.thendont.software_accounting.service.InstallationTaskService;
+import ru.thendont.software_accounting.service.PurchaseService;
 import ru.thendont.software_accounting.service.SoftwareInstallationService;
+import ru.thendont.software_accounting.util.ConstantStrings;
 import ru.thendont.software_accounting.util.Util;
 
 import java.io.ByteArrayOutputStream;
@@ -29,6 +31,9 @@ import java.util.List;
 public class ReportService {
 
     @Autowired
+    private PurchaseService purchaseService;
+
+    @Autowired
     private InstallationRequestService installationRequestService;
 
     @Autowired
@@ -38,6 +43,84 @@ public class ReportService {
     private SoftwareInstallationService softwareInstallationService;
 
     private PdfFont font;
+
+    public byte[] generatePurchaseReport(User user) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try {
+            font = getFont();
+
+            PdfWriter writer = new PdfWriter(baos);
+            PdfDocument pdf = new PdfDocument(writer);
+            Document document = new Document(pdf);
+
+            document.add(new Paragraph("Отчет по закупкам лицензий")
+                    .setFontSize(18)
+                    .setBold()
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFont(font));
+
+            document.add(new Paragraph("Сформировал: " + user.getLastName() + " " + user.getFirstName() + " " +
+                    user.getPatronymic())
+                    .setFontSize(10)
+                    .setMarginBottom(20)
+                    .setFont(font));
+
+            List<Purchase> purchases = purchaseService.findAll();
+            if (purchases.isEmpty()) {
+                document.add(new Paragraph("Список закупок лицензий пуст")
+                        .setFont(font));
+            }
+
+            Table table = new Table(UnitValue.createPercentArray(new float[]{2, 2, 3, 2, 3}));
+            table.setWidth(UnitValue.createPercentValue(100));
+
+            table.addHeaderCell(new Cell().add(new Paragraph("Менеджер"))
+                    .setBold()
+                    .setFont(font));
+            table.addHeaderCell(new Cell().add(new Paragraph("Дата"))
+                    .setBold()
+                    .setFont(font));
+            table.addHeaderCell(new Cell().add(new Paragraph("Контрактный номер"))
+                    .setBold()
+                    .setFont(font));
+            table.addHeaderCell(new Cell().add(new Paragraph("Стоимость"))
+                    .setBold()
+                    .setFont(font));
+            table.addHeaderCell(new Cell().add(new Paragraph("Лицензия"))
+                    .setBold()
+                    .setFont(font));
+
+            for (Purchase purchase : purchases) {
+                table.addCell(new Cell().add(new Paragraph(Util.getUserInitials(user))
+                        .setFont(font)));
+                table.addCell(new Cell().add(new Paragraph(purchase.getBoughtAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+                        .setFont(font)));
+                table.addCell(new Cell().add(new Paragraph(purchase.getContractNumber())
+                        .setFont(font)));
+                table.addCell(new Cell().add(new Paragraph(purchase.getCost().toString() + " руб.")
+                        .setFont(font)));
+                table.addCell(new Cell().add(new Paragraph(purchase.getLicense().getSoftware().getTitle() +
+                        " " + purchase.getLicense().getSoftware().getVersion() + " - " + purchase.getLicense().getType())
+                        .setFont(font)));
+            }
+
+            document.add(table);
+
+            document.add(new Paragraph("\n\nОтчет сгенерирован: " +
+                    Util.getCurrentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+                    .setFontSize(8)
+                    .setTextAlignment(TextAlignment.RIGHT)
+                    .setFont(font));
+
+            document.close();
+        }
+        catch (Exception ex) {
+            throw new RuntimeException(ConstantStrings.PDF_CREATE_ERROR, ex);
+        }
+
+        return baos.toByteArray();
+    }
 
     public byte[] generateReport(User user, String type, LocalDate dateFrom, LocalDate dateTo) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -93,7 +176,7 @@ public class ReportService {
             document.close();
         }
         catch (Exception ex) {
-            throw new RuntimeException("Ошибка при создании PDF", ex);
+            throw new RuntimeException(ConstantStrings.PDF_CREATE_ERROR, ex);
         }
 
         return baos.toByteArray();

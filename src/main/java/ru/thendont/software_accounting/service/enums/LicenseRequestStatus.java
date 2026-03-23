@@ -6,9 +6,7 @@ public enum LicenseRequestStatus implements Statusable {
 
     PENDING("В рассмотрении"),
 
-    APPROVED("Одобено"),
-
-    REJECTED("Отклонено");
+    APPROVED("Одобено");
 
     private final String statusName;
 
