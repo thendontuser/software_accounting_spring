@@ -26,6 +26,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * Контроллер панели sam-менеджера(менеджер по управлению программными активами)
+ * @author thendont
+ * @version 1.0
+ */
 @Controller
 @RequestMapping("/manager")
 public class SamManagerPageController {
@@ -56,6 +61,12 @@ public class SamManagerPageController {
     @Autowired
     private EmailService emailService;
 
+    /**
+     * Отображает html-страницу личного кабинета
+     * @param userId идентификатор пользователя, осуществившего вход на страницу
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы sam-менеджера
+     */
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
         try {
@@ -91,6 +102,19 @@ public class SamManagerPageController {
         }
     }
 
+    /**
+     * Метод покупки лицензии. Создает новую запись в таблице покупок
+     * @param requestId идентификатор заявки на закупку лицензии
+     * @param boughtBy идентификатор пользователя, осуществляющего покупку
+     * @param licenseId идентификатор лицензии
+     * @param amount количество лицензий
+     * @param contractNumber контрактный номер покупки
+     * @param dateBegin дата начачла дейтсвия лицензии
+     * @param dateEnd дата окончания действия лицензии
+     * @param totalCost общая стоимость покупки
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Url-адрес страницы sam-менеджера
+     */
     @PostMapping("/purchase/create")
     public String buyLicense(@RequestParam Long requestId,
                              @RequestParam Long boughtBy,
@@ -137,6 +161,15 @@ public class SamManagerPageController {
         }
     }
 
+    /**
+     * Метод продления действия лицензии
+     * @param licenseId идентификатор лицензии
+     * @param userId идентийикатор пользователя, продляющего лицензию
+     * @param durationMonths количество месяцев, на которое продляется лицензия
+     * @param contractNumber контрактный номер
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Url-адрес страницы sam-менеджера
+     */
     @PostMapping("/renewal/create")
     public String renewalLicense(@RequestParam Long licenseId,
                                  @RequestParam Long userId,
@@ -161,6 +194,11 @@ public class SamManagerPageController {
         }
     }
 
+    /**
+     * Метод генерации отчета по закупкам лицензий
+     * @param userId идентификатор пользователя, генерирующего отчет
+     * @return Установка отчета PDF из браузера
+     */
     @GetMapping("/report/purchases")
     public ResponseEntity<byte[]> generateReport(@RequestParam Long userId) {
         try {

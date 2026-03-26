@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс-сущность таблицы developer из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "developer")
 public class Developer {
@@ -66,6 +71,10 @@ public class Developer {
         return location;
     }
 
+    /**
+     * Возвращает список ПО устройства
+     * @return Список ПО устройства
+     */
     public List<Software> getSoftware() {
         return software;
     }

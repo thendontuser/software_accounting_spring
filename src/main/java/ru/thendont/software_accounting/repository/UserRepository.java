@@ -9,6 +9,11 @@ import ru.thendont.software_accounting.service.enums.UserRoles;
 
 import java.util.Optional;
 
+/**
+ * Интерфейс доступа к данным таблицы users из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
 
@@ -18,6 +23,10 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     Iterable<User> findByRoleAndKafedra(UserRoles role, Kafedra kafedra);
 
+    /**
+     * Находит неподтвержденных в регистрации пользователей
+     * @return Список неподтвержденных в регистрации пользователей
+     */
     @Query(value = "SELECT * FROM users WHERE role IS NULL AND kaf_id IS NULL", nativeQuery = true)
     Iterable<User> findPendingUsers();
 }

@@ -19,6 +19,11 @@ import ru.thendont.software_accounting.util.ConstantStrings;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * Контроллер страницы подтверждения регистрации пользователей
+ * @author thendont
+ * @version 1.0
+ */
 @Controller
 @RequestMapping("/pending-users")
 public class PendingUsersPageController {
@@ -39,6 +44,12 @@ public class PendingUsersPageController {
 
     private Long currentUserId;
 
+    /**
+     * Отображает html-страницу подтверждения регистрации пользователй
+     * @param userId идентификатор пользователя, вошедшего на страницу
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы подтверждения регистрации пользователй
+     */
     @GetMapping("/dashboard")
     public String pendingUsers(@RequestParam Long userId, Model model) {
         try {
@@ -61,6 +72,14 @@ public class PendingUsersPageController {
         }
     }
 
+    /**
+     * Метод для подтверждения регистрации пользователя. Сохраняет роль и привязку к кафедре(в зависимости от роли) пользователя
+     * @param userId идентификатор сохраняемого пользователя
+     * @param role роль пользователя
+     * @param kafId идентификатор кафедры
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Url-адрес страницы подтверждения регистрации пользователей
+     */
     @PostMapping("/approve-user")
     public String approveUser(@RequestParam Long userId,
                               @RequestParam String role,
@@ -86,6 +105,12 @@ public class PendingUsersPageController {
         }
     }
 
+    /**
+     * Метод для отклонения регистрации пользователя
+     * @param userId идентификатор пользователя, которогло отклоняем
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Url-адрес страницы подтверждения регистрации пользователей
+     */
     @PostMapping("/reject-user/{userId}")
     public String rejectUser(@PathVariable Long userId, Model model) {
         try {

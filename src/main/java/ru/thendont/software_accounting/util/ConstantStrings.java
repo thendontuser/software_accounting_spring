@@ -1,5 +1,10 @@
 package ru.thendont.software_accounting.util;
 
+/**
+ * Класс, содержащий строковые константы, часто использующиеся в исходном коде
+ * @author thendont
+ * @version 1.0
+ */
 public final class ConstantStrings {
 
     public static final String LOGO_DIRECTORY_PATH = "/logos/";

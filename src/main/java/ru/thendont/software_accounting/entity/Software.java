@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс-сущность таблицы software из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "software")
 public class Software {
@@ -90,18 +95,34 @@ public class Software {
         return logoPath;
     }
 
+    /**
+     * Возвращает список заявок на установку ПО
+     * @return список заявок на установку ПО
+     */
     public List<InstallationRequest> getRequests() {
         return requests;
     }
 
+    /**
+     * Возвращает список установок ПО
+     * @return Список установок ПО
+     */
     public List<SoftwareInstallation> getInstallations() {
         return installations;
     }
 
+    /**
+     * Возвращает список лицензий ПО
+     * @return Список лицензий ПО
+     */
     public List<License> getLicenses() {
         return licenses;
     }
 
+    /**
+     * Возвращает список заявок на покупку лицензий ПО
+     * @return Список заявок на покупку лицензий ПО
+     */
     public List<LicenseRequest> getLicenseRequests() {
         return licenseRequests;
     }

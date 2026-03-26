@@ -5,11 +5,15 @@ import org.springframework.stereotype.Service;
 import ru.thendont.software_accounting.entity.License;
 import ru.thendont.software_accounting.repository.LicenseRepository;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Класс-сервис для управления бизнес логикой, связанной с таблицей license
+ * @author thendont
+ * @version 1.0
+ */
 @Service
 public class LicenseService {
 
@@ -32,14 +36,20 @@ public class LicenseService {
         licenseRepository.deleteById(id);
     }
 
-    public BigDecimal getTotalCost() {
-        return licenseRepository.getTotalCost();
-    }
-
+    /**
+     * Находит истекающие лицензии
+     * @return Список истекающих лицензий
+     */
     public List<License> findExpiringLicenses() {
         return (List<License>) licenseRepository.findExpiringLicenses();
     }
 
+    /**
+     * Возвращает новую дату окончания лицензии
+     * @param license лицензия
+     * @param months количество месяцев, на которые продляется лицензия
+     * @return Дата окончания лицензии
+     */
     public LocalDate extendEnd(License license, int months) {
         return licenseRepository.extendEnd(license.getId(), months);
     }

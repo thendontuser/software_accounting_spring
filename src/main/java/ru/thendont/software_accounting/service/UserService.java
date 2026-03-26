@@ -14,6 +14,11 @@ import ru.thendont.software_accounting.service.enums.UserRoles;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Класс-сервис для управления бизнес логикой, связанной с таблицей users
+ * @author thendont
+ * @version 1.0
+ */
 @Service
 public class UserService implements UserDetailsService {
 
@@ -47,6 +52,10 @@ public class UserService implements UserDetailsService {
         return (List<User>) userRepository.findByRole(role);
     }
 
+    /**
+     * Находит неподтвержденных в регистрации пользователей
+     * @return Список неподтвержденных в регистрации пользователей
+     */
     public List<User> findPendingUsers() {
         return (List<User>) userRepository.findPendingUsers();
     }

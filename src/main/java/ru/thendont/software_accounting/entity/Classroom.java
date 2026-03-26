@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс-сущность таблицы classroom из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "classroom")
 public class Classroom {
@@ -58,6 +63,10 @@ public class Classroom {
         return kafedra;
     }
 
+    /**
+     * Возвращает список устройств аудитории
+     * @return Список устройств аудитории
+     */
     public List<Device> getDevices() {
         return devices;
     }

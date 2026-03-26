@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.service.UserService;
 
+/**
+ * Контроллер страницы посетителей и неподтвержденных в регистрации пользователей
+ * @author thendont
+ * @version 1.0
+ */
 @Controller
 @RequestMapping("/visitor")
 public class VisitorPageController {
@@ -20,6 +25,12 @@ public class VisitorPageController {
     @Autowired
     private UserService userService;
 
+    /**
+     * Отображает страницу посетителей и неподтвержденных пользователей
+     * @param userId идентификатор пользователя-посетителя
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы посетителей
+     */
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam(required = false) Long userId, Model model) {
         logger.info("=== ПЕРЕХОД НА ГОСТЕВУЮ СТРАНИЦУ ===");

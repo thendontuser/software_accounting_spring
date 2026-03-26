@@ -13,6 +13,11 @@ import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.service.UserService;
 import ru.thendont.software_accounting.service.enums.Urls;
 
+/**
+ * Контроллер системы аутентификации и авторизации пользователей в системе
+ * @author thendont
+ * @version 1.0
+ */
 @Controller
 @RequestMapping("/auth")
 public class AuthController {
@@ -23,6 +28,15 @@ public class AuthController {
     @Autowired
     private UserService userService;
 
+    /**
+     * Отображает страницу входа в систему
+     * @param error хранит ошибку при входе в систему
+     * @param logout хранит сообщение о выходе из системы
+     * @param registered хранит сообщение об успешной регистрации пользователя в системе
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @param request хранит информацию об http-запросе
+     * @return Имя шаблона страницы входа в систему
+     */
     @GetMapping("/login")
     public String showLoginPage(@RequestParam(value = "error", required = false) String error,
                                 @RequestParam(value = "logout", required = false) String logout,
@@ -49,6 +63,12 @@ public class AuthController {
         return "sign-in";
     }
 
+    /**
+     * Метод-обработчик входа пользователя в систему. Определяет верность ввода корретных данных пользователя
+     * @param authentication хранит данные об аутентификации пользователя
+     * @return Страница личного кабинета пользователя, если данные корректны. Страница входа с параметром error, если данные
+     * некорректны
+     */
     @GetMapping("/login/success")
     public String handleLoginSuccess(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
@@ -63,6 +83,12 @@ public class AuthController {
         return getPageFromUser(user);
     }
 
+    /**
+     * Отображает страницу регистрации в системе
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @param request хранит информацию об http-запросе
+     * @return Шаблон страницы регистрации в системе
+     */
     @GetMapping("/register")
     public String showRegisterPage(Model model, HttpServletRequest request) {
         HttpSession session = request.getSession(true);
@@ -71,6 +97,13 @@ public class AuthController {
         return "sign-up";
     }
 
+    /**
+     * Метод-обработчик регистрации пользователя в системе
+     * @param user пользователь, осуществивший регистрацию в системе
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Страница входа в систему с сообщением об успешной регистрации, если данные введены корректно.
+     * Страница регистрации, если данные некорректные
+     */
     @PostMapping("/register")
     public String showRegisterPage(@ModelAttribute User user, Model model) {
         User u = userService.findByUsername(user.getUsername()).orElse(null);

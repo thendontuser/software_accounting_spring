@@ -24,6 +24,11 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * Контроллер панели заведующего лабораториями
+ * @author thendont
+ * @version 1.0
+ */
 @Controller
 @RequestMapping("/hol")
 public class HeadOfLabsController {
@@ -57,6 +62,12 @@ public class HeadOfLabsController {
     @Autowired
     private EmailService emailService;
 
+    /**
+     * Отображает html-страницу страницу личного кабинета
+     * @param userId идентификатор пользователя, осуществившего вход на страницу
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы заведующего лабораториями
+     */
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
         try {
@@ -85,6 +96,14 @@ public class HeadOfLabsController {
         }
     }
 
+    /**
+     * Генерирует отчет по типу
+     * @param userId идентификатор пользователя, генериующего отчет
+     * @param type тип отчета
+     * @param dateFrom дата начала выборки
+     * @param dateTo дата окончания выборки
+     * @return Установка отчета PDF из браузера
+     */
     @GetMapping("/generate-report")
     public ResponseEntity<byte[]> generateReport(
                          @RequestParam Long userId,
@@ -109,6 +128,15 @@ public class HeadOfLabsController {
         }
     }
 
+    /**
+     * Создает новую запись в таблицу задач лаборантов
+     * @param requestId иднетификатор заявки на установку ПО
+     * @param assignedBy идентификатор пользователя, поручающего задачу
+     * @param assignedTo идентификатор пользователя, кому отдается поручение
+     * @param deadline срок задачи
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Url-адрес страницы заведующего лабораториями
+     */
     @PostMapping("/create-task")
     public String createTask(@RequestParam Long requestId,
                              @RequestParam Long assignedBy,
@@ -157,6 +185,14 @@ public class HeadOfLabsController {
         }
     }
 
+    /**
+     * Обновляет статус задачи лаборанта
+     * @param taskId идентификатор задачи
+     * @param userId идентифактор пользователя, обновляющего задачу
+     * @param status новый статус задачи
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Url-адрес страницы заведующего лабораториями
+     */
     @PostMapping("/update-task-status")
     public String updateTaskStatus(@RequestParam Long taskId,
                                    @RequestParam Long userId,
@@ -187,6 +223,14 @@ public class HeadOfLabsController {
         }
     }
 
+    /**
+     * Отклоняет заявку на установку ПО
+     * @param requestId идентийикатор заявки
+     * @param userId идентификатор пользователя, отклоняющего заявку
+     * @param comment комментарий
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Url-адрес страницы заведующего лабораториями
+     */
     @PostMapping("/reject-request")
     public String rejectInstallationRequest(@RequestParam Long requestId,
                                             @RequestParam Long userId,
@@ -218,6 +262,15 @@ public class HeadOfLabsController {
         }
     }
 
+    /**
+     * Создание новой записи в таблицу заявок на устаноку лицензий
+     * @param userId идентификатор пользователя, создающего заявку
+     * @param softwareId идентийикатор ПО
+     * @param quantity количество лицензий
+     * @param reason причина закукпи лицензий
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Url-адрес страницы заведующего лабораториями
+     */
     @PostMapping("/request-license")
     public String licenseRequest(@RequestParam Long userId,
                                  @RequestParam Long softwareId,

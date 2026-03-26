@@ -8,6 +8,11 @@ import ru.thendont.software_accounting.entity.User;
 
 import java.time.LocalDate;
 
+/**
+ * Интерфейс доступа к данным таблицы installation_task из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Repository
 public interface InstallationTaskRepository extends CrudRepository<InstallationTask, Long> {
 
@@ -15,6 +20,13 @@ public interface InstallationTaskRepository extends CrudRepository<InstallationT
 
     Iterable<InstallationTask> findByAssignedTo(User assignedTo);
 
+    /**
+     * Находит задачи пользователей по кафедре и по промежутку дат
+     * @param kafId идентификатор кафедры
+     * @param dateFrom дата начала выборки
+     * @param dateTo дата окончания выборки
+     * @return Список задач пользователей по кафедре и по промежутку дат
+     */
     @Query(value = "SELECT * FROM installation_task WHERE assigned_by in (SELECT id FROM users WHERE kaf_id = :kafId)" +
             "AND created_at BETWEEN :dateFrom AND :dateTo",
             nativeQuery = true)

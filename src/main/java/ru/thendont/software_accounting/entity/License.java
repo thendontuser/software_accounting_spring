@@ -6,6 +6,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс-сущность таблицы license из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "license")
 public class License {
@@ -94,6 +99,10 @@ public class License {
         return price;
     }
 
+    /**
+     * Возвращает список покупок на лицензию
+     * @return Список покупок на лицензию
+     */
     public List<Purchase> getPurchases() {
         return purchases;
     }

@@ -19,6 +19,9 @@ import ru.thendont.software_accounting.util.Util;
 
 import java.util.*;
 
+/**
+ * Контроллер панели лаборанта
+ */
 @Controller
 @RequestMapping("/assistant")
 public class LabAssistantController {
@@ -46,6 +49,12 @@ public class LabAssistantController {
     @Autowired
     private EmailService emailService;
 
+    /**
+     * Отображает html-страницу личного кабинета
+     * @param userId идентификатор пользователя, осуществившего вход на страницу
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы лаборанта
+     */
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
         try {
@@ -74,6 +83,15 @@ public class LabAssistantController {
         }
     }
 
+    /**
+     * Создание отчета по выполнению задачи
+     * @param taskId идентификатор задачи
+     * @param userId идентификатор пользователя, создающего отчет
+     * @param licenseRequired флаг необходимости в покупке лицензии
+     * @param notes заметки пользователя
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы лаборанта
+     */
     @PostMapping("/submit-report")
     public String submitReport(@RequestParam Long taskId,
                                @RequestParam Long userId,
@@ -109,6 +127,14 @@ public class LabAssistantController {
         }
     }
 
+    /**
+     * Создание записей в таблицу установок
+     * @param taskId идентификатор задачи
+     * @param userId идентификатор пользователя
+     * @param deviceIds список идентификаторов выбранных устройств
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы лаборанта
+     */
     @PostMapping("/confirm-devices")
     public String confirmDevices(@RequestParam Long taskId,
                                  @RequestParam Long userId,

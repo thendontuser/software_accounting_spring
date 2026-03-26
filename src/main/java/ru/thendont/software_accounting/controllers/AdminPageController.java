@@ -14,6 +14,11 @@ import ru.thendont.software_accounting.util.ConstantStrings;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+/**
+ * Контроллер панели администратора системы
+ * @author thendont
+ * @version 1.0
+ */
 @Controller
 @RequestMapping("/admin")
 public class AdminPageController {
@@ -49,6 +54,12 @@ public class AdminPageController {
     @Autowired
     private SoftwareService softwareService;
 
+    /**
+     * Отображает html-страницу личного кабинета
+     * @param userId идентификатор пользователя, осуществившего вход на страницу
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы администратора
+     */
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
         if (currentUserId == null) {
@@ -94,6 +105,12 @@ public class AdminPageController {
     }
 
 // Для сущности user ==========================================================================================
+    /**
+     * Отображает страницу редактирования пользователя
+     * @param id идентификатор редактируемого пользователя
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы редактирования пользователя
+     */
     @GetMapping("/edit/users/{id}")
     public String editUser(@PathVariable Long id, Model model) {
         try {
@@ -109,6 +126,11 @@ public class AdminPageController {
         }
     }
 
+    /**
+     * Метод-обработчик отредактрованного пользователя. Сохраняет новые данные о пользователе в БД
+     * @param user отредактированный пользователь
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/edit/users")
     public String editUser(@ModelAttribute User user) {
         if (user.getRole() == null) {
@@ -122,6 +144,11 @@ public class AdminPageController {
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
+    /**
+     * Удаляет пользователя из БД
+     * @param id идентификатор удаляемого пользователя
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/delete/users/{id}")
     public String deleteUser(@PathVariable Long id) {
         userService.deleteById(id);
@@ -131,6 +158,12 @@ public class AdminPageController {
 // Для сущности user ==========================================================================================
 
 // Для сущности department ==========================================================================================
+    /**
+     * Отображает страницу редактирования факультета
+     * @param id идентификатор факультета
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы редактирования факультета
+     */
     @GetMapping("/edit/departments/{id}")
     public String editDepartment(@PathVariable Long id, Model model) {
         try {
@@ -146,6 +179,11 @@ public class AdminPageController {
         }
     }
 
+    /**
+     * Метод-обработчик отредактрованного факультета. Сохраняет новые данные о факультете в БД
+     * @param department отредактированный факультет
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/edit/departments")
     public String editDepartment(@ModelAttribute Department department) {
         departmentService.save(department);
@@ -153,6 +191,11 @@ public class AdminPageController {
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
+    /**
+     * Удаляет факультет из БД
+     * @param id идентификатор удаляемого факультета
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/delete/departments/{id}")
     public String deleteDepartment(@PathVariable Long id) {
         departmentService.deleteById(id);
@@ -162,6 +205,12 @@ public class AdminPageController {
 // Для сущности department ==========================================================================================
 
 // Для сущности device ==========================================================================================
+    /**
+     * Отображает страницу редактирования устройства
+     * @param id идентификатор редактируемого устройства
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы редактирования устройства
+     */
     @GetMapping("/edit/devices/{id}")
     public String editDevice(@PathVariable Long id, Model model) {
         try {
@@ -178,6 +227,11 @@ public class AdminPageController {
         }
     }
 
+    /**
+     * Метод-обработчик отредактрованного устройства. Сохраняет новые данные об устройстве в БД
+     * @param device отредактированное устройство
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/edit/devices")
     public String editDevice(@ModelAttribute Device device) {
         deviceService.save(device);
@@ -185,6 +239,11 @@ public class AdminPageController {
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
+    /**
+     * Удаляет устройство из БД
+     * @param id идентификатор удаляемого устройства
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/delete/devices/{id}")
     public String deleteDevice(@PathVariable Long id) {
         deviceService.deleteById(id);
@@ -194,6 +253,12 @@ public class AdminPageController {
 // Для сущности device ==========================================================================================
 
 // Для сущности kafedra ==========================================================================================
+    /**
+     * Отображает страницу редактирования кафедры
+     * @param id идентификатор редактируемой кафедры
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы редактирования кафедры
+     */
     @GetMapping("/edit/kafedras/{id}")
     public String editKafedra(@PathVariable Long id, Model model) {
         try {
@@ -209,6 +274,11 @@ public class AdminPageController {
         }
     }
 
+    /**
+     * Метод-обработчик отредактрованной кафедры. Сохраняет новые данные о кафедре в БД
+     * @param kafedra отредактированная кафедра
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/edit/kafedras")
     public String editKafedra(@ModelAttribute Kafedra kafedra) {
         kafedraService.save(kafedra);
@@ -216,6 +286,11 @@ public class AdminPageController {
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
+    /**
+     * Удаляет кафедру из БД
+     * @param id идентификатор удаляемой кафедры
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/delete/kafedras/{id}")
     public String deleteKafedra(@PathVariable Long id) {
         kafedraService.deleteById(id);
@@ -225,6 +300,12 @@ public class AdminPageController {
 // Для сущности kafedra ==========================================================================================
 
 // Для сущности classroom ==========================================================================================
+    /**
+     * Отображает страницу редактирования аудитории
+     * @param id идентификатор редактируемой аудитории
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы редактирования аудитории
+     */
     @GetMapping("/edit/classrooms/{id}")
     public String editClassrooms(@PathVariable Long id, Model model) {
         try {
@@ -240,6 +321,11 @@ public class AdminPageController {
         }
     }
 
+    /**
+     * Метод-обработчик отредактрованной аудитории. Сохраняет новые данные об аудитории в БД
+     * @param classroom отредактированная аудитория
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/edit/classrooms")
     public String editClassroom(@ModelAttribute Classroom classroom) {
         classroomService.save(classroom);
@@ -247,6 +333,11 @@ public class AdminPageController {
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
+    /**
+     * Удаляет аудиторию из БД
+     * @param id идентификатор удаляемой аудитории
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/delete/classrooms/{id}")
     public String deleteClassroom(@PathVariable Long id) {
         classroomService.deleteById(id);
@@ -256,6 +347,12 @@ public class AdminPageController {
 // Для сущности classroom ==========================================================================================
 
 // Для сущности software ==========================================================================================
+    /**
+     * Отображает страницу редактирования ПО
+     * @param id идентификатор редактируемого ПО
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы редактирования ПО
+     */
     @GetMapping("/edit/software/{id}")
     public String editSoftware(@PathVariable Long id, Model model) {
         try {
@@ -273,6 +370,11 @@ public class AdminPageController {
         }
     }
 
+    /**
+     * Метод-обработчик отредактрованного ПО. Сохраняет новые данные о ПО в БД
+     * @param software отредактированное ПО
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/edit/software")
     public String editSoftware(@ModelAttribute Software software) {
         software.setLogoPath(ConstantStrings.LOGO_DIRECTORY_PATH + software.getLogoPath());
@@ -281,8 +383,13 @@ public class AdminPageController {
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
+    /**
+     * Удаляет ПО из БД
+     * @param id идентификатор удаляемого ПО
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/delete/software/{id}")
-    public String deleteSoftware(@PathVariable Long id, Model model) {
+    public String deleteSoftware(@PathVariable Long id) {
         softwareService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ ПО ===", username);
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
@@ -290,6 +397,12 @@ public class AdminPageController {
 // Для сущности software ==========================================================================================
 
 // Для сущности developer ==========================================================================================
+    /**
+     * Отображает страницу редактирования разработчика
+     * @param id идентификатор редактируемого разработчика
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы редактирования разработчика
+     */
     @GetMapping("/edit/developers/{id}")
     public String editDeveloper(@PathVariable Long id, Model model) {
         try {
@@ -305,6 +418,11 @@ public class AdminPageController {
         }
     }
 
+    /**
+     * Метод-обработчик отредактрованного разработчика. Сохраняет новые данные о разработчике в БД
+     * @param developer отредактированный разработчик
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/edit/developers")
     public String editDeveloper(@ModelAttribute Developer developer) {
         developerService.save(developer);
@@ -312,8 +430,13 @@ public class AdminPageController {
         return Urls.ADMIN_URL.getUrlString() + currentUserId;
     }
 
+    /**
+     * Удаляет разработчика из БД
+     * @param id идентификатор удаляемого разработчика
+     * @return Url-адрес панели администратора
+     */
     @PostMapping("/delete/developers/{id}")
-    public String deleteDeveloper(@PathVariable Long id, Model model) {
+    public String deleteDeveloper(@PathVariable Long id) {
         developerService.deleteById(id);
         logger.info("@{}: === УСПЕШНОЕ УДАЛЕНИЕ РАЗРАБОТЧИКА ===", username);
         return Urls.ADMIN_URL.getUrlString() + currentUserId;

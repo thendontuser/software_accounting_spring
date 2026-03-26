@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс-сущность таблицы device из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "device")
 public class Device {
@@ -93,6 +98,10 @@ public class Device {
         return classroom;
     }
 
+    /**
+     * Возвращает список установок на устройстве
+     * @return Список установок на устройстве
+     */
     public List<SoftwareInstallation> getInstallations() {
         return installations;
     }

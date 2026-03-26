@@ -8,6 +8,11 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+/**
+ * Класс, предоставляющий работу с электронной почтой
+ * @author thendont
+ * @version 1.0
+ */
 @Service
 public class EmailService {
 
@@ -20,6 +25,13 @@ public class EmailService {
     @Value("${spring.mail.from}")
     private String fromUser;
 
+    /**
+     * Отправляет сообщение на почту
+     * @param toAddress email-адрес адресата
+     * @param subject тема сообщения
+     * @param message текст сообщения
+     * @throws MailException возникает при ошибках отправки сообщения, например, если отсутствует соединение с интернетом
+     */
     public void sendMessage(String toAddress, String subject, String message) throws MailException {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(fromUser);

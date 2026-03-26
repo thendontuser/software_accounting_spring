@@ -10,6 +10,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Класс-сервис для управления бизнес логикой, связанной с таблицей installation_request
+ * @author thendont
+ * @version 1.0
+ */
 @Service
 public class InstallationRequestService {
 
@@ -36,13 +41,16 @@ public class InstallationRequestService {
         return (List<InstallationRequest>) installationRequestRepository.findByKafedraId(kafedra.getId());
     }
 
+    /**
+     * Находит заявки пользователей по кафедре и по промежутку дат
+     * @param kafedra кафедра
+     * @param dateFrom дата начала выборки
+     * @param dateTo дата окончания выборки
+     * @return Список заявок пользователей по кафедре и по промежутку дат
+     */
     public List<InstallationRequest> findByKafedraAndDateBetween(Kafedra kafedra, LocalDate dateFrom, LocalDate dateTo) {
         return (List<InstallationRequest>) installationRequestRepository.findByKafedraAndDateBetween(
                 kafedra.getId(), dateFrom, dateTo
         );
     }
-
-    /*public boolean isPossibleInstallSoftware(InstallationRequest installationRequest) {
-        return installationRequest.getDevice().getRamSize() > 1;
-    }*/
 }

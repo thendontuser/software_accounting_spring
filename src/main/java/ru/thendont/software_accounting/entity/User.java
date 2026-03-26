@@ -6,6 +6,11 @@ import ru.thendont.software_accounting.service.enums.UserRoles;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс-сущность таблицы users из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "users")
 public class User {
@@ -145,14 +150,26 @@ public class User {
         return kafedra;
     }
 
+    /**
+     * Возвращает список заявок на установку ПО, поданных пользователем
+     * @return Список заявок на установку ПО, поданных пользователем
+     */
     public List<InstallationRequest> getRequests() {
         return requests;
     }
 
+    /**
+     * Возвращает список установок ПО, совершенных пользователем
+     * @return Список установок ПО, совершенных пользователем
+     */
     public List<SoftwareInstallation> getInstallations() {
         return installations;
     }
 
+    /**
+     * Возвращет спиок заявок на покупку лицензий, поданных пользователем
+     * @return Спиок заявок на покупку лицензий, поданных пользователем
+     */
     public List<LicenseRequest> getLicenseRequests() {
         return licenseRequests;
     }

@@ -7,6 +7,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс-сущность таблицы installation_request из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "installation_request")
 public class InstallationRequest {
@@ -116,6 +121,10 @@ public class InstallationRequest {
         return comment;
     }
 
+    /**
+     * Возвращает список задач по заявке
+     * @return Список задач по заявке
+     */
     public List<InstallationTask> getTasks() {
         return tasks;
     }

@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс-сущность таблицы kafedra из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "kafedra")
 public class Kafedra {
@@ -61,10 +66,18 @@ public class Kafedra {
         return department;
     }
 
+    /**
+     * Возвращает список пользователей кафедры
+     * @return Список пользователей кафедры
+     */
     public List<User> getUsers() {
         return users;
     }
 
+    /**
+     * Возвращает список аудиторий кафедры
+     * @return Список аудиторий кафедры
+     */
     public List<Classroom> getClassrooms() {
         return classrooms;
     }

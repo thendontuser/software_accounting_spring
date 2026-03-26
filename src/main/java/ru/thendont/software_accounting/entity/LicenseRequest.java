@@ -5,6 +5,11 @@ import ru.thendont.software_accounting.service.enums.LicenseRequestStatus;
 
 import java.time.LocalDate;
 
+/**
+ * Класс-сущность таблицы license_request из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "license_request")
 public class LicenseRequest {

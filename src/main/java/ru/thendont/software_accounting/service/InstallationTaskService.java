@@ -11,6 +11,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Класс-сервис для управления бизнес логикой, связанной с таблицей installation_task
+ * @author thendont
+ * @version 1.0
+ */
 @Service
 public class InstallationTaskService {
     
@@ -41,6 +46,13 @@ public class InstallationTaskService {
         return (List<InstallationTask>) installationTaskRepository.findByAssignedTo(assignedTo);
     }
 
+    /**
+     * Находит задачи пользователей по кафедре и по промежутку дат
+     * @param kafedra кафедра
+     * @param dateFrom дата начала выборки
+     * @param dateTo дата окончания выборки
+     * @return Список задач пользователей по кафедре и по промежутку дат
+     */
     public List<InstallationTask> findByKafedraAndDateBetween(Kafedra kafedra, LocalDate dateFrom, LocalDate dateTo) {
         return (List<InstallationTask>) installationTaskRepository.findByKafedraAndDateBetween(
                 kafedra.getId(), dateFrom, dateTo

@@ -22,6 +22,11 @@ import ru.thendont.software_accounting.util.Util;
 
 import java.util.NoSuchElementException;
 
+/**
+ * Контроллер панели преподавателя
+ * @author thendont
+ * @version 1.0
+ */
 @Controller
 @RequestMapping("/teacher")
 public class TeacherPageController {
@@ -43,6 +48,12 @@ public class TeacherPageController {
     @Autowired
     private ClassroomService classroomService;
 
+    /**
+     * Отображает html-страницу личного кабинета
+     * @param userId идентификатор пользователя, осуществившего вход на страницу
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы преподавателя
+     */
     @GetMapping("/dashboard")
     public String showDashboard(@RequestParam Long userId, Model model) {
         try {
@@ -59,6 +70,15 @@ public class TeacherPageController {
         }
     }
 
+    /**
+     * Метод подачи заявки на установку ПО. Сохраняет новую запись в таблице заявок на установку ПО
+     * @param userId идентификатор пользователя, подающего заявку
+     * @param softwareId идентификатор ПО
+     * @param classroomId идентификатор аудитории
+     * @param comment комментарий
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Url-адрес страницы преподавателя
+     */
     @PostMapping("/request")
     public String sendRequest(@RequestParam Long userId, @RequestParam Long softwareId, @RequestParam Long classroomId,
                               @RequestParam(required = false) String comment, Model model) {

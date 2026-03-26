@@ -5,6 +5,11 @@ import ru.thendont.software_accounting.service.enums.InstallationTaskStatus;
 
 import java.time.LocalDate;
 
+/**
+ * Класс-сущность таблицы installation_task из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "installation_task")
 public class InstallationTask {

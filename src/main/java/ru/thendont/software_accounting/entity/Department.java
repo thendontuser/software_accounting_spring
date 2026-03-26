@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс-сущность таблицы department из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "department")
 public class Department {
@@ -45,6 +50,10 @@ public class Department {
         return title;
     }
 
+    /**
+     * Возвращает список кафедр факультета
+     * @return Список кафедр факультета
+     */
     public List<Kafedra> getKafedraList() {
         return kafedraList;
     }

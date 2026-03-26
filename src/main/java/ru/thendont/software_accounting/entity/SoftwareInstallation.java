@@ -4,6 +4,11 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
+/**
+ * Класс-сущность таблицы software_installation из БД
+ * @author thendont
+ * @version 1.0
+ */
 @Entity
 @Table(name = "software_installation")
 public class SoftwareInstallation {

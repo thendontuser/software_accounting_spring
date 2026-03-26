@@ -60,19 +60,4 @@ public class LicenseServiceTest {
 
         assertNull(licenseService.findById(saved.getId()).orElse(null));
     }
-
-    @Test
-    public void testTotalPriceLicense() {
-        List<Software> installedSoftware = softwareInstallationService.findAllInstalledSoftware();
-        int totalPrice = 0;
-
-        for (License license : licenseService.findAll()) {
-            for (Software software : installedSoftware) {
-                if (license.getSoftware().getId().equals(software.getId())) {
-                    totalPrice += license.getPrice();
-                }
-            }
-        }
-        assertEquals(totalPrice, licenseService.getTotalCost().intValue());
-    }
 }
