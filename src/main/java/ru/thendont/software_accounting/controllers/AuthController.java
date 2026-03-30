@@ -126,6 +126,7 @@ public class AuthController {
                 case HEAD_OF_LABORATORIES -> Urls.HEAD_OF_LABORATORIES_URL.getUrlString() + user.getId();
                 case LABORATORY_ASSISTANT -> Urls.LABORATORY_ASSISTANT.getUrlString() + user.getId();
                 case SAM_MANAGER -> Urls.SAM_MANAGER.getUrlString() + user.getId();
+                case SYSTEM -> null;
             };
     }
 }

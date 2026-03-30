@@ -8,6 +8,11 @@ package ru.thendont.software_accounting.service.enums;
 public enum UserRoles {
 
     /**
+     * Системыный пользователь(администратор)
+     */
+    SYSTEM,
+
+    /**
      * Администратор
      */
     ADMIN,

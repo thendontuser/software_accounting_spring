@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import ru.thendont.software_accounting.service.enums.UserRoles;
 
@@ -30,7 +31,7 @@ public class SecurityConfig {
                     "/auth/**",
                     "/visitor/**"
                 ).permitAll()
-                .requestMatchers("/admin/**", "/pending-users/**").hasRole(UserRoles.ADMIN.name())
+                .requestMatchers("/admin/**", "/pending-users/**", "/audit/**").hasRole(UserRoles.ADMIN.name())
                 .requestMatchers("/teacher/**").hasRole(UserRoles.TEACHER.name())
                 .requestMatchers("/hol/**").hasRole(UserRoles.HEAD_OF_LABORATORIES.name())
                 .requestMatchers("/assistant/**").hasRole(UserRoles.LABORATORY_ASSISTANT.name())
@@ -52,6 +53,7 @@ public class SecurityConfig {
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/auth/logout"))
                 .logoutSuccessUrl("/auth/login?logout")
+                .logoutSuccessHandler(customLogoutSuccessHandler())
                 .permitAll()
             )
             .rememberMe(remember -> remember
@@ -59,6 +61,13 @@ public class SecurityConfig {
                 .tokenValiditySeconds(86400)
             );
         return http.build();
+    }
+
+    @Bean
+    public LogoutSuccessHandler customLogoutSuccessHandler() {
+        return (request, response, authentication) -> {
+            response.sendRedirect("/auth/login?logout");
+        };
     }
 
     @Bean

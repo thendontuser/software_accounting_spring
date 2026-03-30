@@ -4,6 +4,7 @@ import ru.thendont.software_accounting.entity.InstallationRequest;
 import ru.thendont.software_accounting.entity.User;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Общий утилитный класс для часто используемых методов
@@ -13,11 +14,19 @@ import java.time.LocalDate;
 public final class Util {
 
     /**
-     * Возвращает текущую(сегодняшнюю) дату
+     * Возвращает текущую дату
      * @return Текущая дата
      */
     public static LocalDate getCurrentDate() {
         return LocalDate.now();
+    }
+
+    /**
+     * Возвращает текущую дату и время
+     * @return Текущая дата и время
+     */
+    public static LocalDateTime getCurrentDateTime() {
+        return LocalDateTime.now();
     }
 
     /**

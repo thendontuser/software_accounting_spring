@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель аудита - Учет ПО</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .header {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon,
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, #0f766e, #0ea5e9);
+            border-radius: 12px;
+            font-size: 22px;
+        }
+
+        .logo-text h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .logo-text p {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-details {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 600;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        .user-avatar {
+            background: linear-gradient(135deg, #0f766e, #0ea5e9);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #eef2ff;
+            color: #2563eb;
+        }
+
+        .btn-secondary:hover {
+            background: #dbeafe;
+        }
+
+        .logout-button {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .logout-button:hover {
+            background: #ef4444;
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .content-area {
+            padding: 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #0f766e, #0ea5e9);
+            border-radius: 24px;
+            padding: 24px 28px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(14, 165, 233, 0.18);
+        }
+
+        .hero h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .hero p {
+            opacity: 0.92;
+            max-width: 760px;
+            line-height: 1.5;
+        }
+
+        .hero-badge {
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 16px;
+            padding: 14px 18px;
+            min-width: 180px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-badge span {
+            display: block;
+            font-size: 12px;
+            opacity: 0.85;
+            margin-bottom: 6px;
+        }
+
+        .hero-badge strong {
+            font-size: 24px;
+        }
+
+        .quick-stats,
+        .nav-cards {
+            display: grid;
+            gap: 20px;
+        }
+
+        .quick-stats {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            margin-top: 24px;
+        }
+
+        .stat-card,
+        .nav-card,
+        .table-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon,
+        .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #0f766e, #0ea5e9);
+            font-size: 22px;
+        }
+
+        .stat-info h4 {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 4px;
+        }
+
+        .stat-info span {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .nav-cards {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            margin-top: 24px;
+        }
+
+        .nav-card {
+            padding: 24px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 30px rgba(15, 118, 110, 0.14);
+        }
+
+        .nav-card.active {
+            border-color: #0ea5e9;
+            background: #f8fafc;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            font-size: 26px;
+            margin-bottom: 18px;
+            background: linear-gradient(135deg, #0f766e, #0ea5e9);
+        }
+
+        .nav-card h3 {
+            font-size: 19px;
+            margin-bottom: 8px;
+        }
+
+        .nav-card p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.45;
+            margin-bottom: 16px;
+        }
+
+        .card-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .section-header {
+            margin: 28px 0 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .section-header h2 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+        }
+
+        .table-container {
+            display: none;
+            overflow: hidden;
+        }
+
+        .table-container.show {
+            display: block;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .table-title h3 {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .table-title p {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .search-container {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f8fafc;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 520px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 14px;
+        }
+
+        .search-box i,
+        .search-reset {
+            color: #94a3b8;
+        }
+
+        .search-box input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .search-reset {
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .search-reset:hover {
+            color: #ef4444;
+        }
+
+        .search-stats {
+            margin-top: 8px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #f8fafc;
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 15px 18px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            vertical-align: top;
+        }
+
+        .data-table tr:hover td {
+            background: #f8fafc;
+        }
+
+        .mono {
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .text-block {
+            max-width: 460px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #334155;
+            line-height: 1.45;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge.neutral {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .badge.info {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .empty-state td {
+            text-align: center;
+            color: #94a3b8;
+            padding: 36px 18px;
+        }
+
+        .empty-state i {
+            display: block;
+            font-size: 34px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 1200px) {
+            .nav-cards {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header,
+            .content-area {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+            }
+
+            .user-info {
+                justify-content: space-between;
+            }
+
+            .user-details {
+                display: none;
+            }
+
+            .hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hero-badge {
+                width: 100%;
+            }
+
+            .nav-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .logout-button span {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="logo">
+        <div class="logo-icon">
+            <i class="fas fa-shield-halved"></i>
+        </div>
+        <div class="logo-text">
+            <h1>Учет ПО</h1>
+            <p>Панель аудита</p>
+        </div>
+    </div>
+
+    <div class="user-info">
+        <div class="user-details">
+            <div class="user-name" th:text="${user.lastName + ' ' + user.firstName + ' ' + user.patronymic}">Администратор</div>
+            <div class="user-role">Просмотр журналов аудита</div>
+        </div>
+        <div class="user-avatar">
+            <span th:text="${#strings.substring(user.lastName, 0, 1) + #strings.substring(user.firstName, 0, 1)}">АА</span>
+        </div>
+        <div class="header-actions">
+            <button type="button" class="btn btn-secondary" onclick="window.history.back()">
+                <i class="fas fa-arrow-left"></i> Назад
+            </button>
+            <a th:href="@{/auth/logout}" class="btn logout-button">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Выйти</span>
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="content-area">
+    <section class="hero">
+        <div>
+            <h2>Журналы аудита системы</h2>
+            <p>Страница предназначена только для просмотра. Здесь можно просматривать действия пользователей, детальные изменения полей, архив удаленных записей и историю пользовательских сессий, а также быстро фильтровать записи через строки поиска.</p>
+        </div>
+        <div class="hero-badge">
+            <span>Всего записей аудита</span>
+            <strong th:text="${auditLogs.size() + auditLogDetails.size() + auditDeletedArchives.size() + auditUserSessions.size()}">0</strong>
+        </div>
+    </section>
+
+    <section class="quick-stats">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+            <div class="stat-info">
+                <h4>Журнал действий</h4>
+                <span th:text="${auditLogs.size()}">0</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-file-pen"></i></div>
+            <div class="stat-info">
+                <h4>Детали изменений</h4>
+                <span th:text="${auditLogDetails.size()}">0</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-box-archive"></i></div>
+            <div class="stat-info">
+                <h4>Архив удалений</h4>
+                <span th:text="${auditDeletedArchives.size()}">0</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-user-clock"></i></div>
+            <div class="stat-info">
+                <h4>Пользовательские сессии</h4>
+                <span th:text="${auditUserSessions.size()}">0</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="nav-cards">
+        <div class="nav-card active" id="card-audit-log" onclick="showSection('audit-log')">
+            <div class="card-icon"><i class="fas fa-clipboard-list"></i></div>
+            <h3>Журнал действий</h3>
+            <p>Общие записи по операциям над сущностями, пользователям и времени выполнения действий.</p>
+            <div class="card-count">
+                <i class="fas fa-table"></i>
+                <span th:text="${auditLogs.size()}">0</span>
+            </div>
+        </div>
+
+        <div class="nav-card" id="card-audit-details" onclick="showSection('audit-details')">
+            <div class="card-icon"><i class="fas fa-file-pen"></i></div>
+            <h3>Детали изменений</h3>
+            <p>Построчный просмотр полей, для которых были зафиксированы старые и новые значения.</p>
+            <div class="card-count">
+                <i class="fas fa-table"></i>
+                <span th:text="${auditLogDetails.size()}">0</span>
+            </div>
+        </div>
+
+        <div class="nav-card" id="card-audit-archive" onclick="showSection('audit-archive')">
+            <div class="card-icon"><i class="fas fa-box-archive"></i></div>
+            <h3>Архив удалений</h3>
+            <p>Хранилище записей об удаленных сущностях с сохраненными данными и временем удаления.</p>
+            <div class="card-count">
+                <i class="fas fa-table"></i>
+                <span th:text="${auditDeletedArchives.size()}">0</span>
+            </div>
+        </div>
+
+        <div class="nav-card" id="card-audit-sessions" onclick="showSection('audit-sessions')">
+            <div class="card-icon"><i class="fas fa-user-clock"></i></div>
+            <h3>Сессии пользователей</h3>
+            <p>История входов и выходов пользователей с идентификаторами сессий и статусом активности.</p>
+            <div class="card-count">
+                <i class="fas fa-table"></i>
+                <span th:text="${auditUserSessions.size()}">0</span>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-header">
+        <h2>
+            <i class="fas fa-clipboard-list" id="section-icon"></i>
+            <span id="section-name">Журнал действий</span>
+        </h2>
+        <span class="badge info">
+            <i class="fas fa-eye"></i>
+            Режим только чтения
+        </span>
+    </div>
+
+    <section id="audit-log-section" class="table-container show">
+        <div class="table-header">
+            <div class="table-title">
+                <h3>Таблица `audit_log`</h3>
+                <p>Фиксирует тип действия, сущность, пользователя и время события.</p>
+            </div>
+        </div>
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="audit-log-search" placeholder="Поиск по типу действия, сущности, пользователю или роли..." onkeyup="filterTable('audit-log')">
+                <span class="search-reset" onclick="resetSearch('audit-log')"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="search-stats" id="audit-log-stats">Показано <span id="audit-log-count">0</span> из <span th:text="${auditLogs.size()}">0</span></div>
+        </div>
+        <div class="table-scroll">
+            <table class="data-table" id="audit-log-table">
+                <thead>
+                <tr>
+                    <th>Тип действия</th>
+                    <th>Сущность</th>
+                    <th>ID сущности</th>
+                    <th>Пользователь</th>
+                    <th>Роль</th>
+                    <th>Время</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="log : ${auditLogs}">
+                    <td th:text="${log.actionType}">UPDATE</td>
+                    <td th:text="${log.entityName}">User</td>
+                    <td class="mono" th:text="${log.entityId}">15</td>
+                    <td th:text="${log.user != null ? log.user.lastName + ' ' + log.user.firstName + ' ' + log.user.patronymic : 'Не указан'}">Иванов Иван Иванович</td>
+                    <td>
+                        <span th:if="${log.userRole != null}" th:switch="${log.userRole.name()}">
+                            <span th:case="'ADMIN'">Администратор</span>
+                            <span th:case="'SYSTEM'">Администратор</span>
+                            <span th:case="'TEACHER'">Преподаватель</span>
+                            <span th:case="'HEAD_OF_LABORATORIES'">Зав. лабораторией</span>
+                            <span th:case="'LABORATORY_ASSISTANT'">Лаборант</span>
+                            <span th:case="'SAM_MANAGER'">SAM-менеджер</span>
+                        </span>
+                    </td>
+                    <td class="mono" th:text="${log.timestamp != null ? #temporals.format(log.timestamp, 'dd.MM.yyyy HH:mm:ss') : '-'}">29.03.2026 12:00:00</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="audit-details-section" class="table-container">
+        <div class="table-header">
+            <div class="table-title">
+                <h3>Таблица `audit_log_details`</h3>
+                <p>Показывает, какие поля и как именно были изменены для записи журнала.</p>
+            </div>
+        </div>
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="audit-details-search" placeholder="Поиск по полю, старому или новому значению..." onkeyup="filterTable('audit-details')">
+                <span class="search-reset" onclick="resetSearch('audit-details')"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="search-stats" id="audit-details-stats">Показано <span id="audit-details-count">0</span> из <span th:text="${auditLogDetails.size()}">0</span></div>
+        </div>
+        <div class="table-scroll">
+            <table class="data-table" id="audit-details-table">
+                <thead>
+                <tr>
+                    <th>ID журнала</th>
+                    <th>Поле</th>
+                    <th>Старое значение</th>
+                    <th>Новое значение</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="detail : ${auditLogDetails}">
+                    <td class="mono" th:text="${detail.auditLog != null ? detail.auditLog.id : '-'}">8</td>
+                    <td th:text="${detail.fieldName}">email</td>
+                    <td><div class="text-block" th:text="${detail.oldValue != null ? detail.oldValue : '-'}">old@mail.com</div></td>
+                    <td><div class="text-block" th:text="${detail.newValue != null ? detail.newValue : '-'}">new@mail.com</div></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="audit-archive-section" class="table-container">
+        <div class="table-header">
+            <div class="table-title">
+                <h3>Таблица `audit_deleted_archive`</h3>
+                <p>Содержит удаленные сущности, идентификаторы и сериализованные данные удаленных объектов.</p>
+            </div>
+        </div>
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="audit-archive-search" placeholder="Поиск по сущности, ID, удалившему пользователю или данным..." onkeyup="filterTable('audit-archive')">
+                <span class="search-reset" onclick="resetSearch('audit-archive')"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="search-stats" id="audit-archive-stats">Показано <span id="audit-archive-count">0</span> из <span th:text="${auditDeletedArchives.size()}">0</span></div>
+        </div>
+        <div class="table-scroll">
+            <table class="data-table" id="audit-archive-table">
+                <thead>
+                <tr>
+                    <th>Сущность</th>
+                    <th>ID сущности</th>
+                    <th>Удаленные данные</th>
+                    <th>Удалил</th>
+                    <th>Дата удаления</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="archive : ${auditDeletedArchives}">
+                    <td th:text="${archive.entityName}">Software</td>
+                    <td class="mono" th:text="${archive.entityId}">42</td>
+                    <td><div class="text-block mono" th:text="${archive.deletedData}">{}</div></td>
+                    <td class="mono" th:text="${archive.deletedBy}">3</td>
+                    <td class="mono" th:text="${archive.deletedAt != null ? #temporals.format(archive.deletedAt, 'dd.MM.yyyy HH:mm:ss') : '-'}">29.03.2026 12:00:00</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section id="audit-sessions-section" class="table-container">
+        <div class="table-header">
+            <div class="table-title">
+                <h3>Таблица `audit_user_session`</h3>
+                <p>История пользовательских сессий, времени входа и завершения, а также признак текущей активности.</p>
+            </div>
+        </div>
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="audit-sessions-search" placeholder="Поиск по пользователю, session ID, статусу или времени..." onkeyup="filterTable('audit-sessions')">
+                <span class="search-reset" onclick="resetSearch('audit-sessions')"><i class="fas fa-times"></i></span>
+            </div>
+            <div class="search-stats" id="audit-sessions-stats">Показано <span id="audit-sessions-count">0</span> из <span th:text="${auditUserSessions.size()}">0</span></div>
+        </div>
+        <div class="table-scroll">
+            <table class="data-table" id="audit-sessions-table">
+                <thead>
+                <tr>
+                    <th>Пользователь</th>
+                    <th>Session ID</th>
+                    <th>Вход</th>
+                    <th>Выход</th>
+                    <th>Статус</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="auditSession : ${auditUserSessions}">
+                    <td th:text="${auditSession.user != null ? auditSession.user.lastName + ' ' + auditSession.user.firstName + ' ' + auditSession.user.patronymic : 'Не указан'}">Иванов Иван Иванович</td>
+                    <td class="mono" th:text="${auditSession.sessionId}">ABC123</td>
+                    <td class="mono" th:text="${auditSession.loginTime != null ? #temporals.format(auditSession.loginTime, 'dd.MM.yyyy HH:mm:ss') : '-'}">29.03.2026 09:00:00</td>
+                    <td class="mono" th:text="${auditSession.logoutTime != null ? #temporals.format(auditSession.logoutTime, 'dd.MM.yyyy HH:mm:ss') : '-'}">29.03.2026 18:00:00</td>
+                    <td>
+                        <span th:if="${auditSession.active}" class="badge success">
+                            <i class="fas fa-circle"></i> Активна
+                        </span>
+                        <span th:unless="${auditSession.active}" class="badge neutral">
+                            <i class="fas fa-circle"></i> Завершена
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<script>
+    const sectionMeta = {
+        'audit-log': {
+            icon: 'fa-clipboard-list',
+            name: 'Журнал действий'
+        },
+        'audit-details': {
+            icon: 'fa-file-pen',
+            name: 'Детали изменений'
+        },
+        'audit-archive': {
+            icon: 'fa-box-archive',
+            name: 'Архив удалений'
+        },
+        'audit-sessions': {
+            icon: 'fa-user-clock',
+            name: 'Сессии пользователей'
+        }
+    };
+
+    function showSection(section) {
+        document.querySelectorAll('.nav-card').forEach(card => card.classList.remove('active'));
+        document.querySelectorAll('.table-container').forEach(container => container.classList.remove('show'));
+
+        document.getElementById(`card-${section}`).classList.add('active');
+        document.getElementById(`${section}-section`).classList.add('show');
+        document.getElementById('section-icon').className = `fas ${sectionMeta[section].icon}`;
+        document.getElementById('section-name').textContent = sectionMeta[section].name;
+
+        setTimeout(() => updateTableCount(section), 50);
+    }
+
+    function filterTable(tableId) {
+        const input = document.getElementById(`${tableId}-search`);
+        const table = document.getElementById(`${tableId}-table`);
+        const rows = table.querySelectorAll('tbody tr');
+        const filter = input.value.toLowerCase();
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            if (row.classList.contains('empty-state')) {
+                return;
+            }
+
+            const text = row.textContent.toLowerCase();
+            const isVisible = text.includes(filter);
+            row.style.display = isVisible ? '' : 'none';
+
+            if (isVisible) {
+                visibleCount++;
+            }
+        });
+
+        toggleEmptyState(tableId, visibleCount, table);
+        updateTableCount(tableId, visibleCount);
+    }
+
+    function toggleEmptyState(tableId, visibleCount, table) {
+        let emptyRow = document.getElementById(`${tableId}-empty`);
+
+        if (visibleCount === 0) {
+            if (!emptyRow) {
+                emptyRow = document.createElement('tr');
+                emptyRow.id = `${tableId}-empty`;
+                emptyRow.className = 'empty-state';
+
+                const cell = document.createElement('td');
+                cell.colSpan = table.querySelectorAll('thead th').length;
+                cell.innerHTML = '<i class="fas fa-search"></i>Ничего не найдено';
+                emptyRow.appendChild(cell);
+                table.querySelector('tbody').appendChild(emptyRow);
+            }
+        } else if (emptyRow) {
+            emptyRow.remove();
+        }
+    }
+
+    function updateTableCount(tableId, visibleCount = null) {
+        const table = document.getElementById(`${tableId}-table`);
+        if (!table) {
+            return;
+        }
+
+        const rows = Array.from(table.querySelectorAll('tbody tr')).filter(row => !row.classList.contains('empty-state'));
+
+        if (visibleCount === null) {
+            visibleCount = rows.filter(row => row.style.display !== 'none').length;
+        }
+
+        const countElement = document.getElementById(`${tableId}-count`);
+        if (countElement) {
+            countElement.textContent = visibleCount;
+        }
+    }
+
+    function resetSearch(tableId) {
+        const input = document.getElementById(`${tableId}-search`);
+        if (!input) {
+            return;
+        }
+
+        input.value = '';
+        filterTable(tableId);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        ['audit-log', 'audit-details', 'audit-archive', 'audit-sessions'].forEach(tableId => updateTableCount(tableId));
+        showSection('audit-log');
+    });
+</script>
+</body>
+</html>
