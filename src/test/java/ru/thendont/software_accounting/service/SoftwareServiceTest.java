@@ -8,6 +8,11 @@ import ru.thendont.software_accounting.entity.Software;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Предоставляет методы для модульного тестирования сервиса ПО
+ * @author thendont
+ * @version 1.0
+ */
 @SpringBootTest
 public class SoftwareServiceTest {
 
@@ -17,9 +22,12 @@ public class SoftwareServiceTest {
     @Autowired
     private DeveloperService developerService;
 
+    /**
+     * Тестирует создание новой записи ПО
+     */
     @Test
     public void testCreateSoftware() {
-        Developer developer = developerService.findById(Long.valueOf(3)).orElse(null);
+        Developer developer = developerService.findById(3L).orElse(null);
         Software software = new Software(null, "testTitle", "testVersion", developer, "testLogo");
         Software saved = softwareService.save(software);
 
@@ -29,13 +37,17 @@ public class SoftwareServiceTest {
         softwareService.deleteById(saved.getId());
     }
 
+    /**
+     * Тестирует обновление записи ПО
+     */
     @Test
     public void testUpdateSoftware() {
-        Developer developer = developerService.findById(Long.valueOf(3)).orElse(null);
+        Developer developer = developerService.findById(3L).orElse(null);
         Software software = new Software(null, "testTitle", "testVersion", developer, "testLogo");
         Software saved = softwareService.save(software);
-        Software target = softwareService.findById(Long.valueOf(saved.getId())).orElse(null);
+        Software target = softwareService.findById(saved.getId()).orElse(null);
 
+        assert target != null;
         target.setVersion("1.5");
         target = softwareService.save(target);
 
@@ -44,9 +56,12 @@ public class SoftwareServiceTest {
         softwareService.deleteById(saved.getId());
     }
 
+    /**
+     * Тестирует удаление записи ПО
+     */
     @Test
     public void testDeleteSoftware() {
-        Developer developer = developerService.findById(Long.valueOf(3)).orElse(null);
+        Developer developer = developerService.findById(3L).orElse(null);
         Software software = new Software(null, "testTitle", "testVersion", developer, "testLogo");
         Software saved = softwareService.save(software);
 

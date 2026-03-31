@@ -7,10 +7,14 @@ import ru.thendont.software_accounting.entity.License;
 import ru.thendont.software_accounting.entity.Software;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Предоставляет методы для модульного тестирования сервиса лицензий
+ * @author thendont
+ * @version 1.0
+ */
 @SpringBootTest
 public class LicenseServiceTest {
 
@@ -23,9 +27,12 @@ public class LicenseServiceTest {
     @Autowired
     private SoftwareInstallationService softwareInstallationService;
 
+    /**
+     * Тестирует создание новой записи лицензии
+     */
     @Test
     public void testCreateLicense() {
-        Software software = softwareService.findById(Long.valueOf(1)).orElse(null);
+        Software software = softwareService.findById(1L).orElse(null);
         License license = new License(null, "test", software, LocalDate.now(), LocalDate.now(), 5000);
         License saved = licenseService.save(license);
 
@@ -35,12 +42,17 @@ public class LicenseServiceTest {
         licenseService.deleteById(saved.getId());
     }
 
+    /**
+     * Тестирует обновление записи лицензии
+     */
     @Test
     public void testUpdateLicense() {
-        Software software = softwareService.findById(Long.valueOf(1)).orElse(null);
+        Software software = softwareService.findById(1L).orElse(null);
         License license = new License(null, "test", software, LocalDate.now(), LocalDate.now(), 5000);
         License saved = licenseService.save(license);
         License target = licenseService.findById(saved.getId()).orElse(null);
+
+        assert target != null;
 
         target.setType("testUpdate");
         target = licenseService.save(target);
@@ -50,9 +62,12 @@ public class LicenseServiceTest {
         licenseService.deleteById(saved.getId());
     }
 
+    /**
+     * Тестирует удаление записи лицензии
+     */
     @Test
     public void testDeleteLicense() {
-        Software software = softwareService.findById(Long.valueOf(1)).orElse(null);
+        Software software = softwareService.findById(1L).orElse(null);
         License license = new License(null, "test", software, LocalDate.now(), LocalDate.now(), 5000);
         License saved = licenseService.save(license);
 
