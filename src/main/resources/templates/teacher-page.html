@@ -319,6 +319,99 @@
         .status.rejected { background: #fff5f5; color: #e53e3e; }
         .status.completed { background: #ebf8ff; color: #3182ce; }
 
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+            min-width: 300px;
+            max-width: 450px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease-out;
+            cursor: pointer;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            border-left: 4px solid #22543d;
+        }
+
+        .notification-error {
+            background: linear-gradient(135deg, #fc8181, #f56565);
+            color: white;
+            border-left: 4px solid #742a2a;
+        }
+
+        .notification-warning {
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            color: #78350f;
+            border-left: 4px solid #78350f;
+        }
+
+        .notification-icon {
+            font-size: 24px;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            opacity: 0.95;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        /* Modal validation styles */
+        .modal-error {
+            border: 2px solid #f56565 !important;
+            background-color: #fff5f5 !important;
+        }
+
+        .field-error {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
         /* Modal */
         .modal {
             display: none;
@@ -382,6 +475,9 @@
     </div>
 </header>
 
+<!-- Notification Container -->
+<div id="notificationContainer"></div>
+
 <div class="container">
     <!-- Sidebar -->
     <nav class="sidebar">
@@ -391,7 +487,7 @@
                 <i class="fas fa-th-large"></i>
                 <span>Доступное ПО</span>
             </a>
-            <a href="#" class="nav-item" onclick="openRequestModal('', 1)">
+            <a href="#" class="nav-item" onclick="openRequestModal()">
                 <i class="fas fa-plus-circle"></i>
                 <span>Подать заявку</span>
             </a>
@@ -493,11 +589,13 @@
             <h2>Подача заявки на установку</h2>
             <button class="close-modal" onclick="closeRequestModal()">&times;</button>
         </div>
-        <form th:action="@{|/teacher/request?userId=${user.id}|}" method="post">
-            <!-- <input type="hidden" id="softwareId" name="softwareId"> -->
+        <form th:action="@{|/teacher/request?userId=${user.id}|}" method="post" id="requestForm">
+            <div id="modalNotification"></div>
             <div style="margin-bottom: 1rem;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Программное обеспечение</label>
-                <select name="softwareId" id="softwareSelect" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px;">
+                <select name="softwareId" id="softwareSelect"
+                        th:value="${lastSoftwareId}"
+                        style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px;">
                     <option th:each="soft : ${software}"
                             th:value="${soft.id}"
                             th:text="${soft.title}">ПО</option>
@@ -505,7 +603,9 @@
             </div>
             <div style="margin-bottom: 1rem;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Аудитория</label>
-                <select name="classroomId" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px;">
+                <select name="classroomId" id="classroomSelect"
+                        th:value="${lastClassroomId}"
+                        style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px;">
                     <option th:each="classroom : ${classroomList}"
                             th:value="${classroom.id}"
                             th:text="|Номер - №${classroom.number})|">Устройство</option>
@@ -513,7 +613,9 @@
             </div>
             <div style="margin-bottom: 1.5rem;">
                 <label style="display: block; margin-bottom: 5px; font-weight: 600;">Комментарий к заявке</label>
-                <textarea name="comment" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px; height: 100px; resize: vertical;"
+                <textarea name="comment" id="commentText"
+                          th:value="${lastComment}"
+                          style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 5px; height: 100px; resize: vertical;"
                           placeholder="Опишите причину установки, особенности использования..."></textarea>
             </div>
             <button type="submit" class="btn-primary" style="width: 100%;">
@@ -523,34 +625,211 @@
     </div>
 </div>
 
+<!-- Замени этот div -->
+<div id="serverMessages" style="display: none;"
+     th:data-error-message="${errorMessage}"
+     th:data-error-type="${errorType}"
+     th:data-success-message="${successMessage}"
+     th:data-last-software-id="${lastSoftwareId}"
+     th:data-last-classroom-id="${lastClassroomId}"
+     th:data-last-comment="${lastComment}">
+</div>
+
 <script>
-    function openRequestModalFromButton(button) {
-        const softwareName = button.getAttribute('data-software-name');
-        const softwareId = button.getAttribute('data-software-id');
-        openRequestModal(softwareName, softwareId);
+    // ========== ОСНОВНЫЕ ФУНКЦИИ ==========
+
+    function openRequestModal(softwareId) {
+        clearModalError();
+
+        const softwareSelect = document.getElementById('softwareSelect');
+        const modal = document.getElementById('requestModal');
+
+        if (softwareSelect && softwareId) {
+            softwareSelect.value = softwareId;
+        } else if (softwareSelect) {
+            softwareSelect.value = '';
+        }
+
+        if (modal) modal.style.display = 'block';
     }
 
-    function openRequestModal(softwareName, softwareId) {
-        document.getElementById('softwareSelect').value = softwareId || '';
-        document.getElementById('requestModal').style.display = 'block';
+    function openRequestModalFromButton(button) {
+        if (!button) return;
+        const softwareId = button.getAttribute('data-software-id');
+        openRequestModal(softwareId);
     }
 
     function closeRequestModal() {
-        document.getElementById('requestModal').style.display = 'none';
+        const modal = document.getElementById('requestModal');
+        const softwareSelect = document.getElementById('softwareSelect');
+        const commentText = document.getElementById('commentText');
+
+        if (modal) modal.style.display = 'none';
+        clearModalError();
+        if (softwareSelect) softwareSelect.value = '';
+        if (commentText) commentText.value = '';
     }
 
     function filterSoftware() {
-        const searchText = document.getElementById('searchInput').value.toLowerCase();
+        const searchInput = document.getElementById('searchInput');
+        if (!searchInput) return;
+
+        const searchText = searchInput.value.toLowerCase();
         const cards = document.querySelectorAll('.software-card');
 
         cards.forEach(card => {
-            const title = card.getAttribute('data-title').toLowerCase();
-            const matchesSearch = title.includes(searchText);
-            card.style.display = matchesSearch ? 'block' : 'none';
+            const title = card.getAttribute('data-title');
+            if (title) {
+                card.style.display = title.toLowerCase().includes(searchText) ? 'block' : 'none';
+            }
         });
     }
 
-    // Close modal when clicking outside
+    // ========== УВЕДОМЛЕНИЯ ==========
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function showNotification(message, type = 'error', title = '') {
+        const container = document.getElementById('notificationContainer');
+        if (!container) return;
+
+        const notification = document.createElement('div');
+        const titles = { error: 'Ошибка', warning: 'Внимание', success: 'Успех' };
+        const icons = { error: 'fa-exclamation-circle', warning: 'fa-exclamation-triangle', success: 'fa-check-circle' };
+
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-icon">
+                <i class="fas ${icons[type]}"></i>
+            </div>
+            <div class="notification-content">
+                <div class="notification-title">${escapeHtml(title || titles[type])}</div>
+                <div class="notification-message">${escapeHtml(message)}</div>
+            </div>
+            <button class="notification-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+
+        container.appendChild(notification);
+
+        setTimeout(() => {
+            if (notification.parentElement) notification.remove();
+        }, 5000);
+
+        notification.addEventListener('click', (e) => {
+            const closeBtn = notification.querySelector('.notification-close');
+            if (e.target !== closeBtn && !closeBtn.contains(e.target)) {
+                notification.remove();
+            }
+        });
+    }
+
+    // ========== МОДАЛЬНЫЕ ОШИБКИ ==========
+
+    function showModalError(message) {
+        const modalNotification = document.getElementById('modalNotification');
+        if (!modalNotification) return;
+
+        modalNotification.style.display = 'block';
+        modalNotification.innerHTML = `
+            <div style="background: #fff5f5; border-left: 4px solid #f56565; padding: 12px 15px; border-radius: 8px; margin-bottom: 15px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-exclamation-circle" style="color: #f56565; font-size: 18px;"></i>
+                    <span style="color: #742a2a; font-size: 14px;">${escapeHtml(message)}</span>
+                </div>
+            </div>
+        `;
+
+        const softwareSelect = document.getElementById('softwareSelect');
+        const classroomSelect = document.getElementById('classroomSelect');
+
+        if (softwareSelect) softwareSelect.classList.add('modal-error');
+        if (classroomSelect) classroomSelect.classList.add('modal-error');
+
+        setTimeout(() => {
+            if (softwareSelect) softwareSelect.classList.remove('modal-error');
+            if (classroomSelect) classroomSelect.classList.remove('modal-error');
+        }, 3000);
+    }
+
+    function clearModalError() {
+        const modalNotification = document.getElementById('modalNotification');
+        if (modalNotification) {
+            modalNotification.style.display = 'none';
+            modalNotification.innerHTML = '';
+        }
+
+        const softwareSelect = document.getElementById('softwareSelect');
+        const classroomSelect = document.getElementById('classroomSelect');
+
+        if (softwareSelect) softwareSelect.classList.remove('modal-error');
+        if (classroomSelect) classroomSelect.classList.remove('modal-error');
+    }
+
+    // ========== ЗАГРУЗКА СТРАНИЦЫ ==========
+    document.addEventListener('DOMContentLoaded', function() {
+        // Берем данные из data-атрибутов
+        const messagesDiv = document.getElementById('serverMessages');
+
+        if (messagesDiv) {
+            let errorMessage = messagesDiv.getAttribute('data-error-message');
+            let errorType = messagesDiv.getAttribute('data-error-type');
+            let successMessage = messagesDiv.getAttribute('data-success-message');
+            let lastSoftwareId = messagesDiv.getAttribute('data-last-software-id');
+            let lastClassroomId = messagesDiv.getAttribute('data-last-classroom-id');
+            let lastComment = messagesDiv.getAttribute('data-last-comment');
+
+            // Очищаем значения, если они равны "null" или пустые
+            if (errorMessage === 'null' || errorMessage === '' || errorMessage === 'undefined') errorMessage = null;
+            if (errorType === 'null' || errorType === '' || errorType === 'undefined') errorType = null;
+            if (successMessage === 'null' || successMessage === '' || successMessage === 'undefined') successMessage = null;
+            if (lastSoftwareId === 'null' || lastSoftwareId === '' || lastSoftwareId === 'undefined') lastSoftwareId = null;
+            if (lastClassroomId === 'null' || lastClassroomId === '' || lastClassroomId === 'undefined') lastClassroomId = null;
+            if (lastComment === 'null' || lastComment === '' || lastComment === 'undefined') lastComment = null;
+
+            console.log('errorMessage:', errorMessage);
+            console.log('errorType:', errorType);
+            console.log('successMessage:', successMessage);
+
+            // Показываем ТОЛЬКО если есть реальное сообщение об ошибке
+            if (errorMessage && errorType === 'duplicate_request') {
+                showNotification(errorMessage, 'warning', 'Дубликат заявки');
+
+                // Заполняем форму
+                const softwareSelect = document.getElementById('softwareSelect');
+                const classroomSelect = document.getElementById('classroomSelect');
+                const commentText = document.getElementById('commentText');
+
+                if (softwareSelect && lastSoftwareId) {
+                    softwareSelect.value = lastSoftwareId;
+                }
+                if (classroomSelect && lastClassroomId) {
+                    classroomSelect.value = lastClassroomId;
+                }
+                if (commentText && lastComment) {
+                    commentText.value = lastComment;
+                }
+
+                // Показываем модалку с ошибкой
+                showModalError(errorMessage);
+                document.getElementById('requestModal').style.display = 'block';
+            }
+
+            // Показываем успех ТОЛЬКО если есть реальное сообщение об успехе
+            else if (successMessage) {
+                showNotification(successMessage, 'success', 'Заявка создана');
+            }
+        }
+    });
+
+    // ========== ЗАКРЫТИЕ ПО КЛИКУ ==========
+
     window.onclick = function(event) {
         const modal = document.getElementById('requestModal');
         if (event.target === modal) {

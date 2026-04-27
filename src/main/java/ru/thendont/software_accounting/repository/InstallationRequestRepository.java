@@ -3,14 +3,16 @@ package ru.thendont.software_accounting.repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import ru.thendont.software_accounting.entity.Classroom;
 import ru.thendont.software_accounting.entity.InstallationRequest;
+import ru.thendont.software_accounting.entity.Software;
 
 import java.time.LocalDate;
 
 /**
  * Интерфейс доступа к данным таблицы installation_request из БД
  * @author thendont
- * @version 1.0
+ * @version 1.2
  */
 @Repository
 public interface InstallationRequestRepository extends CrudRepository<InstallationRequest, Long> {
@@ -35,4 +37,6 @@ public interface InstallationRequestRepository extends CrudRepository<Installati
             "AND request_date BETWEEN :dateFrom AND :dateTo",
             nativeQuery = true)
     Iterable<InstallationRequest> findByKafedraAndDateBetween(Long kafId, LocalDate dateFrom, LocalDate dateTo);
+
+    Iterable<InstallationRequest> findBySoftwareAndClassroom(Software software, Classroom classroom);
 }

@@ -25,7 +25,7 @@ import java.util.NoSuchElementException;
 /**
  * Контроллер панели преподавателя
  * @author thendont
- * @version 1.0
+ * @version 1.2
  */
 @Controller
 @RequestMapping("/teacher")
@@ -86,6 +86,24 @@ public class TeacherPageController {
             User user = userService.findById(userId).orElseThrow();
             Software software = softwareService.findById(softwareId).orElseThrow();
             Classroom classroom = classroomService.findById(classroomId).orElseThrow();
+
+            if (installationRequestService.existsBy(software, classroom)) {
+                model.addAttribute("errorMessage", "Заявка на установку данного ПО в выбранной аудитории уже существует!");
+                model.addAttribute("errorType", "duplicate_request");
+
+                model.addAttribute("user", user);
+                model.addAttribute("software", softwareService.findAll());
+                model.addAttribute("classroomList", classroomService.findByKafedra(user.getKafedra()));
+
+                model.addAttribute("lastSoftwareId", softwareId);
+                model.addAttribute("lastClassroomId", classroomId);
+                model.addAttribute("lastComment", comment);
+
+                logger.warn("@{}: === ПОПЫТКА СОЗДАНИЯ ДУБЛИКАТА ЗАЯВКИ: ПО={}, Аудитория={} ===",
+                        username, software.getTitle(), classroom.getNumber());
+                return "teacher-page";
+            }
+
             InstallationRequest request = new InstallationRequest(null, software, classroom, user, Util.getCurrentDate(),
                     InstallationRequestStatus.PENDING, comment);
 
