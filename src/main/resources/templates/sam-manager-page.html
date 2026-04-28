@@ -1139,7 +1139,7 @@
                         <button th:if="${req.status.name() == 'PENDING'}"
                                 class="btn btn-primary btn-sm"
                                 th:attr="data-id=${req.id},
-                                     data-software=${req.software.title},
+                                     data-software=${req.software.title + ' ' + req.software.version},
                                      data-software-id=${req.software.id},
                                      data-amount=${req.amount}"
                                 onclick="openPurchaseModal(this)">
@@ -1358,7 +1358,7 @@
                 <td>
                     <button class="btn btn-warning btn-sm"
                             th:attr="data-license-id=${lic.id},
-                                 data-software=${lic.software.title},
+                                 data-software=${lic.software.title + lic.software.version},
                                  data-type=${lic.type},
                                  data-price=${lic.price}"
                             onclick="openRenewalModal(this)">
@@ -1405,7 +1405,7 @@
                         <option th:each="license : ${licenses}"
                                 th:value="${license.id}"
                                 th:text="${license.software.title + ' ' + license.software.version + ' - ' + license.type + ' (' + license.price + ' ₽)'}"
-                                th:attr="data-price=${license.price}">
+                                th:attr="data-price=${license.price}, data-software-title=${license.software.title}">
                         </option>
                     </select>
                 </div>
@@ -1839,7 +1839,62 @@
         }
     }
 
-    // Также обновите функцию openPurchaseModal, чтобы сбрасывать скрытое поле
+    // Функция фильтрации лицензий по названию ПО (нестрогое соответствие)
+    function filterLicensesBySoftware(softwareName) {
+        const licenseSelect = document.getElementById('licenseSelect');
+
+        // Сохраняем все оригинальные опции в атрибут, если ещё не сохранили
+        if (!licenseSelect.hasAttribute('data-all-options')) {
+            const options = licenseSelect.querySelectorAll('option[data-software-title]');
+            const allOptions = [];
+            options.forEach(option => {
+                if (option.value) { // пропускаем пустой option
+                    allOptions.push({
+                        value: option.value,
+                        text: option.text,
+                        price: option.getAttribute('data-price'),
+                        softwareTitle: option.getAttribute('data-software-title')
+                    });
+                }
+            });
+            licenseSelect.setAttribute('data-all-options', JSON.stringify(allOptions));
+        }
+
+        // Получаем все опции
+        const allOptions = JSON.parse(licenseSelect.getAttribute('data-all-options'));
+
+        // Очищаем селект, оставляя только первый (пустой) option
+        while (licenseSelect.options.length > 1) {
+            licenseSelect.remove(1);
+        }
+
+        // Приводим название ПО к нижнему регистру для регистронезависимого поиска
+        const searchName = softwareName.toLowerCase().trim();
+
+        // Добавляем отфильтрованные опции
+        allOptions.forEach(licenseData => {
+            const licenseTitle = licenseData.softwareTitle.toLowerCase().trim();
+
+            if (searchName.includes(licenseTitle)) {
+                const option = document.createElement('option');
+                option.value = licenseData.value;
+                option.text = licenseData.text;
+                option.setAttribute('data-price', licenseData.price);
+                option.setAttribute('data-software-title', licenseData.softwareTitle);
+                licenseSelect.appendChild(option);
+            }
+        });
+
+        // Если нет подходящих лицензий, показываем сообщение
+        if (licenseSelect.options.length === 1) {
+            const noOption = document.createElement('option');
+            noOption.disabled = true;
+            noOption.text = 'Нет доступных лицензий для этого ПО';
+            licenseSelect.appendChild(noOption);
+        }
+    }
+
+    // Модифицируем функцию openPurchaseModal
     function openPurchaseModal(button) {
         const requestId = button.getAttribute('data-id');
         const softwareName = button.getAttribute('data-software');
@@ -1850,11 +1905,13 @@
         currentRequestAmount = amount;
 
         document.getElementById('purchaseRequestId').value = requestId;
-        // document.getElementById('purchaseSoftwareId').value = softwareId;
         document.getElementById('purchaseSoftware').value = softwareName;
         document.getElementById('purchaseAmount').value = amount;
 
-        // Сбрасываем выбор лицензии
+        // Фильтруем лицензии по названию ПО
+        filterLicensesBySoftware(softwareName);
+
+        // Сбрасываем выбор лицензии (устанавливаем на пустой option)
         const licenseSelect = document.getElementById('licenseSelect');
         if (licenseSelect) {
             licenseSelect.selectedIndex = 0;
