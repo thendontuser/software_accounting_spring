@@ -251,6 +251,26 @@
             box-shadow: 0 5px 15px rgba(72, 187, 120, 0.3);
         }
 
+        .btn-danger {
+            background: linear-gradient(135deg, #fc8181, #e53e3e);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 62, 62, 0.3);
+        }
+
         /* Stats Cards */
         .stats-grid {
             display: grid;
@@ -287,6 +307,7 @@
         .stat-icon.green { background: #f0fff4; color: #38a169; }
         .stat-icon.yellow { background: #fefcbf; color: #d69e2e; }
         .stat-icon.purple { background: #faf5ff; color: #9f7aea; }
+        .stat-icon.red { background: #fff5f5; color: #e53e3e; }
 
         .stat-value {
             font-size: 28px;
@@ -410,6 +431,7 @@
 
         .btn-icon.report:hover { background: #c3dafe; color: #5a67d8; }
         .btn-icon.view:hover { background: #bee3f8; color: #3182ce; }
+        .btn-icon.delete:hover { background: #fed7d7; color: #e53e3e; }
 
         /* Modal */
         .modal {
@@ -587,6 +609,11 @@
                 <span>Мои поручения</span>
                 <span class="badge" th:text="${#lists.size(installationTasks)}">0</span>
             </button>
+            <button class="nav-item" onclick="showSection('software-list')">
+                <i class="fas fa-trash-alt"></i>
+                <span>Удаление ПО</span>
+                <span class="badge" th:text="${#lists.size(installations)}">0</span>
+            </button>
         </div>
 
         <div class="nav-section">
@@ -690,7 +717,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <!-- Сортировка по ID (номеру) на стороне сервера или через Thymeleaf -->
                         <tr th:each="task : ${installationTasks}"
                             th:attr="data-task-id=${task.id}">
                             <td th:text="${task.id}">1</td>
@@ -703,10 +729,10 @@
                                   #strings.substring(task.assignedBy.patronymic, 0, 1) + '.'}">Петров П.П.</td>
                             <td>
                                 <span class="status" th:classappend="${task.status.name()}"
-                                      th:text="${task.status.getStatusName()}">В работе</span></td>
+                                      th:text="${task.status.getStatusName()}">В работе</span>
+                            </td>
                             <td>
                                 <div class="action-buttons">
-                                    <!-- Кнопка отчета для незавершенных задач -->
                                     <button class="btn-icon report"
                                             th:if="${task.status.name() != 'DONE'}"
                                             th:attr="data-task-id=${task.id},
@@ -719,7 +745,6 @@
                                         <i class="fas fa-file-alt"></i>
                                     </button>
 
-                                    <!-- Кнопка для отметки устройств -->
                                     <button class="btn-icon"
                                             th:if="${task.status.name() != 'DONE'}"
                                             style="color: #48bb78;"
@@ -730,7 +755,6 @@
                                         <i class="fas fa-laptop"></i>
                                     </button>
 
-                                    <!-- Кнопка просмотра отчета для завершенных задач -->
                                     <button class="btn-icon view"
                                             th:if="${task.status.name() == 'DONE'}"
                                             th:attr="data-task-id=${task.id}"
@@ -748,11 +772,10 @@
                         </tbody>
                     </table>
 
-                    <!-- Скрытый контейнер с данными об устройствах - С ПРОВЕРКОЙ -->
+                    <!-- Скрытый контейнер с данными об устройствах -->
                     <div style="display: none;" id="devices-data-container">
                         <th:block th:each="task : ${installationTasks}">
                             <div th:attr="data-task-id=${task.id}">
-                                <!-- Используем ?: для подстраховки от null -->
                                 <th:block th:each="device : ${taskDevices[task.id] ?: {}}">
                                     <span th:text="${device.id} + ':' + ${device.title}"
                                           th:attr="data-device-id=${device.id}, data-device-title=${device.title}"
@@ -763,6 +786,113 @@
                         </th:block>
                     </div>
 
+                </div>
+            </div>
+        </div>
+
+        <!-- Секция "Удаление ПО" -->
+        <div id="software-list-section" style="display: none;">
+            <div class="page-header">
+                <h1 class="page-title">Управление установками ПО</h1>
+            </div>
+
+            <!-- Статистика по установкам -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-cube"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" th:text="${#lists.size(installations)}">0</div>
+                            <div class="stat-label">Всего установок</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-laptop"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" th:text="${#lists.size(installations)}">0</div>
+                            <div class="stat-label">Устройств с ПО</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon red">
+                            <i class="fas fa-trash-alt"></i>
+                        </div>
+                        <div>
+                            <div class="stat-value" th:text="${#lists.size(installations)}">0</div>
+                            <div class="stat-label">Доступно для удаления</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Поисковая строка для установок -->
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" id="softwareSearch"
+                       placeholder="Поиск по названию ПО, версии, устройству, аудитории, дате..."
+                       onkeyup="searchTable('software-table', 'softwareSearch', 'softwareNoResults')">
+                <span class="search-clear" id="softwareSearchClear" onclick="clearSearch('softwareSearch', 'software-table', 'softwareNoResults')">✕</span>
+            </div>
+            <div id="softwareNoResults" style="display: none; text-align: center; padding: 1rem; color: #718096;">
+                <i class="fas fa-search"></i> По вашему запросу ничего не найдено
+            </div>
+
+            <!-- Таблица установок ПО -->
+            <div class="table-container">
+                <div class="table-title">
+                    <i class="fas fa-trash-alt"></i>
+                    Список установленного ПО
+                </div>
+                <div class="table-responsive">
+                    <table id="software-table">
+                        <thead>
+                        <tr>
+                            <th onclick="sortTable('software-table', 0)">Название ПО <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('software-table', 1)">Версия <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('software-table', 2)">Устройство <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('software-table', 3)">Аудитория <i class="fas fa-sort"></i></th>
+                            <th onclick="sortTable('software-table', 4, 'date')">Дата установки <i class="fas fa-sort"></i></th>
+                            <th>Действия</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="installation : ${installations}"
+                            th:attr="data-installation-id=${installation.id}">
+                            <td th:text="${installation.software.title}">Microsoft Office</td>
+                            <td th:text="${installation.software.version}">2021</td>
+                            <td th:text="${installation.device.title}">Компьютер №1</td>
+                            <td th:text="'№' + ${installation.device.classroom.number}">101</td>
+                            <td th:text="${#temporals.format(installation.date, 'dd.MM.yyyy')}">15.03.2024</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon delete"
+                                            th:attr="data-installation-id=${installation.id},
+                                                     data-software-title=${installation.software.title},
+                                                     data-software-version=${installation.software.version},
+                                                     data-device-title=${installation.device.title}"
+                                            onclick="openDeleteModal(this)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.size(installations) == 0}">
+                            <td colspan="6" style="text-align: center; color: #718096; padding: 2rem;">
+                                Нет записей об установленном ПО
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -848,12 +978,7 @@
             <input type="hidden" name="taskId" id="reportTaskId">
             <input type="hidden" name="userId" th:value="${user.id}">
             <div class="modal-body">
-                <!-- Детали поручения -->
-                <div class="info-block" id="taskDetails">
-                    <!-- Заполняется через JS -->
-                </div>
-
-                <!-- Чекбокс для отметки о необходимости лицензии -->
+                <div class="info-block" id="taskDetails"></div>
                 <div class="checkbox-container">
                     <input type="checkbox" name="licenseRequired" id="licenseRequired">
                     <label for="licenseRequired">
@@ -861,12 +986,8 @@
                         Требуется приобретение лицензии
                     </label>
                 </div>
-
-                <!-- Поле для комментария -->
                 <label for="notes">Комментарий о выполненной работе:</label>
                 <textarea name="notes" id="notes" placeholder="Опишите процесс установки, возникшие проблемы и результаты..."></textarea>
-
-                <!-- Подтверждение успешной установки (неявно подразумевается при отправке отчета) -->
                 <p style="font-size: 12px; color: #718096; margin-top: 10px;">
                     <i class="fas fa-info-circle"></i>
                     Отправка отчета подтверждает успешную установку ПО на указанные устройства
@@ -879,6 +1000,37 @@
     </div>
 </div>
 
+<!-- Модальное окно для подтверждения удаления -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-trash-alt" style="color: #e53e3e; margin-right: 10px;"></i> Подтверждение удаления</h2>
+            <button class="close-modal" onclick="closeModal('deleteModal')">&times;</button>
+        </div>
+        <form th:action="@{|/assistant/delete-software|}" method="post">
+            <input type="hidden" name="installationId" id="deleteInstallationId">
+            <input type="hidden" name="userId" th:value="${user.id}">
+            <div class="modal-body">
+                <p>Вы действительно хотите удалить запись об установке ПО?</p>
+                <div class="info-block" id="deleteInfoBlock" style="margin-top: 15px;">
+                    <!-- Заполняется через JS -->
+                </div>
+                <p style="color: #e53e3e; font-size: 13px; margin-top: 15px;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Это действие нельзя отменить.
+                </p>
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn-primary" onclick="closeModal('deleteModal')"
+                        style="background: #718096;">Отмена</button>
+                <button type="submit" class="btn-danger">
+                    <i class="fas fa-trash-alt"></i> Удалить
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- Модальное окно для просмотра отчета -->
 <div id="viewReportModal" class="modal">
     <div class="modal-content" style="max-width: 600px; width: 90%;">
@@ -886,13 +1038,9 @@
             <h2><i class="fas fa-file-alt" style="margin-right: 10px;"></i> Детали отчета</h2>
             <button class="close-modal" onclick="closeModal('viewReportModal')">&times;</button>
         </div>
-        <div class="modal-body" id="reportContent" style="max-height: 60vh; overflow-y: auto; padding: 20px; word-wrap: break-word; word-break: break-word;">
-            <!-- Содержимое будет заполнено через JavaScript -->
-        </div>
+        <div class="modal-body" id="reportContent" style="max-height: 60vh; overflow-y: auto; padding: 20px; word-wrap: break-word; word-break: break-word;"></div>
         <div style="display: flex; gap: 10px; justify-content: flex-end; padding: 20px; border-top: 1px solid #e2e8f0;">
-            <button class="btn-primary" onclick="closeModal('viewReportModal')" style="background: #718096;">
-                Закрыть
-            </button>
+            <button class="btn-primary" onclick="closeModal('viewReportModal')" style="background: #718096;">Закрыть</button>
         </div>
     </div>
 </div>
@@ -905,34 +1053,24 @@
             <button class="close-modal" onclick="closeModal('devicesModal')">&times;</button>
         </div>
         <form th:action="@{|/assistant/confirm-devices|}" method="post">
-            <input type="hidden" name="taskId" id="modalTaskId"> <!-- Изменено с deviceTaskId на modalTaskId -->
+            <input type="hidden" name="taskId" id="modalTaskId">
             <input type="hidden" name="userId" th:value="${user.id}">
             <div class="modal-body">
-                <!-- Информация о поручении -->
-                <div class="info-block" id="modalTaskInfo"> <!-- Изменено с deviceTaskInfo на modalTaskInfo -->
-                    <!-- Заполняется через JS -->
-                </div>
-
-                <!-- Контейнер для списка устройств -->
+                <div class="info-block" id="modalTaskInfo"></div>
                 <div id="devicesListContainer">
                     <div style="text-align: center; padding: 2rem;">
                         <i class="fas fa-spinner fa-spin"></i> Загрузка устройств...
                     </div>
                 </div>
             </div>
-
-            <!-- Кнопки управления -->
             <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button type="button" class="btn-primary" onclick="selectAllDevices()"
-                        style="flex: 1; background: #4a5568;">
+                <button type="button" class="btn-primary" onclick="selectAllDevices()" style="flex: 1; background: #4a5568;">
                     <i class="fas fa-check-double"></i> Выбрать все
                 </button>
-                <button type="button" class="btn-primary" onclick="deselectAllDevices()"
-                        style="flex: 1; background: #718096;">
+                <button type="button" class="btn-primary" onclick="deselectAllDevices()" style="flex: 1; background: #718096;">
                     <i class="fas fa-times"></i> Очистить
                 </button>
             </div>
-
             <button type="submit" class="btn-success" style="width: 100%; margin-top: 15px;" id="submitDevicesBtn">
                 <i class="fas fa-check-circle"></i> Подтвердить установку
             </button>
@@ -950,21 +1088,18 @@
 
     // Навигация по секциям
     function showSection(sectionId) {
-        // Скрываем все секции
         document.getElementById('tasks-section').style.display = 'none';
+        document.getElementById('software-list-section').style.display = 'none';
         document.getElementById('my-reports-section').style.display = 'none';
 
-        // Показываем нужную секцию
         document.getElementById(sectionId + '-section').style.display = 'block';
 
-        // Обновляем активный пункт меню
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
         });
         event.currentTarget.classList.add('active');
     }
 
-    // Работа с модальными окнами
     function openModal(modalId) {
         document.getElementById(modalId).style.display = 'block';
     }
@@ -988,51 +1123,52 @@
             <p><i class="fas fa-user-tie" style="margin-right: 5px;"></i> Зав. лабораторией: ${assignedBy}</p>
         `;
 
-        // Очищаем поля формы
         document.getElementById('licenseRequired').checked = false;
         document.getElementById('notes').value = '';
 
         openModal('reportModal');
     }
 
-    // Просмотр отчета по задаче (для завершенных задач) с подсветкой
+    // Открыть модальное окно для удаления
+    function openDeleteModal(button) {
+        const installationId = button.getAttribute('data-installation-id');
+        const softwareTitle = button.getAttribute('data-software-title');
+        const softwareVersion = button.getAttribute('data-software-version');
+        const deviceTitle = button.getAttribute('data-device-title');
+
+        document.getElementById('deleteInstallationId').value = installationId;
+        document.getElementById('deleteInfoBlock').innerHTML = `
+            <p><strong>ПО:</strong> ${softwareTitle} ${softwareVersion}</p>
+            <p><strong>Устройство:</strong> ${deviceTitle}</p>
+        `;
+
+        openModal('deleteModal');
+    }
+
     function viewTaskReport(button) {
         const taskId = button.getAttribute('data-task-id');
-
-        // Переключаемся на секцию отчетов
         showSection('my-reports');
-
-        // Подсвечиваем соответствующий отчет
         setTimeout(function() {
             highlightReportRowByTaskId(taskId);
         }, 100);
     }
 
-    // Подсветка строки отчета по taskId (как на странице зав лаба)
     function highlightReportRowByTaskId(taskId) {
-        // Находим все строки в таблице отчетов
         const reportRows = document.querySelectorAll('#reports-table tbody tr');
-
-        // Снимаем подсветку со всех строк
         reportRows.forEach(row => {
             row.style.backgroundColor = '';
             row.style.borderLeft = '';
         });
 
-        // Ищем строку, где data-task-id совпадает
         let found = false;
         for (let row of reportRows) {
             const rowTaskId = row.getAttribute('data-task-id');
             if (rowTaskId && rowTaskId === taskId) {
-                // Подсвечиваем найденную строку
                 row.style.backgroundColor = '#fff3cd';
                 row.style.borderLeft = '4px solid #ffc107';
                 row.style.transition = 'background-color 0.5s';
-
-                // Прокручиваем к этой строке
                 row.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
-                // Мигание для привлечения внимания
                 let blinkCount = 0;
                 const blinkInterval = setInterval(() => {
                     row.style.backgroundColor = blinkCount % 2 === 0 ? '#ffe69c' : '#fff3cd';
@@ -1053,7 +1189,6 @@
         }
     }
 
-    // Просмотр деталей отчета
     function viewReportDetails(button) {
         const row = button.closest('tr');
         const cells = row.getElementsByTagName('td');
@@ -1063,7 +1198,6 @@
         const classroom = cells[2].innerText;
         const licenseRequired = cells[3].innerText;
 
-        // Получаем полный текст комментария из атрибута title или из ячейки
         let notes = '';
         const notesCell = cells[4];
         const notesSpan = notesCell.querySelector('span');
@@ -1076,7 +1210,6 @@
             notes = notesCell.innerText;
         }
 
-        // Заменяем переносы строк на HTML теги для правильного отображения
         notes = notes.replace(/\n/g, '<br>');
 
         const reportContent = document.getElementById('reportContent');
@@ -1087,13 +1220,11 @@
                     <p><strong>Дата отчета:</strong> ${reportDate}</p>
                     <p><strong>Требуется лицензия:</strong> ${licenseRequired}</p>
                 </div>
-
                 <div style="background: #f7fafc; padding: 15px; border-radius: 10px;">
                     <h3 style="margin-bottom: 10px; color: #2d3748;">Детали установки</h3>
                     <p><strong>Программное обеспечение:</strong> ${software}</p>
                     <p><strong>Аудитория:</strong> ${classroom}</p>
                 </div>
-
                 <div style="background: #f7fafc; padding: 15px; border-radius: 10px;">
                     <h3 style="margin-bottom: 10px; color: #2d3748;">Комментарий</h3>
                     <div style="background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;
@@ -1108,7 +1239,7 @@
         openModal('viewReportModal');
     }
 
-    // Функция поиска по таблице
+    // Функции поиска и сортировки
     function searchTable(tableId, inputId, noResultsId) {
         const input = document.getElementById(inputId);
         const filter = input.value.toLowerCase();
@@ -1119,23 +1250,19 @@
 
         let visibleCount = 0;
 
-        // Показываем кнопку очистки если есть текст
         if (filter.length > 0) {
             clearBtn.style.display = 'inline';
         } else {
             clearBtn.style.display = 'none';
         }
 
-        // Проходим по всем строкам таблицы (кроме последней, если это строка "Нет данных")
         for (let i = 0; i < rows.length; i++) {
-            // Пропускаем строку с сообщением об отсутствии данных
             if (rows[i].cells.length === 1 && rows[i].cells[0].colSpan > 1) {
                 continue;
             }
 
             let found = false;
-            // Ищем по всем ячейкам строки (кроме последней с действиями)
-            for (let j = 0; j < rows[i].cells.length - 1; j++) {
+            for (let j = 0; j < rows[i].cells.length - (tableId === 'software-table' ? 0 : 1); j++) {
                 const cell = rows[i].cells[j];
                 if (cell) {
                     const textValue = cell.textContent || cell.innerText;
@@ -1154,7 +1281,6 @@
             }
         }
 
-        // Показываем сообщение, если ничего не найдено
         if (visibleCount === 0) {
             noResults.style.display = 'block';
         } else {
@@ -1162,7 +1288,6 @@
         }
     }
 
-    // Очистка поиска
     function clearSearch(inputId, tableId, noResultsId) {
         document.getElementById(inputId).value = '';
         document.getElementById(inputId + 'Clear').style.display = 'none';
@@ -1176,37 +1301,28 @@
         }
     }
 
-    // Сортировка таблицы
     function sortTable(tableId, column, type = 'string') {
         const table = document.getElementById(tableId);
         const tbody = table.getElementsByTagName('tbody')[0];
         const rows = Array.from(tbody.getElementsByTagName('tr'));
-
-        // Фильтруем строки, исключая строку "Нет данных"
         const dataRows = rows.filter(row => !(row.cells.length === 1 && row.cells[0].colSpan > 1));
 
-        // Определяем направление сортировки
         let direction = 'asc';
         if (currentSort.table === tableId && currentSort.column === column) {
             direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
         }
 
-        // Сортируем строки
         dataRows.sort((a, b) => {
             let aVal = a.cells[column].textContent.trim();
             let bVal = b.cells[column].textContent.trim();
 
-            // Специальная обработка для разных типов
             if (type === 'number') {
-                // Извлекаем число (для номера поручения)
                 aVal = parseInt(aVal) || 0;
                 bVal = parseInt(bVal) || 0;
             } else if (type === 'date') {
-                // Конвертируем дату ДД.ММ.ГГГГ в сравнимый формат
                 aVal = convertDateToComparable(aVal);
                 bVal = convertDateToComparable(bVal);
             } else {
-                // Для строк - сравниваем в нижнем регистре
                 aVal = aVal.toLowerCase();
                 bVal = bVal.toLowerCase();
             }
@@ -1222,23 +1338,19 @@
             }
         });
 
-        // Перестраиваем tbody
         while (tbody.firstChild) {
             tbody.removeChild(tbody.firstChild);
         }
 
         dataRows.forEach(row => tbody.appendChild(row));
 
-        // Добавляем обратно строку "Нет данных", если она была
         const noDataRow = rows.find(row => row.cells.length === 1 && row.cells[0].colSpan > 1);
         if (noDataRow) {
             tbody.appendChild(noDataRow);
         }
 
-        // Обновляем иконки сортировки
         updateSortIcons(tableId, column, direction);
 
-        // Сохраняем текущую сортировку
         currentSort = {
             table: tableId,
             column: column,
@@ -1246,7 +1358,6 @@
         };
     }
 
-    // Конвертация даты из формата ДД.ММ.ГГГГ в сравнимый формат (ГГГГММДД)
     function convertDateToComparable(dateStr) {
         const parts = dateStr.split('.');
         if (parts.length === 3) {
@@ -1255,7 +1366,6 @@
         return dateStr;
     }
 
-    // Обновление иконок сортировки
     function updateSortIcons(tableId, activeColumn, direction) {
         const headers = document.querySelectorAll(`#${tableId} th`);
         headers.forEach((header, index) => {
@@ -1270,7 +1380,7 @@
         });
     }
 
-    // Обновление счетчика выбранных устройств
+    // Функции для работы с устройствами
     function updateSelectedCount() {
         const checkboxes = document.querySelectorAll('#devicesListContainer input[name="deviceIds"]');
         const selected = document.querySelectorAll('#devicesListContainer input[name="deviceIds"]:checked');
@@ -1281,7 +1391,6 @@
         }
     }
 
-    // Выбрать все устройства
     function selectAllDevices() {
         const checkboxes = document.querySelectorAll('#devicesListContainer input[name="deviceIds"]');
         checkboxes.forEach(checkbox => {
@@ -1290,7 +1399,6 @@
         updateSelectedCount();
     }
 
-    // Очистить выбор устройств
     function deselectAllDevices() {
         const checkboxes = document.querySelectorAll('#devicesListContainer input[name="deviceIds"]');
         checkboxes.forEach(checkbox => {
@@ -1330,7 +1438,6 @@
         });
 
         devicesHtml += '</div>';
-
         devicesHtml += `
             <div style="display: flex; justify-content: space-between; margin-bottom: 10px; color: #718096;">
                 <span><i class="fas fa-info-circle"></i> Отметьте устройства, на которые выполнена установка</span>
@@ -1340,12 +1447,10 @@
 
         container.innerHTML = devicesHtml;
 
-        // Добавляем обработчики для подсчета выбранных
         document.querySelectorAll('#devicesListContainer input[name="deviceIds"]').forEach(checkbox => {
             checkbox.addEventListener('change', updateSelectedCount);
         });
 
-        // Обновляем счетчик
         updateSelectedCount();
 
         const submitBtn = document.getElementById('submitDevicesBtn');
@@ -1363,15 +1468,10 @@
         if (submitBtn) submitBtn.disabled = true;
     }
 
-    // Новая функция для открытия модального окна с устройствами из контейнера
     function openDevicesModalFromContainer(button) {
-        console.log('Opening devices modal from container');
-
         const taskId = button.getAttribute('data-task-id');
         const software = button.getAttribute('data-software');
         const classroom = button.getAttribute('data-classroom');
-
-        console.log('Task ID:', taskId);
 
         const modalTaskId = document.getElementById('modalTaskId');
         const modalTaskInfo = document.getElementById('modalTaskInfo');
@@ -1389,12 +1489,10 @@
             <p><i class="fas fa-door-open" style="margin-right: 5px;"></i> Аудитория: №${classroom}</p>
         `;
 
-        // Находим контейнер с устройствами для этой задачи
         const deviceContainer = document.querySelector(`#devices-data-container div[data-task-id="${taskId}"]`);
         const container = document.getElementById('devicesListContainer');
 
         if (!deviceContainer) {
-            console.log('No devices container found for task:', taskId);
             container.innerHTML = `
                 <div style="text-align: center; color: #718096; padding: 2rem; border: 1px solid #e2e8f0; border-radius: 8px;">
                     <i class="fas fa-info-circle" style="font-size: 24px; margin-bottom: 10px;"></i>
@@ -1417,8 +1515,6 @@
             });
         });
 
-        console.log('Found devices:', devices);
-
         if (devices.length > 0) {
             renderDevicesList(container, devices);
         } else {
@@ -1435,16 +1531,13 @@
         openModal('devicesModal');
     }
 
-    // Закрытие модалок по клику вне области
     window.onclick = function(event) {
         if (event.target.classList.contains('modal')) {
             event.target.style.display = 'none';
         }
     }
 
-    // Инициализация сортировки по номеру при загрузке страницы
     window.onload = function() {
-        // Сортируем таблицу поручений по номеру (по умолчанию)
         setTimeout(() => {
             sortTable('tasks-table', 0, 'number');
         }, 100);

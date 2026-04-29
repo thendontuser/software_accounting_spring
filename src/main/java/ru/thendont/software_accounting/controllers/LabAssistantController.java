@@ -21,6 +21,8 @@ import java.util.*;
 
 /**
  * Контроллер панели лаборанта
+ * @author thendont
+ * @version 1.2
  */
 @Controller
 @RequestMapping("/assistant")
@@ -63,6 +65,7 @@ public class LabAssistantController {
 
             List<InstallationTask> installationTasks = installationTaskService.findByAssignedTo(user);
             List<InstallationReport> myReports = installationReportService.findByTaskAssignedTo(user);
+            List<SoftwareInstallation> installations = softwareInstallationService.findByKafedra(user.getKafedra());
 
             Map<Long, List<Device>> taskDevices = new HashMap<>();
             for (InstallationTask task : installationTasks) {
@@ -74,6 +77,7 @@ public class LabAssistantController {
             model.addAttribute("installationTasks", installationTasks);
             model.addAttribute("myReports", myReports);
             model.addAttribute("taskDevices", taskDevices);
+            model.addAttribute("installations", installations);
 
             return "lab-assistant";
         }
@@ -154,6 +158,26 @@ public class LabAssistantController {
                     softwareInstallationService.save(softwareInstallation);
                 }
             }
+            return Urls.LABORATORY_ASSISTANT.getUrlString() + userId;
+        }
+        catch (NoSuchElementException ex) {
+            logger.error("@{}: === ПРОИЗОШЛА ОШИБКА ===", username, ex);
+            return ErrorHandler.errorPage(ConstantStrings.OBJECT_NOT_FOUND_TITLE, ConstantStrings.OBJECT_NOT_FOUND_MESSAGE, model);
+        }
+    }
+
+    /**
+     * Удаление записи из таблицы установок ПО
+     * @param installationId идентификатор записи установки ПО
+     * @param userId идентификатор пользователя
+     * @param model экземпляр интерфейса Model для добавления атрибутов в шаблон
+     * @return Имя шаблона страницы лаборанта
+     */
+    @PostMapping("/delete-software")
+    public String deleteSoftware(@RequestParam Long installationId, @RequestParam Long userId, Model model) {
+        try {
+            SoftwareInstallation softwareInstallation = softwareInstallationService.findById(installationId).orElseThrow();
+            softwareInstallationService.deleteById(softwareInstallation.getId());
             return Urls.LABORATORY_ASSISTANT.getUrlString() + userId;
         }
         catch (NoSuchElementException ex) {
