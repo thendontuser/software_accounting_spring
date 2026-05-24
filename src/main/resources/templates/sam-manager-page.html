@@ -1840,7 +1840,7 @@
     }
 
     // Функция фильтрации лицензий по названию ПО (нестрогое соответствие)
-    function filterLicensesBySoftware(softwareName) {
+    function filterLicensesSelectBySoftware(softwareName) {
         const licenseSelect = document.getElementById('licenseSelect');
 
         // Сохраняем все оригинальные опции в атрибут, если ещё не сохранили
@@ -1869,7 +1869,7 @@
         }
 
         // Приводим название ПО к нижнему регистру для регистронезависимого поиска
-        const searchName = softwareName.toLowerCase().trim();
+        const searchName = softwareName?.toLowerCase().trim() ?? "";
 
         // Добавляем отфильтрованные опции
         allOptions.forEach(licenseData => {
@@ -1909,7 +1909,7 @@
         document.getElementById('purchaseAmount').value = amount;
 
         // Фильтруем лицензии по названию ПО
-        filterLicensesBySoftware(softwareName);
+        filterLicensesSelectBySoftware(softwareName);
 
         // Сбрасываем выбор лицензии (устанавливаем на пустой option)
         const licenseSelect = document.getElementById('licenseSelect');
