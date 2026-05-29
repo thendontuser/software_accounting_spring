@@ -464,6 +464,89 @@
             margin-bottom: 12px;
         }
 
+        /* Pagination styles */
+        .pagination-container {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            background: #fafbfc;
+        }
+
+        .pagination-info {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #475569;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #eef2ff;
+            border-color: #0ea5e9;
+            color: #0ea5e9;
+            transform: translateY(-1px);
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #0f766e, #0ea5e9);
+            border-color: transparent;
+            color: white;
+            cursor: default;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-dots {
+            color: #94a3b8;
+            padding: 0 4px;
+        }
+
+        .rows-per-page {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .rows-per-page select {
+            padding: 6px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+        }
+
         @media (max-width: 1200px) {
             .nav-cards {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -516,6 +599,16 @@
 
             .logout-button span {
                 display: none;
+            }
+
+            .pagination-container {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .pagination-controls {
+                justify-content: center;
             }
         }
     </style>
@@ -696,6 +789,7 @@
                 </tbody>
             </table>
         </div>
+        <div class="pagination-container" id="audit-log-pagination"></div>
     </section>
 
     <section id="audit-details-section" class="table-container">
@@ -733,6 +827,7 @@
                 </tbody>
             </table>
         </div>
+        <div class="pagination-container" id="audit-details-pagination"></div>
     </section>
 
     <section id="audit-archive-section" class="table-container">
@@ -772,6 +867,7 @@
                 </tbody>
             </table>
         </div>
+        <div class="pagination-container" id="audit-archive-pagination"></div>
     </section>
 
     <section id="audit-sessions-section" class="table-container">
@@ -818,10 +914,19 @@
                 </tbody>
             </table>
         </div>
+        <div class="pagination-container" id="audit-sessions-pagination"></div>
     </section>
 </div>
 
 <script>
+    // Pagination state for each table
+    const paginationState = {
+        'audit-log': { currentPage: 1, rowsPerPage: 10, filteredData: [] },
+        'audit-details': { currentPage: 1, rowsPerPage: 10, filteredData: [] },
+        'audit-archive': { currentPage: 1, rowsPerPage: 10, filteredData: [] },
+        'audit-sessions': { currentPage: 1, rowsPerPage: 10, filteredData: [] }
+    };
+
     const sectionMeta = {
         'audit-log': {
             icon: 'fa-clipboard-list',
@@ -841,41 +946,195 @@
         }
     };
 
-    function showSection(section) {
-        document.querySelectorAll('.nav-card').forEach(card => card.classList.remove('active'));
-        document.querySelectorAll('.table-container').forEach(container => container.classList.remove('show'));
+    function getAllRows(tableId) {
+        const table = document.getElementById(`${tableId}-table`);
+        if (!table) return [];
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return [];
+        return Array.from(tbody.querySelectorAll('tr')).filter(row => !row.classList.contains('empty-state'));
+    }
 
-        document.getElementById(`card-${section}`).classList.add('active');
-        document.getElementById(`${section}-section`).classList.add('show');
-        document.getElementById('section-icon').className = `fas ${sectionMeta[section].icon}`;
-        document.getElementById('section-name').textContent = sectionMeta[section].name;
+    function filterRows(tableId, searchTerm) {
+        const rows = getAllRows(tableId);
+        if (!searchTerm || searchTerm.trim() === '') {
+            return rows;
+        }
+        const filterLower = searchTerm.toLowerCase();
+        return rows.filter(row => row.textContent.toLowerCase().includes(filterLower));
+    }
 
-        setTimeout(() => updateTableCount(section), 50);
+    function updateFilteredData(tableId) {
+        const searchInput = document.getElementById(`${tableId}-search`);
+        const searchTerm = searchInput ? searchInput.value : '';
+        const allRows = getAllRows(tableId);
+
+        // For pagination, we need to know the original data. We'll store the filtered rows.
+        // But we also need to handle the case where the search changes.
+        if (!paginationState[tableId].allOriginalRows) {
+            paginationState[tableId].allOriginalRows = [...allRows];
+        }
+
+        // If search term changed, reset to page 1
+        const wasReset = paginationState[tableId].lastSearchTerm !== searchTerm;
+        if (wasReset) {
+            paginationState[tableId].currentPage = 1;
+            paginationState[tableId].lastSearchTerm = searchTerm;
+        }
+
+        const filtered = filterRows(tableId, searchTerm);
+        paginationState[tableId].filteredData = filtered;
+
+        // Update count display
+        const totalCount = filtered.length;
+        const countElement = document.getElementById(`${tableId}-count`);
+        if (countElement) {
+            countElement.textContent = totalCount;
+        }
+
+        return filtered;
+    }
+
+    function renderPage(tableId) {
+        const state = paginationState[tableId];
+        const filtered = state.filteredData;
+        const totalRows = filtered.length;
+        const rowsPerPage = state.rowsPerPage;
+        const currentPage = state.currentPage;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        // Hide all rows first
+        const allRows = getAllRows(tableId);
+        allRows.forEach(row => row.style.display = 'none');
+
+        if (totalRows === 0) {
+            toggleEmptyState(tableId, 0, document.getElementById(`${tableId}-table`));
+            renderPaginationControls(tableId, totalPages, totalRows);
+            return;
+        }
+
+        // Remove empty state if exists
+        const emptyRow = document.getElementById(`${tableId}-empty`);
+        if (emptyRow) emptyRow.remove();
+
+        // Calculate start and end indices
+        const startIdx = (currentPage - 1) * rowsPerPage;
+        const endIdx = Math.min(startIdx + rowsPerPage, totalRows);
+
+        // Show only rows for current page
+        for (let i = startIdx; i < endIdx; i++) {
+            if (filtered[i]) {
+                filtered[i].style.display = '';
+            }
+        }
+
+        // Update pagination controls
+        renderPaginationControls(tableId, totalPages, totalRows);
+    }
+
+    function renderPaginationControls(tableId, totalPages, totalRows) {
+        const container = document.getElementById(`${tableId}-pagination`);
+        if (!container) return;
+
+        const state = paginationState[tableId];
+        const currentPage = state.currentPage;
+        const rowsPerPage = state.rowsPerPage;
+
+        if (totalRows === 0) {
+            container.innerHTML = `
+                <div class="pagination-info">
+                    Нет записей для отображения
+                </div>
+            `;
+            return;
+        }
+
+        const startRow = (currentPage - 1) * rowsPerPage + 1;
+        const endRow = Math.min(currentPage * rowsPerPage, totalRows);
+
+        let paginationHtml = `
+            <div class="pagination-info">
+                Показано ${startRow} - ${endRow} из ${totalRows} записей
+            </div>
+            <div class="pagination-controls">
+                <button class="page-btn" onclick="changePage('${tableId}', ${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+        `;
+
+        // Generate page buttons with smart truncation
+        const maxVisible = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+        if (endPage - startPage + 1 < maxVisible) {
+            startPage = Math.max(1, endPage - maxVisible + 1);
+        }
+
+        if (startPage > 1) {
+            paginationHtml += `<button class="page-btn" onclick="changePage('${tableId}', 1)">1</button>`;
+            if (startPage > 2) paginationHtml += `<span class="page-dots">...</span>`;
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHtml += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage('${tableId}', ${i})">${i}</button>`;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) paginationHtml += `<span class="page-dots">...</span>`;
+            paginationHtml += `<button class="page-btn" onclick="changePage('${tableId}', ${totalPages})">${totalPages}</button>`;
+        }
+
+        paginationHtml += `
+                <button class="page-btn" onclick="changePage('${tableId}', ${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="rows-per-page">
+                <span>Показывать:</span>
+                <select onchange="changeRowsPerPage('${tableId}', this.value)">
+                    <option value="10" ${rowsPerPage === 10 ? 'selected' : ''}>10</option>
+                    <option value="25" ${rowsPerPage === 25 ? 'selected' : ''}>25</option>
+                    <option value="50" ${rowsPerPage === 50 ? 'selected' : ''}>50</option>
+                    <option value="100" ${rowsPerPage === 100 ? 'selected' : ''}>100</option>
+                </select>
+            </div>
+        `;
+
+        container.innerHTML = paginationHtml;
+    }
+
+    function changePage(tableId, newPage) {
+        const state = paginationState[tableId];
+        const totalPages = Math.ceil(state.filteredData.length / state.rowsPerPage);
+        if (newPage < 1 || newPage > totalPages) return;
+        state.currentPage = newPage;
+        renderPage(tableId);
+    }
+
+    function changeRowsPerPage(tableId, newRowsPerPage) {
+        const state = paginationState[tableId];
+        state.rowsPerPage = parseInt(newRowsPerPage, 10);
+        state.currentPage = 1; // Reset to first page
+        renderPage(tableId);
     }
 
     function filterTable(tableId) {
+        const state = paginationState[tableId];
+        // Save original rows if not already saved
+        if (!state.allOriginalRows) {
+            state.allOriginalRows = getAllRows(tableId);
+        }
+
+        // Update filtered data
+        updateFilteredData(tableId);
+        renderPage(tableId);
+    }
+
+    function resetSearch(tableId) {
         const input = document.getElementById(`${tableId}-search`);
-        const table = document.getElementById(`${tableId}-table`);
-        const rows = table.querySelectorAll('tbody tr');
-        const filter = input.value.toLowerCase();
-        let visibleCount = 0;
-
-        rows.forEach(row => {
-            if (row.classList.contains('empty-state')) {
-                return;
-            }
-
-            const text = row.textContent.toLowerCase();
-            const isVisible = text.includes(filter);
-            row.style.display = isVisible ? '' : 'none';
-
-            if (isVisible) {
-                visibleCount++;
-            }
-        });
-
-        toggleEmptyState(tableId, visibleCount, table);
-        updateTableCount(tableId, visibleCount);
+        if (!input) return;
+        input.value = '';
+        filterTable(tableId);
     }
 
     function toggleEmptyState(tableId, visibleCount, table) {
@@ -886,9 +1145,9 @@
                 emptyRow = document.createElement('tr');
                 emptyRow.id = `${tableId}-empty`;
                 emptyRow.className = 'empty-state';
-
                 const cell = document.createElement('td');
-                cell.colSpan = table.querySelectorAll('thead th').length;
+                const thCount = table.querySelectorAll('thead th').length;
+                cell.colSpan = thCount;
                 cell.innerHTML = '<i class="fas fa-search"></i>Ничего не найдено';
                 emptyRow.appendChild(cell);
                 table.querySelector('tbody').appendChild(emptyRow);
@@ -898,36 +1157,45 @@
         }
     }
 
-    function updateTableCount(tableId, visibleCount = null) {
-        const table = document.getElementById(`${tableId}-table`);
-        if (!table) {
-            return;
+    function showSection(section) {
+        document.querySelectorAll('.nav-card').forEach(card => card.classList.remove('active'));
+        document.querySelectorAll('.table-container').forEach(container => container.classList.remove('show'));
+
+        document.getElementById(`card-${section}`).classList.add('active');
+        document.getElementById(`${section}-section`).classList.add('show');
+        document.getElementById('section-icon').className = `fas ${sectionMeta[section].icon}`;
+        document.getElementById('section-name').textContent = sectionMeta[section].name;
+
+        // Re-initialize pagination for this table if needed
+        const state = paginationState[section];
+        if (!state.allOriginalRows || state.allOriginalRows.length === 0) {
+            state.allOriginalRows = getAllRows(section);
         }
 
-        const rows = Array.from(table.querySelectorAll('tbody tr')).filter(row => !row.classList.contains('empty-state'));
-
-        if (visibleCount === null) {
-            visibleCount = rows.filter(row => row.style.display !== 'none').length;
-        }
-
-        const countElement = document.getElementById(`${tableId}-count`);
-        if (countElement) {
-            countElement.textContent = visibleCount;
-        }
+        // Update filtered data and render
+        updateFilteredData(section);
+        renderPage(section);
     }
 
-    function resetSearch(tableId) {
-        const input = document.getElementById(`${tableId}-search`);
-        if (!input) {
-            return;
+    function updateTableCount(tableId, visibleCount = null) {
+        // This function is kept for compatibility but not used directly with pagination
+        const state = paginationState[tableId];
+        if (visibleCount !== null && document.getElementById(`${tableId}-count`)) {
+            document.getElementById(`${tableId}-count`).textContent = visibleCount;
+        } else if (state && state.filteredData) {
+            const countElement = document.getElementById(`${tableId}-count`);
+            if (countElement) countElement.textContent = state.filteredData.length;
         }
-
-        input.value = '';
-        filterTable(tableId);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        ['audit-log', 'audit-details', 'audit-archive', 'audit-sessions'].forEach(tableId => updateTableCount(tableId));
+        // Initialize all tables
+        const sections = ['audit-log', 'audit-details', 'audit-archive', 'audit-sessions'];
+        sections.forEach(tableId => {
+            paginationState[tableId].allOriginalRows = getAllRows(tableId);
+            updateFilteredData(tableId);
+            renderPage(tableId);
+        });
         showSection('audit-log');
     });
 </script>

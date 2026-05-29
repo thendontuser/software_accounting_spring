@@ -584,6 +584,89 @@
             color: #1e293b;
         }
 
+        /* Pagination styles */
+        .pagination-container {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            background: #fafbfc;
+        }
+
+        .pagination-info {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #475569;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #eef2ff;
+            border-color: #2563eb;
+            color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-color: transparent;
+            color: white;
+            cursor: default;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-dots {
+            color: #94a3b8;
+            padding: 0 4px;
+        }
+
+        .rows-per-page {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .rows-per-page select {
+            padding: 6px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+        }
+
         /* Модальные окна */
         .modal-overlay {
             position: fixed;
@@ -722,7 +805,6 @@
             gap: 4px;
         }
 
-        /* Кнопки */
         .btn-danger {
             background: linear-gradient(135deg, #ef4444, #dc2626);
             color: white;
@@ -743,7 +825,6 @@
             transform: translateY(-2px);
         }
 
-        /* Сообщения */
         .warning-message {
             background: #fff3e0;
             padding: 1rem 1.25rem;
@@ -754,12 +835,6 @@
             gap: 12px;
             color: #1e293b;
             font-size: 14px;
-        }
-
-        .warning-message i {
-            color: #f59e0b;
-            font-size: 20px;
-            flex-shrink: 0;
         }
 
         .info-message {
@@ -774,13 +849,6 @@
             font-size: 14px;
         }
 
-        .info-message i {
-            color: #2563eb;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-
-        /* Индикатор загрузки */
         .loading-spinner {
             width: 50px;
             height: 50px;
@@ -791,7 +859,6 @@
             margin: 0 auto;
         }
 
-        /* Анимации */
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -813,7 +880,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Responsive */
         @media (max-width: 1024px) {
             .nav-cards {
                 grid-template-columns: repeat(3, 1fr);
@@ -859,6 +925,16 @@
                 width: 100%;
                 justify-content: center;
             }
+
+            .pagination-container {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .pagination-controls {
+                justify-content: center;
+            }
         }
 
         .sub-content {
@@ -867,12 +943,6 @@
 
         .sub-content.show {
             display: block;
-        }
-
-        .nav-card.active {
-            border-color: #2563eb;
-            background: #f8fafc;
-            transform: scale(1.02);
         }
 
         .no-results td {
@@ -889,7 +959,6 @@
             display: block;
         }
 
-        /* Стили для иконок в зависимости от типа связи */
         .relation-icon.requests { background: linear-gradient(135deg, #f97316, #ea580c); }
         .relation-icon.installations { background: linear-gradient(135deg, #6b7280, #4b5563); }
         .relation-icon.licenseRequests { background: linear-gradient(135deg, #14b8a6, #0d9488); }
@@ -1148,6 +1217,7 @@
                 </tbody>
             </table>
         </div>
+        <div class="pagination-container" id="users-pagination"></div>
     </div>
 
     <!-- Directories Section -->
@@ -1209,6 +1279,7 @@
                 </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="department-pagination"></div>
         </div>
 
         <!-- Kafedra Tab -->
@@ -1262,6 +1333,7 @@
                 </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="kafedra-pagination"></div>
         </div>
 
         <!-- Classroom Tab -->
@@ -1314,6 +1386,7 @@
                 </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="classroom-pagination"></div>
         </div>
 
         <!-- Device Tab -->
@@ -1372,6 +1445,7 @@
                 </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="device-pagination"></div>
         </div>
     </div>
 
@@ -1442,6 +1516,7 @@
                 </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="software-pagination"></div>
         </div>
 
         <!-- Developer Tab -->
@@ -1496,6 +1571,7 @@
                 </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="developer-pagination"></div>
         </div>
 
         <!-- Installation Tab -->
@@ -1533,12 +1609,244 @@
                 </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="installation-pagination"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // Управление разделами
+    // ==================== ПАГИНАЦИЯ ====================
+    const paginationState = {};
+
+    function initPaginationForTable(tableId) {
+        if (!paginationState[tableId]) {
+            const table = document.getElementById(`${tableId}-table`);
+            if (!table) return;
+            const tbody = table.querySelector('tbody');
+            if (!tbody) return;
+            const allRows = Array.from(tbody.querySelectorAll('tr')).filter(row => !row.classList.contains('no-results'));
+
+            paginationState[tableId] = {
+                currentPage: 1,
+                rowsPerPage: 10,
+                allOriginalRows: [...allRows],
+                filteredData: [...allRows],
+                lastSearchTerm: ''
+            };
+        }
+    }
+
+    function getAllRows(tableId) {
+        const table = document.getElementById(`${tableId}-table`);
+        if (!table) return [];
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return [];
+        return Array.from(tbody.querySelectorAll('tr')).filter(row => !row.classList.contains('no-results'));
+    }
+
+    function filterRows(tableId, searchTerm) {
+        const rows = getAllRows(tableId);
+        if (!searchTerm || searchTerm.trim() === '') {
+            return rows;
+        }
+        const filterLower = searchTerm.toLowerCase();
+        return rows.filter(row => {
+            const cells = row.querySelectorAll('td');
+            let textContent = '';
+            for (let j = 0; j < cells.length - 1; j++) {
+                textContent += cells[j]?.textContent?.toLowerCase() + ' ';
+            }
+            return textContent.includes(filterLower);
+        });
+    }
+
+    function updateFilteredData(tableId) {
+        const searchInput = document.getElementById(`${tableId}-search`);
+        const searchTerm = searchInput ? searchInput.value : '';
+        const state = paginationState[tableId];
+
+        if (!state) return [];
+
+        if (state.lastSearchTerm !== searchTerm) {
+            state.currentPage = 1;
+            state.lastSearchTerm = searchTerm;
+        }
+
+        const filtered = filterRows(tableId, searchTerm);
+        state.filteredData = filtered;
+
+        const totalCount = filtered.length;
+        const countElement = document.getElementById(`${tableId}-count`);
+        if (countElement) {
+            countElement.textContent = totalCount;
+        }
+
+        return filtered;
+    }
+
+    function renderPage(tableId) {
+        const state = paginationState[tableId];
+        if (!state) return;
+
+        const filtered = state.filteredData;
+        const totalRows = filtered.length;
+        const rowsPerPage = state.rowsPerPage;
+        const currentPage = state.currentPage;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        // Hide all rows first
+        const allRows = getAllRows(tableId);
+        allRows.forEach(row => row.style.display = 'none');
+
+        // Remove empty state if exists
+        const emptyRow = document.getElementById(`${tableId}-no-results`);
+        if (emptyRow) emptyRow.remove();
+
+        if (totalRows === 0) {
+            const table = document.getElementById(`${tableId}-table`);
+            const noResultsRow = document.createElement('tr');
+            noResultsRow.id = `${tableId}-no-results`;
+            noResultsRow.className = 'no-results';
+            const cell = document.createElement('td');
+            const thCount = table.querySelectorAll('thead th').length;
+            cell.colSpan = thCount;
+            cell.innerHTML = '<i class="fas fa-search"></i><br>Ничего не найдено';
+            noResultsRow.appendChild(cell);
+            table.querySelector('tbody').appendChild(noResultsRow);
+            renderPaginationControls(tableId, totalPages, totalRows);
+            return;
+        }
+
+        // Calculate start and end indices
+        const startIdx = (currentPage - 1) * rowsPerPage;
+        const endIdx = Math.min(startIdx + rowsPerPage, totalRows);
+
+        // Show only rows for current page
+        for (let i = startIdx; i < endIdx; i++) {
+            if (filtered[i]) {
+                filtered[i].style.display = '';
+            }
+        }
+
+        // Update pagination controls
+        renderPaginationControls(tableId, totalPages, totalRows);
+    }
+
+    function renderPaginationControls(tableId, totalPages, totalRows) {
+        const container = document.getElementById(`${tableId}-pagination`);
+        if (!container) return;
+
+        const state = paginationState[tableId];
+        if (!state) return;
+
+        const currentPage = state.currentPage;
+        const rowsPerPage = state.rowsPerPage;
+
+        if (totalRows === 0) {
+            container.innerHTML = `<div class="pagination-info">Нет записей для отображения</div>`;
+            return;
+        }
+
+        const startRow = (currentPage - 1) * rowsPerPage + 1;
+        const endRow = Math.min(currentPage * rowsPerPage, totalRows);
+
+        let paginationHtml = `
+            <div class="pagination-info">
+                Показано ${startRow} - ${endRow} из ${totalRows} записей
+            </div>
+            <div class="pagination-controls">
+                <button class="page-btn" onclick="changePage('${tableId}', ${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+        `;
+
+        const maxVisible = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+        if (endPage - startPage + 1 < maxVisible) {
+            startPage = Math.max(1, endPage - maxVisible + 1);
+        }
+
+        if (startPage > 1) {
+            paginationHtml += `<button class="page-btn" onclick="changePage('${tableId}', 1)">1</button>`;
+            if (startPage > 2) paginationHtml += `<span class="page-dots">...</span>`;
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHtml += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage('${tableId}', ${i})">${i}</button>`;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) paginationHtml += `<span class="page-dots">...</span>`;
+            paginationHtml += `<button class="page-btn" onclick="changePage('${tableId}', ${totalPages})">${totalPages}</button>`;
+        }
+
+        paginationHtml += `
+                <button class="page-btn" onclick="changePage('${tableId}', ${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="rows-per-page">
+                <span>Показывать:</span>
+                <select onchange="changeRowsPerPage('${tableId}', this.value)">
+                    <option value="10" ${rowsPerPage === 10 ? 'selected' : ''}>10</option>
+                    <option value="25" ${rowsPerPage === 25 ? 'selected' : ''}>25</option>
+                    <option value="50" ${rowsPerPage === 50 ? 'selected' : ''}>50</option>
+                    <option value="100" ${rowsPerPage === 100 ? 'selected' : ''}>100</option>
+                </select>
+            </div>
+        `;
+
+        container.innerHTML = paginationHtml;
+    }
+
+    function changePage(tableId, newPage) {
+        const state = paginationState[tableId];
+        if (!state) return;
+        const totalPages = Math.ceil(state.filteredData.length / state.rowsPerPage);
+        if (newPage < 1 || newPage > totalPages) return;
+        state.currentPage = newPage;
+        renderPage(tableId);
+    }
+
+    function changeRowsPerPage(tableId, newRowsPerPage) {
+        const state = paginationState[tableId];
+        if (!state) return;
+        state.rowsPerPage = parseInt(newRowsPerPage, 10);
+        state.currentPage = 1;
+        renderPage(tableId);
+    }
+
+    function filterTable(tableId) {
+        const state = paginationState[tableId];
+        if (!state) {
+            initPaginationForTable(tableId);
+        }
+        updateFilteredData(tableId);
+        renderPage(tableId);
+        updateStatsCount(tableId);
+    }
+
+    function updateStatsCount(tableId) {
+        const state = paginationState[tableId];
+        if (state && state.filteredData) {
+            const countElement = document.getElementById(`${tableId}-count`);
+            if (countElement) {
+                countElement.textContent = state.filteredData.length;
+            }
+        }
+    }
+
+    function resetSearch(tableId) {
+        const input = document.getElementById(`${tableId}-search`);
+        if (input) {
+            input.value = '';
+            filterTable(tableId);
+        }
+    }
+
+    // ==================== Управление разделами ====================
     function showSection(section) {
         document.querySelectorAll('.nav-card').forEach(card => {
             card.classList.remove('active');
@@ -1563,16 +1871,32 @@
 
         setTimeout(() => {
             if (section === 'users') {
-                updateTableCount('users');
+                initPaginationForTable('users');
+                updateFilteredData('users');
+                renderPage('users');
             } else if (section === 'directories') {
-                updateTableCount('department');
-                updateTableCount('kafedra');
-                updateTableCount('classroom');
-                updateTableCount('device');
+                initPaginationForTable('department');
+                initPaginationForTable('kafedra');
+                initPaginationForTable('classroom');
+                initPaginationForTable('device');
+                updateFilteredData('department');
+                updateFilteredData('kafedra');
+                updateFilteredData('classroom');
+                updateFilteredData('device');
+                renderPage('department');
+                renderPage('kafedra');
+                renderPage('classroom');
+                renderPage('device');
             } else if (section === 'software') {
-                updateTableCount('software');
-                updateTableCount('developer');
-                updateTableCount('installation');
+                initPaginationForTable('software');
+                initPaginationForTable('developer');
+                initPaginationForTable('installation');
+                updateFilteredData('software');
+                updateFilteredData('developer');
+                updateFilteredData('installation');
+                renderPage('software');
+                renderPage('developer');
+                renderPage('installation');
             }
         }, 100);
     }
@@ -1590,7 +1914,12 @@
         document.getElementById('section-icon').className = 'fas fa-users';
         document.getElementById('section-name').textContent = 'Пользователи';
         document.getElementById('backButton').classList.remove('show');
-        setTimeout(() => updateTableCount('users'), 100);
+
+        setTimeout(() => {
+            initPaginationForTable('users');
+            updateFilteredData('users');
+            renderPage('users');
+        }, 100);
     }
 
     function showSubTab(subTab) {
@@ -1606,88 +1935,32 @@
         });
 
         parentSection.querySelector(`#sub-${subTab}`).classList.add('show');
-        setTimeout(() => updateTableCount(subTab), 100);
-    }
 
-    function filterTable(tableId) {
-        const input = document.getElementById(`${tableId}-search`);
-        const filter = input.value.toLowerCase();
-        const table = document.getElementById(`${tableId}-table`);
-        const rows = table.getElementsByTagName('tr');
-        let visibleCount = 0;
+        setTimeout(() => {
+            let tableId = '';
+            if (subTab === 'software-list') tableId = 'software';
+            else if (subTab === 'developer') tableId = 'developer';
+            else if (subTab === 'installation') tableId = 'installation';
+            else tableId = subTab;
 
-        for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            let textContent = '';
-
-            const cells = row.getElementsByTagName('td');
-            for (let j = 0; j < cells.length - 1; j++) {
-                textContent += cells[j].textContent.toLowerCase() + ' ';
-            }
-
-            if (textContent.includes(filter)) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        }
-
-        let noResultsRow = document.getElementById(`${tableId}-no-results`);
-        if (visibleCount === 0) {
-            if (!noResultsRow) {
-                noResultsRow = table.insertRow();
-                noResultsRow.id = `${tableId}-no-results`;
-                noResultsRow.className = 'no-results';
-                const cell = noResultsRow.insertCell(0);
-                cell.colSpan = table.rows[0]?.cells.length || 1;
-                cell.innerHTML = '<i class="fas fa-search"></i><br>Ничего не найдено';
-            }
-        } else if (noResultsRow) {
-            noResultsRow.remove();
-        }
-
-        updateTableCount(tableId, visibleCount);
+            initPaginationForTable(tableId);
+            updateFilteredData(tableId);
+            renderPage(tableId);
+        }, 100);
     }
 
     function updateTableCount(tableId, visibleCount = null) {
-        const table = document.getElementById(`${tableId}-table`);
-        if (!table) return;
-
-        const rows = table.getElementsByTagName('tr');
-        let total = 0;
-
-        for (let i = 1; i < rows.length; i++) {
-            if (!rows[i].classList.contains('no-results')) {
-                total++;
-            }
-        }
-
-        if (visibleCount === null) {
-            visibleCount = 0;
-            for (let i = 1; i < rows.length; i++) {
-                if (rows[i].style.display !== 'none' && !rows[i].classList.contains('no-results')) {
-                    visibleCount++;
-                }
-            }
-        }
-
-        const statsElement = document.getElementById(`${tableId}-stats`);
-        const countElement = document.getElementById(`${tableId}-count`);
-        if (statsElement && countElement) {
-            countElement.textContent = visibleCount;
+        const state = paginationState[tableId];
+        if (state && visibleCount !== null) {
+            const countElement = document.getElementById(`${tableId}-count`);
+            if (countElement) countElement.textContent = visibleCount;
+        } else if (state && state.filteredData) {
+            const countElement = document.getElementById(`${tableId}-count`);
+            if (countElement) countElement.textContent = state.filteredData.length;
         }
     }
 
-    function resetSearch(tableId) {
-        const input = document.getElementById(`${tableId}-search`);
-        if (input) {
-            input.value = '';
-            filterTable(tableId);
-        }
-    }
-
-    // Функция подтверждения удаления с данными из data-атрибутов
+    // ==================== Функции удаления ====================
     function confirmDeleteFromData(button) {
         const tableName = button.getAttribute('data-table');
         const recordId = button.getAttribute('data-id');
@@ -1910,9 +2183,13 @@
     document.addEventListener('DOMContentLoaded', function() {
         resetToCards();
 
-        const tables = ['users', 'department', 'kafedra', 'classroom', 'device', 'software', 'developer', 'installation'];
-        tables.forEach(tableId => {
-            setTimeout(() => updateTableCount(tableId), 200);
+        const allTableIds = ['users', 'department', 'kafedra', 'classroom', 'device', 'software', 'developer', 'installation'];
+        allTableIds.forEach(tableId => {
+            setTimeout(() => {
+                initPaginationForTable(tableId);
+                updateFilteredData(tableId);
+                renderPage(tableId);
+            }, 100);
         });
     });
 </script>

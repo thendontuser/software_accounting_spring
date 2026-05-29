@@ -500,6 +500,89 @@
             gap: 8px;
         }
 
+        /* Pagination styles */
+        .pagination-container {
+            padding: 16px 24px;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            background: #fafbfc;
+        }
+
+        .pagination-info {
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+            border: 1px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #475569;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #eef2ff;
+            border-color: #2563eb;
+            color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            border-color: transparent;
+            color: white;
+            cursor: default;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-dots {
+            color: #94a3b8;
+            padding: 0 4px;
+        }
+
+        .rows-per-page {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        .rows-per-page select {
+            padding: 6px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+        }
+
         /* Filter Section */
         .filter-section {
             padding: 16px 24px;
@@ -911,6 +994,16 @@
             .form-row {
                 grid-template-columns: 1fr;
             }
+
+            .pagination-container {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .pagination-controls {
+                justify-content: center;
+            }
         }
 
         .btn-outline {
@@ -1067,7 +1160,7 @@
         </button>
     </div>
 
-    <!-- Requests Section (отображается по умолчанию) -->
+    <!-- Requests Section -->
     <div id="requests-section" class="table-container show">
         <div class="table-header">
             <div class="table-title">
@@ -1085,8 +1178,8 @@
                 <i class="fas fa-search"></i>
                 <input type="text" id="requests-search" placeholder="Поиск по ПО, заявителю или комментарию..." onkeyup="filterTable('requests')">
                 <span class="search-reset" onclick="resetSearch('requests')">
-                <i class="fas fa-times"></i>
-            </span>
+                    <i class="fas fa-times"></i>
+                </span>
             </div>
             <div class="search-stats" id="requests-stats">Показано <span id="requests-count">0</span> из <span th:text="${#lists.size(licenseRequests)}">0</span></div>
         </div>
@@ -1099,8 +1192,8 @@
                 <span class="filter-option" onclick="filterRequestsByStatus('PENDING')">В ожидании</span>
                 <span class="filter-option" onclick="filterRequestsByStatus('APPROVED')">Одобренные</span>
                 <span class="filter-option clear-filter" onclick="clearRequestFilters()">
-                <i class="fas fa-times"></i> Сбросить
-            </span>
+                    <i class="fas fa-times"></i> Сбросить
+                </span>
             </div>
         </div>
         <table class="data-table" id="requests-table">
@@ -1122,12 +1215,12 @@
                 <td th:text="${req.requestedBy.lastName + ' ' + req.requestedBy.firstName}">Иванов И.</td>
                 <td th:text="${#temporals.format(req.createdAt, 'dd.MM.yyyy')}">01.01.2024</td>
                 <td>
-                <span th:switch="${req.status.name()}" class="status-badge">
-                    <span th:case="'PENDING'" class="status-badge pending">В ожидании</span>
-                    <span th:case="'APPROVED'" class="status-badge approved">Одобрена</span>
-                    <span th:case="'REJECTED'" class="status-badge rejected">Отклонена</span>
-                    <span th:case="*" th:text="${req.status}"></span>
-                </span>
+                    <span th:switch="${req.status.name()}" class="status-badge">
+                        <span th:case="'PENDING'" class="status-badge pending">В ожидании</span>
+                        <span th:case="'APPROVED'" class="status-badge approved">Одобрена</span>
+                        <span th:case="'REJECTED'" class="status-badge rejected">Отклонена</span>
+                        <span th:case="*" th:text="${req.status}"></span>
+                    </span>
                 </td>
                 <td class="comment-cell"
                     th:title="${req.comment ?: '-'}"
@@ -1146,11 +1239,11 @@
                             <i class="fas fa-shopping-cart"></i> Оформить закупку
                         </button>
                         <span th:if="${req.status.name() == 'APPROVED'}" class="status-badge approved">
-                        <i class="fas fa-check-circle"></i> Одобрено
-                    </span>
+                            <i class="fas fa-check-circle"></i> Одобрено
+                        </span>
                         <span th:if="${req.status.name() == 'REJECTED'}" class="status-badge rejected">
-                        <i class="fas fa-times-circle"></i> Отклонено
-                    </span>
+                            <i class="fas fa-times-circle"></i> Отклонено
+                        </span>
                     </div>
                 </td>
             </tr>
@@ -1162,11 +1255,11 @@
             </tr>
             </tbody>
         </table>
+        <div class="pagination-container" id="requests-pagination"></div>
     </div>
 
-    <!-- Licenses Registry Section с вкладками и общим фильтром -->
+    <!-- Licenses Registry Section -->
     <div id="licenses-section" class="table-container">
-        <!-- Общий фильтр по ПО для обеих вкладок -->
         <div class="filter-section" style="border-bottom: 1px solid #e2e8f0;">
             <div class="filter-title">
                 <i class="fas fa-filter"></i> Фильтр по ПО:
@@ -1202,8 +1295,8 @@
                     <i class="fas fa-search"></i>
                     <input type="text" id="available-search" placeholder="Поиск по ПО, типу..." onkeyup="filterLicensesTable('available')">
                     <span class="search-reset" onclick="resetLicensesSearch('available')">
-                    <i class="fas fa-times"></i>
-                </span>
+                        <i class="fas fa-times"></i>
+                    </span>
                 </div>
                 <div class="search-stats" id="available-stats">Показано <span id="available-count">0</span> из <span th:text="${#lists.size(licenses)}">0</span></div>
             </div>
@@ -1229,6 +1322,7 @@
                 </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="available-pagination"></div>
         </div>
 
         <!-- Вкладка "Приобретенные лицензии" -->
@@ -1244,8 +1338,8 @@
                     <i class="fas fa-search"></i>
                     <input type="text" id="purchased-search" placeholder="Поиск по ПО, типу или контракту..." onkeyup="filterLicensesTable('purchased')">
                     <span class="search-reset" onclick="resetLicensesSearch('purchased')">
-                    <i class="fas fa-times"></i>
-                </span>
+                        <i class="fas fa-times"></i>
+                    </span>
                 </div>
                 <div class="search-stats" id="purchased-stats">Показано <span id="purchased-count">0</span> из <span th:text="${#lists.size(purchases)}">0</span></div>
             </div>
@@ -1271,18 +1365,18 @@
                     <td th:text="${#temporals.format(purch.license.dateEnd, 'dd.MM.yyyy')}">31.12.2024</td>
                     <td th:text="${purch.cost + ' ₽'}">75000 ₽</td>
                     <td>
-                    <span th:if="${purch.license.dateEnd != null and purch.license.dateEnd.isBefore(T(java.time.LocalDate).now().plusDays(30)) and purch.license.dateEnd.isAfter(T(java.time.LocalDate).now())}"
-                          class="status-badge expiring">
-                        <i class="fas fa-exclamation-circle"></i> Истекает
-                    </span>
+                        <span th:if="${purch.license.dateEnd != null and purch.license.dateEnd.isBefore(T(java.time.LocalDate).now().plusDays(30)) and purch.license.dateEnd.isAfter(T(java.time.LocalDate).now())}"
+                              class="status-badge expiring">
+                            <i class="fas fa-exclamation-circle"></i> Истекает
+                        </span>
                         <span th:if="${purch.license.dateEnd != null and purch.license.dateEnd.isAfter(T(java.time.LocalDate).now().plusDays(30))}"
                               class="status-badge" style="background: #d1fae5; color: #10b981;">
-                        <i class="fas fa-check-circle"></i> Активна
-                    </span>
+                            <i class="fas fa-check-circle"></i> Активна
+                        </span>
                         <span th:if="${purch.license.dateEnd != null and purch.license.dateEnd.isBefore(T(java.time.LocalDate).now())}"
                               class="status-badge rejected">
-                        <i class="fas fa-times-circle"></i> Истекла
-                    </span>
+                            <i class="fas fa-times-circle"></i> Истекла
+                        </span>
                     </td>
                     <td th:text="${purch.contractNumber}">К-001-2024</td>
                 </tr>
@@ -1294,6 +1388,7 @@
                 </tr>
                 </tbody>
             </table>
+            <div class="pagination-container" id="purchased-pagination"></div>
         </div>
     </div>
 
@@ -1306,7 +1401,6 @@
             </div>
         </div>
 
-        <!-- Фильтр по ПО -->
         <div class="filter-section" style="border-bottom: 1px solid #e2e8f0;">
             <div class="filter-title">
                 <i class="fas fa-filter"></i> Фильтр по ПО:
@@ -1329,8 +1423,8 @@
                 <i class="fas fa-search"></i>
                 <input type="text" id="expiring-search" placeholder="Поиск по ПО или типу лицензии..." onkeyup="filterExpiringTable()">
                 <span class="search-reset" onclick="resetExpiringSearch()">
-                <i class="fas fa-times"></i>
-            </span>
+                    <i class="fas fa-times"></i>
+                </span>
             </div>
             <div class="search-stats" id="expiring-stats">Показано <span id="expiring-count">0</span> из <span th:text="${#lists.size(expiringLicenses)}">0</span></div>
         </div>
@@ -1374,10 +1468,11 @@
             </tr>
             </tbody>
         </table>
+        <div class="pagination-container" id="expiring-pagination"></div>
     </div>
 </div>
 
-<!-- Модальное окно закупки лицензии (улучшенное) -->
+<!-- Модальное окно закупки лицензии -->
 <div id="purchaseModal" class="modal-overlay" style="display: none;" onclick="closeModal(event)">
     <div class="modal-container" onclick="event.stopPropagation()">
         <div class="modal-header" style="background: linear-gradient(135deg, #2563eb, #7c3aed);">
@@ -1389,7 +1484,6 @@
         <form th:action="@{/manager/purchase/create}" method="post" id="purchaseForm">
             <div class="modal-body">
                 <input type="hidden" name="requestId" id="purchaseRequestId">
-                <!--<input type="hidden" name="softwareId" id="purchaseSoftwareId">-->
                 <input type="hidden" name="boughtBy" th:value="${user.id}">
                 <input type="hidden" name="totalCost" id="totalCostHidden">
 
@@ -1527,91 +1621,281 @@
 </div>
 
 <script>
-    // Данные из контроллера
-    const expiringCount = /*[[${expiringCount}]]*/ 0;
+    // ==================== ПАГИНАЦИЯ ====================
+    const paginationState = {};
 
-    // Переменная для хранения текущего выбранного ПО в фильтре
-    let currentSoftwareFilter = 'all';
+    function initPaginationForTable(tableId) {
+        if (!paginationState[tableId]) {
+            const table = document.getElementById(`${tableId}-table`);
+            if (!table) return;
+            const tbody = table.querySelector('tbody');
+            if (!tbody) return;
+            const allRows = Array.from(tbody.querySelectorAll('tr')).filter(row => !row.classList.contains('no-results'));
 
-    // Переменные для хранения данных о заявке
-    let currentRequestSoftwareId = null;
-    let currentRequestAmount = null;
-
-    // Создаем массив лицензий из данных, переданных через Thymeleaf
-    const availableLicenses = /*[[${licenses}]]*/ [];
-
-    // Управление разделами
-    function showSection(section) {
-        // Обновляем активную карточку
-        document.querySelectorAll('.nav-card').forEach(card => {
-            card.classList.remove('active');
-        });
-        document.getElementById(`card-${section}`).classList.add('active');
-
-        // Показываем нужную секцию
-        document.querySelectorAll('.table-container').forEach(container => {
-            container.classList.remove('show');
-        });
-        document.getElementById(`${section}-section`).classList.add('show');
-
-        // Обновляем заголовок
-        const titles = {
-            'requests': { icon: 'fa-file-signature', name: 'Заявки на закупку' },
-            'licenses': { icon: 'fa-certificate', name: 'Реестр лицензий' },
-            'expiring': { icon: 'fa-exclamation-triangle', name: 'Истекающие лицензии' }
-        };
-
-        document.getElementById('section-icon').className = `fas ${titles[section].icon}`;
-        document.getElementById('section-name').textContent = titles[section].name;
-        document.getElementById('backButton').classList.add('show');
-
-        // Обновляем счетчики
-        setTimeout(() => {
-            if (section === 'requests') {
-                updateTableCount('requests');
-            } else if (section === 'licenses') {
-                applyLicensesFilter();
-            } else if (section === 'expiring') {
-                updateTableCount('expiring');
-            }
-        }, 100);
+            paginationState[tableId] = {
+                currentPage: 1,
+                rowsPerPage: 10,
+                allOriginalRows: [...allRows],
+                filteredData: [...allRows],
+                lastSearchTerm: ''
+            };
+        }
     }
 
-    function resetToCards() {
-        document.querySelectorAll('.table-container').forEach(container => {
-            container.classList.remove('show');
-        });
-        document.querySelectorAll('.nav-card').forEach(card => {
-            card.classList.remove('active');
-        });
-
-        // По умолчанию показываем секцию заявок
-        document.getElementById('requests-section').classList.add('show');
-        document.getElementById('section-icon').className = 'fas fa-file-signature';
-        document.getElementById('section-name').textContent = 'Заявки на закупку';
-        document.getElementById('backButton').classList.remove('show');
-        setTimeout(() => updateTableCount('requests'), 100);
+    function getAllRows(tableId) {
+        const table = document.getElementById(`${tableId}-table`);
+        if (!table) return [];
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return [];
+        return Array.from(tbody.querySelectorAll('tr')).filter(row => !row.classList.contains('no-results'));
     }
 
-    // Управление вкладками в реестре лицензий
-    function showLicensesSubTab(tab) {
-        const container = document.getElementById('licenses-section');
-        container.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
-        container.querySelectorAll('.sub-content').forEach(c => c.classList.remove('show'));
+    function filterRows(tableId, searchTerm, statusFilter = null) {
+        const rows = getAllRows(tableId);
+        let filtered = [...rows];
 
-        if (tab === 'available') {
-            document.querySelector('#licenses-section .sub-tab:first-child').classList.add('active');
-            document.getElementById('sub-available').classList.add('show');
-        } else {
-            document.querySelector('#licenses-section .sub-tab:last-child').classList.add('active');
-            document.getElementById('sub-purchased').classList.add('show');
+        if (searchTerm && searchTerm.trim() !== '') {
+            const filterLower = searchTerm.toLowerCase();
+            filtered = filtered.filter(row => {
+                const cells = row.querySelectorAll('td');
+                let textContent = '';
+                for (let j = 0; j < cells.length - 1; j++) {
+                    textContent += cells[j]?.textContent?.toLowerCase() + ' ';
+                }
+                return textContent.includes(filterLower);
+            });
         }
 
-        // Применяем текущий фильтр к активной вкладке
-        applyLicensesFilter();
+        // Special handling for requests status filter
+        if (tableId === 'requests' && statusFilter && statusFilter !== 'all') {
+            filtered = filtered.filter(row => {
+                const rowStatus = row.getAttribute('data-status');
+                return rowStatus === statusFilter;
+            });
+        }
+
+        return filtered;
     }
 
-    // Общий фильтр по ПО для обеих вкладок
+    function updateFilteredData(tableId, statusFilter = null) {
+        const searchInput = document.getElementById(`${tableId}-search`);
+        const searchTerm = searchInput ? searchInput.value : '';
+        const state = paginationState[tableId];
+
+        if (!state) return [];
+
+        if (state.lastSearchTerm !== searchTerm) {
+            state.currentPage = 1;
+            state.lastSearchTerm = searchTerm;
+        }
+
+        const filtered = filterRows(tableId, searchTerm, statusFilter);
+        state.filteredData = filtered;
+
+        const totalCount = filtered.length;
+        const countElement = document.getElementById(`${tableId}-count`);
+        if (countElement) {
+            countElement.textContent = totalCount;
+        }
+
+        return filtered;
+    }
+
+    function renderPage(tableId) {
+        const state = paginationState[tableId];
+        if (!state) return;
+
+        const filtered = state.filteredData;
+        const totalRows = filtered.length;
+        const rowsPerPage = state.rowsPerPage;
+        const currentPage = state.currentPage;
+        const totalPages = Math.ceil(totalRows / rowsPerPage);
+
+        // Hide all rows first
+        const allRows = getAllRows(tableId);
+        allRows.forEach(row => row.style.display = 'none');
+
+        // Remove empty state if exists
+        const emptyRow = document.getElementById(`${tableId}-no-results`);
+        if (emptyRow) emptyRow.remove();
+
+        if (totalRows === 0) {
+            const table = document.getElementById(`${tableId}-table`);
+            const noResultsRow = document.createElement('tr');
+            noResultsRow.id = `${tableId}-no-results`;
+            noResultsRow.className = 'no-results';
+            const cell = document.createElement('td');
+            const thCount = table.querySelectorAll('thead th').length;
+            cell.colSpan = thCount;
+            cell.innerHTML = '<i class="fas fa-search"></i><br>Ничего не найдено';
+            noResultsRow.appendChild(cell);
+            table.querySelector('tbody').appendChild(noResultsRow);
+            renderPaginationControls(tableId, totalPages, totalRows);
+            return;
+        }
+
+        // Calculate start and end indices
+        const startIdx = (currentPage - 1) * rowsPerPage;
+        const endIdx = Math.min(startIdx + rowsPerPage, totalRows);
+
+        // Show only rows for current page
+        for (let i = startIdx; i < endIdx; i++) {
+            if (filtered[i]) {
+                filtered[i].style.display = '';
+            }
+        }
+
+        renderPaginationControls(tableId, totalPages, totalRows);
+    }
+
+    function renderPaginationControls(tableId, totalPages, totalRows) {
+        const container = document.getElementById(`${tableId}-pagination`);
+        if (!container) return;
+
+        const state = paginationState[tableId];
+        if (!state) return;
+
+        const currentPage = state.currentPage;
+        const rowsPerPage = state.rowsPerPage;
+
+        if (totalRows === 0) {
+            container.innerHTML = `<div class="pagination-info">Нет записей для отображения</div>`;
+            return;
+        }
+
+        const startRow = (currentPage - 1) * rowsPerPage + 1;
+        const endRow = Math.min(currentPage * rowsPerPage, totalRows);
+
+        let paginationHtml = `
+            <div class="pagination-info">
+                Показано ${startRow} - ${endRow} из ${totalRows} записей
+            </div>
+            <div class="pagination-controls">
+                <button class="page-btn" onclick="changePage('${tableId}', ${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+        `;
+
+        const maxVisible = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+        if (endPage - startPage + 1 < maxVisible) {
+            startPage = Math.max(1, endPage - maxVisible + 1);
+        }
+
+        if (startPage > 1) {
+            paginationHtml += `<button class="page-btn" onclick="changePage('${tableId}', 1)">1</button>`;
+            if (startPage > 2) paginationHtml += `<span class="page-dots">...</span>`;
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            paginationHtml += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage('${tableId}', ${i})">${i}</button>`;
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) paginationHtml += `<span class="page-dots">...</span>`;
+            paginationHtml += `<button class="page-btn" onclick="changePage('${tableId}', ${totalPages})">${totalPages}</button>`;
+        }
+
+        paginationHtml += `
+                <button class="page-btn" onclick="changePage('${tableId}', ${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            <div class="rows-per-page">
+                <span>Показывать:</span>
+                <select onchange="changeRowsPerPage('${tableId}', this.value)">
+                    <option value="10" ${rowsPerPage === 10 ? 'selected' : ''}>10</option>
+                    <option value="25" ${rowsPerPage === 25 ? 'selected' : ''}>25</option>
+                    <option value="50" ${rowsPerPage === 50 ? 'selected' : ''}>50</option>
+                    <option value="100" ${rowsPerPage === 100 ? 'selected' : ''}>100</option>
+                </select>
+            </div>
+        `;
+
+        container.innerHTML = paginationHtml;
+    }
+
+    function changePage(tableId, newPage) {
+        const state = paginationState[tableId];
+        if (!state) return;
+        const totalPages = Math.ceil(state.filteredData.length / state.rowsPerPage);
+        if (newPage < 1 || newPage > totalPages) return;
+        state.currentPage = newPage;
+        renderPage(tableId);
+    }
+
+    function changeRowsPerPage(tableId, newRowsPerPage) {
+        const state = paginationState[tableId];
+        if (!state) return;
+        state.rowsPerPage = parseInt(newRowsPerPage, 10);
+        state.currentPage = 1;
+        renderPage(tableId);
+    }
+
+    function filterTable(tableId) {
+        const state = paginationState[tableId];
+        if (!state) {
+            initPaginationForTable(tableId);
+        }
+        updateFilteredData(tableId);
+        renderPage(tableId);
+    }
+
+    function resetSearch(tableId) {
+        const input = document.getElementById(`${tableId}-search`);
+        if (input) {
+            input.value = '';
+            filterTable(tableId);
+        }
+    }
+
+    // Requests status filter
+    let currentStatusFilter = 'all';
+
+    function filterRequestsByStatus(status) {
+        currentStatusFilter = status;
+
+        document.querySelectorAll('#requests-section .filter-option').forEach(opt => {
+            opt.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        const state = paginationState['requests'];
+        if (!state) {
+            initPaginationForTable('requests');
+        }
+
+        updateFilteredData('requests', currentStatusFilter);
+        renderPage('requests');
+    }
+
+    function clearRequestFilters() {
+        const searchInput = document.getElementById('requests-search');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+
+        currentStatusFilter = 'all';
+
+        document.querySelectorAll('#requests-section .filter-option').forEach(opt => {
+            opt.classList.remove('active');
+        });
+        document.querySelector('#requests-section .filter-option:first-child').classList.add('active');
+
+        const state = paginationState['requests'];
+        if (state) {
+            state.lastSearchTerm = '';
+        }
+
+        updateFilteredData('requests', 'all');
+        renderPage('requests');
+    }
+
+    // Licenses filters
+    let currentSoftwareFilter = 'all';
+
     function filterLicensesBySoftware() {
         const select = document.getElementById('licenses-software-filter-select');
         currentSoftwareFilter = select.value;
@@ -1619,7 +1903,6 @@
     }
 
     function applyLicensesFilter() {
-        // Определяем, какая вкладка сейчас активна
         const activeTab = document.querySelector('#licenses-section .sub-tab.active');
         let tableId = '';
 
@@ -1633,93 +1916,50 @@
     }
 
     function filterLicensesTable(tableId) {
-        const table = document.getElementById(`${tableId}-table`);
-        if (!table) return;
+        const state = paginationState[tableId];
+        if (!state) {
+            initPaginationForTable(tableId);
+        }
 
-        const rows = table.getElementsByTagName('tr');
-        let visibleCount = 0;
-
-        // Получаем текст поиска
         const searchInput = document.getElementById(`${tableId}-search`);
-        const searchFilter = searchInput ? searchInput.value.toLowerCase() : '';
+        const searchTerm = searchInput ? searchInput.value : '';
+        const stateObj = paginationState[tableId];
 
-        for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            if (row.classList.contains('no-results')) continue;
+        if (stateObj && stateObj.lastSearchTerm !== searchTerm) {
+            stateObj.currentPage = 1;
+            stateObj.lastSearchTerm = searchTerm;
+        }
 
-            let showRow = true;
+        let filtered = getAllRows(tableId);
 
-            // Фильтр по ПО
-            if (currentSoftwareFilter !== 'all') {
+        // Filter by software
+        if (currentSoftwareFilter !== 'all') {
+            filtered = filtered.filter(row => {
                 const rowSoftwareId = row.getAttribute('data-software-id');
-                if (rowSoftwareId != currentSoftwareFilter) {
-                    showRow = false;
-                }
-            }
+                return rowSoftwareId == currentSoftwareFilter;
+            });
+        }
 
-            // Поисковый фильтр
-            if (showRow && searchFilter) {
+        // Filter by search
+        if (searchTerm && searchTerm.trim() !== '') {
+            const filterLower = searchTerm.toLowerCase();
+            filtered = filtered.filter(row => {
+                const cells = row.querySelectorAll('td');
                 let textContent = '';
-                const cells = row.getElementsByTagName('td');
                 for (let j = 0; j < cells.length - 1; j++) {
-                    if (cells[j]) {
-                        textContent += cells[j].textContent.toLowerCase() + ' ';
-                    }
+                    textContent += cells[j]?.textContent?.toLowerCase() + ' ';
                 }
-                if (!textContent.includes(searchFilter)) {
-                    showRow = false;
-                }
-            }
-
-            if (showRow) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
+                return textContent.includes(filterLower);
+            });
         }
 
-        // Проверяем, есть ли видимые строки
-        const tbody = table.querySelector('tbody');
-        const noResultsRow = document.getElementById(`${tableId}-no-results`);
-
-        if (visibleCount === 0) {
-            if (!noResultsRow) {
-                const newRow = tbody.insertRow(0);
-                newRow.id = `${tableId}-no-results`;
-                newRow.className = 'no-results';
-                const cell = newRow.insertCell(0);
-                cell.colSpan = table.rows[0]?.cells.length || 1;
-                cell.innerHTML = '<i class="fas fa-search"></i><br>Ничего не найдено';
-                cell.style.textAlign = 'center';
-                cell.style.padding = '40px';
-            }
-        } else if (noResultsRow) {
-            noResultsRow.remove();
+        if (stateObj) {
+            stateObj.filteredData = filtered;
+            const countElement = document.getElementById(`${tableId}-count`);
+            if (countElement) countElement.textContent = filtered.length;
         }
 
-        updateLicensesTableCount(tableId, visibleCount);
-    }
-
-    function updateLicensesTableCount(tableId, visibleCount) {
-        const table = document.getElementById(`${tableId}-table`);
-        if (!table) return;
-
-        const tbody = table.querySelector('tbody');
-        const rows = tbody ? tbody.getElementsByTagName('tr') : [];
-        let total = 0;
-
-        for (let i = 0; i < rows.length; i++) {
-            if (!rows[i].classList.contains('no-results')) {
-                total++;
-            }
-        }
-
-        const statsElement = document.getElementById(`${tableId}-stats`);
-        const countElement = document.getElementById(`${tableId}-count`);
-        if (statsElement && countElement) {
-            countElement.textContent = visibleCount;
-        }
+        renderPage(tableId);
     }
 
     function resetLicensesSearch(tableId) {
@@ -1731,124 +1971,164 @@
     }
 
     function clearLicensesSoftwareFilter() {
-        // Сбрасываем фильтр по ПО
         const select = document.getElementById('licenses-software-filter-select');
         select.value = 'all';
         currentSoftwareFilter = 'all';
-
-        // Применяем сброс к текущей активной вкладке
         applyLicensesFilter();
     }
 
-    // Фильтрация заявок по статусу
-    function filterRequestsByStatus(status) {
-        const table = document.getElementById('requests-table');
-        const rows = table.getElementsByTagName('tr');
-        let visibleCount = 0;
+    function showLicensesSubTab(tab) {
+        const container = document.getElementById('licenses-section');
+        container.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
+        container.querySelectorAll('.sub-content').forEach(c => c.classList.remove('show'));
 
-        document.querySelectorAll('#requests-section .filter-option').forEach(opt => {
-            opt.classList.remove('active');
-        });
-        event.target.classList.add('active');
-
-        for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            if (row.classList.contains('no-results')) continue;
-
-            const rowStatus = row.getAttribute('data-status');
-
-            if (status === 'all' || rowStatus === status) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
+        if (tab === 'available') {
+            document.querySelector('#licenses-section .sub-tab:first-child').classList.add('active');
+            document.getElementById('sub-available').classList.add('show');
+        } else {
+            document.querySelector('#licenses-section .sub-tab:last-child').classList.add('active');
+            document.getElementById('sub-purchased').classList.add('show');
         }
 
-        const tbody = table.querySelector('tbody');
-        const noResultsRow = document.getElementById('requests-no-results');
-
-        if (visibleCount === 0) {
-            if (!noResultsRow) {
-                const newRow = tbody.insertRow(0);
-                newRow.id = 'requests-no-results';
-                newRow.className = 'no-results';
-                const cell = newRow.insertCell(0);
-                cell.colSpan = 7;
-                cell.innerHTML = '<i class="fas fa-filter"></i><br>Нет заявок с выбранным статусом';
-                cell.style.textAlign = 'center';
-                cell.style.padding = '40px';
-            }
-        } else if (noResultsRow) {
-            noResultsRow.remove();
-        }
-
-        updateTableCount('requests', visibleCount);
+        applyLicensesFilter();
     }
 
-    function clearRequestFilters() {
-        const searchInput = document.getElementById('requests-search');
-        if (searchInput) {
-            searchInput.value = '';
-        }
+    // Expiring licenses filters
+    let currentExpiringSoftwareFilter = 'all';
 
-        document.querySelectorAll('#requests-section .filter-option').forEach(opt => {
-            opt.classList.remove('active');
-        });
-        document.querySelector('#requests-section .filter-option:first-child').classList.add('active');
-
-        const table = document.getElementById('requests-table');
-        const rows = table.getElementsByTagName('tr');
-        for (let i = 1; i < rows.length; i++) {
-            rows[i].style.display = '';
-        }
-
-        const noResultsRow = document.getElementById('requests-no-results');
-        if (noResultsRow) noResultsRow.remove();
-
-        updateTableCount('requests');
+    function filterExpiringLicenses() {
+        const select = document.getElementById('expiring-software-filter-select');
+        currentExpiringSoftwareFilter = select.value;
+        filterExpiringTable();
     }
 
-    function updateTableCount(tableId, visibleCount = null) {
-        const table = document.getElementById(`${tableId}-table`);
-        if (!table) return;
-
-        const tbody = table.querySelector('tbody');
-        const rows = tbody ? tbody.getElementsByTagName('tr') : [];
-        let total = 0;
-
-        for (let i = 0; i < rows.length; i++) {
-            if (!rows[i].classList.contains('no-results')) {
-                total++;
-            }
+    function filterExpiringTable() {
+        const state = paginationState['expiring'];
+        if (!state) {
+            initPaginationForTable('expiring');
         }
 
-        if (visibleCount === null) {
-            visibleCount = 0;
-            for (let i = 0; i < rows.length; i++) {
-                if (rows[i].style.display !== 'none' && !rows[i].classList.contains('no-results')) {
-                    visibleCount++;
+        const searchInput = document.getElementById('expiring-search');
+        const searchTerm = searchInput ? searchInput.value : '';
+        const stateObj = paginationState['expiring'];
+
+        if (stateObj && stateObj.lastSearchTerm !== searchTerm) {
+            stateObj.currentPage = 1;
+            stateObj.lastSearchTerm = searchTerm;
+        }
+
+        let filtered = getAllRows('expiring');
+
+        if (currentExpiringSoftwareFilter !== 'all') {
+            filtered = filtered.filter(row => {
+                const rowSoftwareId = row.getAttribute('data-software-id');
+                return rowSoftwareId == currentExpiringSoftwareFilter;
+            });
+        }
+
+        if (searchTerm && searchTerm.trim() !== '') {
+            const filterLower = searchTerm.toLowerCase();
+            filtered = filtered.filter(row => {
+                const cells = row.querySelectorAll('td');
+                let textContent = '';
+                for (let j = 0; j < cells.length - 1; j++) {
+                    textContent += cells[j]?.textContent?.toLowerCase() + ' ';
                 }
-            }
+                return textContent.includes(filterLower);
+            });
         }
 
-        const statsElement = document.getElementById(`${tableId}-stats`);
-        const countElement = document.getElementById(`${tableId}-count`);
-        if (statsElement && countElement) {
-            countElement.textContent = visibleCount;
+        if (stateObj) {
+            stateObj.filteredData = filtered;
+            const countElement = document.getElementById('expiring-count');
+            if (countElement) countElement.textContent = filtered.length;
+        }
+
+        renderPage('expiring');
+    }
+
+    function resetExpiringSearch() {
+        const input = document.getElementById('expiring-search');
+        if (input) {
+            input.value = '';
+            filterExpiringTable();
         }
     }
 
-    // Функция фильтрации лицензий по названию ПО (нестрогое соответствие)
+    function clearExpiringSoftwareFilter() {
+        const select = document.getElementById('expiring-software-filter-select');
+        select.value = 'all';
+        currentExpiringSoftwareFilter = 'all';
+        filterExpiringTable();
+    }
+
+    // UI Navigation
+    function showSection(section) {
+        document.querySelectorAll('.nav-card').forEach(card => {
+            card.classList.remove('active');
+        });
+        document.getElementById(`card-${section}`).classList.add('active');
+
+        document.querySelectorAll('.table-container').forEach(container => {
+            container.classList.remove('show');
+        });
+        document.getElementById(`${section}-section`).classList.add('show');
+
+        const titles = {
+            'requests': { icon: 'fa-file-signature', name: 'Заявки на закупку' },
+            'licenses': { icon: 'fa-certificate', name: 'Реестр лицензий' },
+            'expiring': { icon: 'fa-exclamation-triangle', name: 'Истекающие лицензии' }
+        };
+
+        document.getElementById('section-icon').className = `fas ${titles[section].icon}`;
+        document.getElementById('section-name').textContent = titles[section].name;
+        document.getElementById('backButton').classList.add('show');
+
+        setTimeout(() => {
+            if (section === 'requests') {
+                initPaginationForTable('requests');
+                updateFilteredData('requests', currentStatusFilter);
+                renderPage('requests');
+            } else if (section === 'licenses') {
+                initPaginationForTable('available');
+                initPaginationForTable('purchased');
+                applyLicensesFilter();
+            } else if (section === 'expiring') {
+                initPaginationForTable('expiring');
+                filterExpiringTable();
+            }
+        }, 100);
+    }
+
+    function resetToCards() {
+        document.querySelectorAll('.table-container').forEach(container => {
+            container.classList.remove('show');
+        });
+        document.querySelectorAll('.nav-card').forEach(card => {
+            card.classList.remove('active');
+        });
+
+        document.getElementById('requests-section').classList.add('show');
+        document.getElementById('section-icon').className = 'fas fa-file-signature';
+        document.getElementById('section-name').textContent = 'Заявки на закупку';
+        document.getElementById('backButton').classList.remove('show');
+
+        setTimeout(() => {
+            initPaginationForTable('requests');
+            updateFilteredData('requests', currentStatusFilter);
+            renderPage('requests');
+        }, 100);
+    }
+
+    // Purchase and Renewal functions
     function filterLicensesSelectBySoftware(softwareName) {
         const licenseSelect = document.getElementById('licenseSelect');
 
-        // Сохраняем все оригинальные опции в атрибут, если ещё не сохранили
         if (!licenseSelect.hasAttribute('data-all-options')) {
             const options = licenseSelect.querySelectorAll('option[data-software-title]');
             const allOptions = [];
             options.forEach(option => {
-                if (option.value) { // пропускаем пустой option
+                if (option.value) {
                     allOptions.push({
                         value: option.value,
                         text: option.text,
@@ -1860,21 +2140,16 @@
             licenseSelect.setAttribute('data-all-options', JSON.stringify(allOptions));
         }
 
-        // Получаем все опции
         const allOptions = JSON.parse(licenseSelect.getAttribute('data-all-options'));
 
-        // Очищаем селект, оставляя только первый (пустой) option
         while (licenseSelect.options.length > 1) {
             licenseSelect.remove(1);
         }
 
-        // Приводим название ПО к нижнему регистру для регистронезависимого поиска
         const searchName = softwareName?.toLowerCase().trim() ?? "";
 
-        // Добавляем отфильтрованные опции
         allOptions.forEach(licenseData => {
             const licenseTitle = licenseData.softwareTitle.toLowerCase().trim();
-
             if (searchName.includes(licenseTitle)) {
                 const option = document.createElement('option');
                 option.value = licenseData.value;
@@ -1885,7 +2160,6 @@
             }
         });
 
-        // Если нет подходящих лицензий, показываем сообщение
         if (licenseSelect.options.length === 1) {
             const noOption = document.createElement('option');
             noOption.disabled = true;
@@ -1894,40 +2168,30 @@
         }
     }
 
-    // Модифицируем функцию openPurchaseModal
     function openPurchaseModal(button) {
         const requestId = button.getAttribute('data-id');
         const softwareName = button.getAttribute('data-software');
         const softwareId = button.getAttribute('data-software-id');
         const amount = button.getAttribute('data-amount');
 
-        currentRequestSoftwareId = softwareId;
-        currentRequestAmount = amount;
-
         document.getElementById('purchaseRequestId').value = requestId;
         document.getElementById('purchaseSoftware').value = softwareName;
         document.getElementById('purchaseAmount').value = amount;
 
-        // Фильтруем лицензии по названию ПО
         filterLicensesSelectBySoftware(softwareName);
 
-        // Сбрасываем выбор лицензии (устанавливаем на пустой option)
         const licenseSelect = document.getElementById('licenseSelect');
         if (licenseSelect) {
             licenseSelect.selectedIndex = 0;
         }
 
-        // Сбрасываем даты
         document.getElementById('dateBeginPicker').value = '';
         document.getElementById('dateEndPicker').value = '';
-
-        // Сбрасываем цену и скрытое поле
         document.getElementById('unitPrice').textContent = '0 ₽';
         document.getElementById('selectedAmount').textContent = amount;
         document.getElementById('totalPrice').textContent = '0 ₽';
         document.getElementById('totalCostHidden').value = '0';
 
-        // Открываем модальное окно
         document.getElementById('purchaseModal').style.display = 'flex';
     }
 
@@ -1943,8 +2207,6 @@
             document.getElementById('unitPrice').textContent = price + ' ₽';
             document.getElementById('selectedAmount').textContent = amount;
             document.getElementById('totalPrice').textContent = total + ' ₽';
-
-            // Устанавливаем значение в скрытое поле для отправки на сервер
             document.getElementById('totalCostHidden').value = total;
         } else {
             document.getElementById('unitPrice').textContent = '0 ₽';
@@ -1953,7 +2215,6 @@
         }
     }
 
-    // Модальное окно продления
     function openRenewalModal(button) {
         const licenseId = button.getAttribute('data-license-id');
         const software = button.getAttribute('data-software');
@@ -1992,23 +2253,29 @@
     }
 
     function generateReport() {
-        // Получаем userId из атрибута или из глобальной переменной
         const userId = [[${user.id}]];
         window.location.href = '/manager/report/purchases?userId=' + userId;
     }
 
-    // Инициализация
+    // Initialization
     document.addEventListener('DOMContentLoaded', function() {
         resetToCards();
 
-        setTimeout(() => {
-            updateTableCount('requests');
-            updateLicensesTableCount('available', /*[[${#lists.size(licenses)}]]*/ 0);
-            updateLicensesTableCount('purchased', /*[[${#lists.size(purchases)}]]*/ 0);
-            updateTableCount('expiring');
-        }, 200);
+        const allTableIds = ['requests', 'available', 'purchased', 'expiring'];
+        allTableIds.forEach(tableId => {
+            setTimeout(() => {
+                initPaginationForTable(tableId);
+                if (tableId === 'requests') {
+                    updateFilteredData('requests', currentStatusFilter);
+                } else if (tableId === 'available' || tableId === 'purchased') {
+                    filterLicensesTable(tableId);
+                } else if (tableId === 'expiring') {
+                    filterExpiringTable();
+                }
+                renderPage(tableId);
+            }, 100);
+        });
 
-        // Валидация дат перед отправкой
         const purchaseForm = document.getElementById('purchaseForm');
         if (purchaseForm) {
             purchaseForm.addEventListener('submit', function(e) {
@@ -2028,270 +2295,6 @@
             });
         }
     });
-
-    // Переменная для хранения текущего выбранного ПО в фильтре истекающих лицензий
-    let currentExpiringSoftwareFilter = 'all';
-
-    // Функция фильтрации истекающих лицензий
-    function filterExpiringLicenses() {
-        const select = document.getElementById('expiring-software-filter-select');
-        currentExpiringSoftwareFilter = select.value;
-        filterExpiringTable();
-    }
-
-    function filterExpiringTable() {
-        const table = document.getElementById('expiring-table');
-        if (!table) return;
-
-        const rows = table.getElementsByTagName('tr');
-        let visibleCount = 0;
-
-        // Получаем текст поиска
-        const searchInput = document.getElementById('expiring-search');
-        const searchFilter = searchInput ? searchInput.value.toLowerCase() : '';
-
-        for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            if (row.classList.contains('no-results')) continue;
-
-            let showRow = true;
-
-            // Фильтр по ПО
-            if (currentExpiringSoftwareFilter !== 'all') {
-                const rowSoftwareId = row.getAttribute('data-software-id');
-                if (rowSoftwareId != currentExpiringSoftwareFilter) {
-                    showRow = false;
-                }
-            }
-
-            // Поисковый фильтр
-            if (showRow && searchFilter) {
-                let textContent = '';
-                const cells = row.getElementsByTagName('td');
-                for (let j = 0; j < cells.length - 1; j++) {
-                    if (cells[j]) {
-                        textContent += cells[j].textContent.toLowerCase() + ' ';
-                    }
-                }
-                if (!textContent.includes(searchFilter)) {
-                    showRow = false;
-                }
-            }
-
-            if (showRow) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        }
-
-        // Проверяем, есть ли видимые строки
-        const tbody = table.querySelector('tbody');
-        const noResultsRow = document.getElementById('expiring-no-results');
-
-        if (visibleCount === 0) {
-            if (!noResultsRow) {
-                const newRow = tbody.insertRow(0);
-                newRow.id = 'expiring-no-results';
-                newRow.className = 'no-results';
-                const cell = newRow.insertCell(0);
-                cell.colSpan = table.rows[0]?.cells.length || 1;
-                cell.innerHTML = '<i class="fas fa-search"></i><br>Ничего не найдено';
-                cell.style.textAlign = 'center';
-                cell.style.padding = '40px';
-            }
-        } else if (noResultsRow) {
-            noResultsRow.remove();
-        }
-
-        // Обновляем счетчик
-        const statsElement = document.getElementById('expiring-stats');
-        const countElement = document.getElementById('expiring-count');
-        if (statsElement && countElement) {
-            countElement.textContent = visibleCount;
-        }
-    }
-
-    function resetExpiringSearch() {
-        const input = document.getElementById('expiring-search');
-        if (input) {
-            input.value = '';
-            filterExpiringTable();
-        }
-    }
-
-    function clearExpiringSoftwareFilter() {
-        // Сбрасываем фильтр по ПО
-        const select = document.getElementById('expiring-software-filter-select');
-        select.value = 'all';
-        currentExpiringSoftwareFilter = 'all';
-
-        // Применяем сброс
-        filterExpiringTable();
-    }
-
-    // Обновляем функцию showSection для корректной фильтрации истекающих лицензий
-    function showSection(section) {
-        // Обновляем активную карточку
-        document.querySelectorAll('.nav-card').forEach(card => {
-            card.classList.remove('active');
-        });
-        document.getElementById(`card-${section}`).classList.add('active');
-
-        // Показываем нужную секцию
-        document.querySelectorAll('.table-container').forEach(container => {
-            container.classList.remove('show');
-        });
-        document.getElementById(`${section}-section`).classList.add('show');
-
-        // Обновляем заголовок
-        const titles = {
-            'requests': { icon: 'fa-file-signature', name: 'Заявки на закупку' },
-            'licenses': { icon: 'fa-certificate', name: 'Реестр лицензий' },
-            'expiring': { icon: 'fa-exclamation-triangle', name: 'Истекающие лицензии' }
-        };
-
-        document.getElementById('section-icon').className = `fas ${titles[section].icon}`;
-        document.getElementById('section-name').textContent = titles[section].name;
-        document.getElementById('backButton').classList.add('show');
-
-        // Обновляем счетчики
-        setTimeout(() => {
-            if (section === 'requests') {
-                updateTableCount('requests');
-            } else if (section === 'licenses') {
-                applyLicensesFilter();
-            } else if (section === 'expiring') {
-                // Применяем фильтры при открытии секции истекающих лицензий
-                filterExpiringTable();
-            }
-        }, 100);
-    }
-
-    // Инициализация
-    document.addEventListener('DOMContentLoaded', function() {
-        resetToCards();
-
-        setTimeout(() => {
-            updateTableCount('requests');
-            updateLicensesTableCount('available', /*[[${#lists.size(licenses)}]]*/ 0);
-            updateLicensesTableCount('purchased', /*[[${#lists.size(purchases)}]]*/ 0);
-            filterExpiringTable(); // Инициализируем фильтр истекающих лицензий
-        }, 200);
-
-        // Валидация дат перед отправкой
-        const purchaseForm = document.getElementById('purchaseForm');
-        if (purchaseForm) {
-            purchaseForm.addEventListener('submit', function(e) {
-                const dateBegin = document.getElementById('dateBeginPicker').value;
-                const dateEnd = document.getElementById('dateEndPicker').value;
-
-                if (dateBegin && dateEnd) {
-                    const begin = new Date(dateBegin);
-                    const end = new Date(dateEnd);
-
-                    if (end <= begin) {
-                        e.preventDefault();
-                        alert('Дата окончания должна быть позже даты начала!');
-                        return false;
-                    }
-                }
-            });
-        }
-    });
-
-    // Фильтрация таблиц (для заявок и других таблиц)
-    function filterTable(tableId) {
-        const input = document.getElementById(`${tableId}-search`);
-        if (!input) return;
-
-        const filter = input.value.toLowerCase();
-        const table = document.getElementById(`${tableId}-table`);
-        if (!table) return;
-
-        const rows = table.getElementsByTagName('tr');
-        let visibleCount = 0;
-
-        for (let i = 1; i < rows.length; i++) {
-            const row = rows[i];
-            if (row.classList.contains('no-results')) continue;
-
-            let textContent = '';
-            const cells = row.getElementsByTagName('td');
-
-            for (let j = 0; j < cells.length - 1; j++) {
-                if (cells[j]) {
-                    textContent += cells[j].textContent.toLowerCase() + ' ';
-                }
-            }
-
-            if (textContent.includes(filter)) {
-                row.style.display = '';
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
-        }
-
-        const tbody = table.querySelector('tbody');
-        const noResultsRow = document.getElementById(`${tableId}-no-results`);
-
-        if (visibleCount === 0) {
-            if (!noResultsRow) {
-                const newRow = tbody.insertRow(0);
-                newRow.id = `${tableId}-no-results`;
-                newRow.className = 'no-results';
-                const cell = newRow.insertCell(0);
-                cell.colSpan = table.rows[0]?.cells.length || 1;
-                cell.innerHTML = '<i class="fas fa-search"></i><br>Ничего не найдено';
-                cell.style.textAlign = 'center';
-                cell.style.padding = '40px';
-            }
-        } else if (noResultsRow) {
-            noResultsRow.remove();
-        }
-
-        updateTableCount(tableId, visibleCount);
-    }
-
-    function resetSearch(tableId) {
-        const input = document.getElementById(`${tableId}-search`);
-        if (input) {
-            input.value = '';
-            filterTable(tableId);
-        }
-    }
-
-    function updateTableCount(tableId, visibleCount = null) {
-        const table = document.getElementById(`${tableId}-table`);
-        if (!table) return;
-
-        const tbody = table.querySelector('tbody');
-        const rows = tbody ? tbody.getElementsByTagName('tr') : [];
-        let total = 0;
-
-        for (let i = 0; i < rows.length; i++) {
-            if (!rows[i].classList.contains('no-results')) {
-                total++;
-            }
-        }
-
-        if (visibleCount === null) {
-            visibleCount = 0;
-            for (let i = 0; i < rows.length; i++) {
-                if (rows[i].style.display !== 'none' && !rows[i].classList.contains('no-results')) {
-                    visibleCount++;
-                }
-            }
-        }
-
-        const statsElement = document.getElementById(`${tableId}-stats`);
-        const countElement = document.getElementById(`${tableId}-count`);
-        if (statsElement && countElement) {
-            countElement.textContent = visibleCount;
-        }
-    }
 </script>
 </body>
 </html>
