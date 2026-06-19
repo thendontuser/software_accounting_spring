@@ -94,7 +94,7 @@ public class ReportService {
             for (Purchase purchase : purchases) {
                 table.addCell(new Cell().add(new Paragraph(Util.getUserInitials(purchase.getBoughtBy()))
                         .setFont(font)));
-                table.addCell(new Cell().add(new Paragraph(purchase.getBoughtAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+                table.addCell(new Cell().add(new Paragraph(formatDate(purchase.getBoughtAt()))
                         .setFont(font)));
                 table.addCell(new Cell().add(new Paragraph(purchase.getContractNumber())
                         .setFont(font)));
@@ -108,7 +108,7 @@ public class ReportService {
             document.add(table);
 
             document.add(new Paragraph("\n\nОтчет сгенерирован: " +
-                    Util.getCurrentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+                    formatDate(Util.getCurrentDate()))
                     .setFontSize(8)
                     .setTextAlignment(TextAlignment.RIGHT)
                     .setFont(font));
@@ -168,7 +168,7 @@ public class ReportService {
             }
 
             document.add(new Paragraph("\n\nОтчет сгенерирован: " +
-                    Util.getCurrentDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+                    formatDate(Util.getCurrentDate()))
                     .setFontSize(8)
                     .setTextAlignment(TextAlignment.RIGHT)
                     .setFont(font));
@@ -225,10 +225,9 @@ public class ReportService {
         for (InstallationRequest req : requests) {
             table.addCell(new Cell().add(new Paragraph(String.valueOf(i++))
                     .setFont(font)));
-            table.addCell(new Cell().add(new Paragraph(req.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+            table.addCell(new Cell().add(new Paragraph(formatDate(req.getDate()))
                     .setFont(font)));
-            table.addCell(new Cell().add(new Paragraph(req.getUser().getLastName() + " " +
-                    req.getUser().getFirstName().charAt(0) + "." + req.getUser().getPatronymic().charAt(0) + ".")
+            table.addCell(new Cell().add(new Paragraph(Util.getUserInitials(req.getUser()))
                     .setFont(font)));
             table.addCell(new Cell().add(new Paragraph(req.getSoftware().getTitle())
                     .setFont(font)));
@@ -301,12 +300,11 @@ public class ReportService {
         for (InstallationTask task : tasks) {
             table.addCell(new Cell().add(new Paragraph(String.valueOf(i++))
                     .setFont(font)));
-            table.addCell(new Cell().add(new Paragraph(task.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+            table.addCell(new Cell().add(new Paragraph(formatDate(task.getCreatedAt()))
                     .setFont(font)));
-            table.addCell(new Cell().add(new Paragraph(task.getDeadline().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+            table.addCell(new Cell().add(new Paragraph(formatDate(task.getDeadline()))
                     .setFont(font)));
-            table.addCell(new Cell().add(new Paragraph(task.getAssignedTo().getLastName() + " " +
-                    task.getAssignedTo().getFirstName().charAt(0) + "." + task.getAssignedTo().getPatronymic().charAt(0) + ".")
+            table.addCell(new Cell().add(new Paragraph(Util.getUserInitials(task.getAssignedTo()))
                     .setFont(font)));
             table.addCell(new Cell().add(new Paragraph(task.getInstallationRequest().getSoftware().getTitle()))
                     .setFont(font));
@@ -363,7 +361,7 @@ public class ReportService {
                     .setFont(font)));
             table.addCell(new Cell().add(new Paragraph("№" + inst.getDevice().getClassroom().getNumber())
                     .setFont(font)));
-            table.addCell(new Cell().add(new Paragraph(inst.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
+            table.addCell(new Cell().add(new Paragraph(formatDate(inst.getDate()))
                     .setFont(font)));
         }
 
