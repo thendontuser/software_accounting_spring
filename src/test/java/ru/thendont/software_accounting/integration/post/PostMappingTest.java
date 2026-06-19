@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.StopWatch;
 import ru.thendont.software_accounting.entity.Department;
 import ru.thendont.software_accounting.entity.User;
 import ru.thendont.software_accounting.service.DepartmentService;
@@ -28,6 +29,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class PostMappingTest {
 
     @Autowired
+    private StopWatch stopWatch;
+
+    @Autowired
     private MockMvc mockMvc;
 
     @Autowired
@@ -47,11 +51,14 @@ public class PostMappingTest {
         Department department = new Department();
         department.setTitle("new department");
 
+        stopWatch.start("POST запрос на /admin/edit/departments: ");
         mockMvc.perform(post("/admin/edit/departments")
                         .flashAttr("department", department)
                         .param("currentUserId", Long.toString(user.getId()))
                         .with(user(user.getUsername()).roles(UserRoles.ADMIN.name()))
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection());
+        stopWatch.stop();
+        System.out.println(stopWatch.prettyPrint());
     }
 }
