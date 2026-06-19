@@ -92,7 +92,7 @@ public class ReportService {
                     .setFont(font));
 
             for (Purchase purchase : purchases) {
-                table.addCell(new Cell().add(new Paragraph(Util.getUserInitials(user))
+                table.addCell(new Cell().add(new Paragraph(Util.getUserInitials(purchase.getBoughtBy()))
                         .setFont(font)));
                 table.addCell(new Cell().add(new Paragraph(purchase.getBoughtAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy")))
                         .setFont(font)));
